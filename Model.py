@@ -6,21 +6,22 @@ hours=50
 randomlist = []
 randomlist2 = []
 randomlist3 = []
-for i in range(0,hours):
-    n = random.randint(0,500)
-    randomlist.append(n)
+# for i in range(0,hours):
+#     n = random.randint(400,500)
+#     randomlist.append(n)
 
-for i in range(0,hours):
-    n = random.randint(0,200)
-    randomlist2.append(n)
+# for i in range(0,hours):
+#     n = random.randint(500,700)
+#     randomlist2.append(n)
 
-for i in range(0,hours):
-    n = random.randint(0,300)
-    randomlist3.append(n)
+# for i in range(0,hours):
+#     n = random.randint(250,300)
+#     randomlist3.append(n)
 
-node1_demands = randomlist
-node2_demands = randomlist2
-node3_demands = randomlist3
+node1_demands = [400]
+node2_demands = [400]
+node3_demands = [400]
+
 Plants = ['Plant1', 'Plant2', 'Plant3']
 def demands():
     demands_dict = {}
@@ -179,7 +180,7 @@ def sum_power_generation_rule_2(model, i,t):
 model.sum_power_generation_constraint_2 = Constraint(model.I, model.T, rule=sum_power_generation_rule_2)
 
 solver = SolverFactory('mindtpy')
-results = solver.solve(model,mip_solver='glpk', nlp_solver='ipopt',tee=True)
+results = solver.solve(model,mip_solver='gurobi', nlp_solver='ipopt',tee=True)
 
 #Results
 print(f"Objective value: {model.obj():.2f}")
