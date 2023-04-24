@@ -2,26 +2,29 @@ from pyomo.environ import *
 import math
 import random
 import matplotlib.pyplot as plt
-hours=50
+hours=10
 randomlist = []
 randomlist2 = []
 randomlist3 = []
-# for i in range(0,hours):
-#     n = random.randint(400,500)
-#     randomlist.append(n)
+for i in range(0,hours):
+    n = random.randint(1300,1900)
+    randomlist.append(n)
 
-# for i in range(0,hours):
-#     n = random.randint(500,700)
-#     randomlist2.append(n)
+for i in range(0,hours):
+    n = random.randint(500,550)
+    randomlist2.append(n)
 
-# for i in range(0,hours):
-#     n = random.randint(250,300)
-#     randomlist3.append(n)
+for i in range(0,hours):
+    n = random.randint(600,650)
+    randomlist3.append(n)
 
-node1_demands = [400]
-node2_demands = [400]
-node3_demands = [400]
 
+node1_demands = randomlist
+node2_demands = randomlist2
+node3_demands = randomlist3
+node1_costs = [1.8]*hours
+node2_costs = [1.4]*hours
+node3_costs = [1.0]*hours
 Plants = ['Plant1', 'Plant2', 'Plant3']
 def demands():
     demands_dict = {}
@@ -42,10 +45,10 @@ def gencosts():
             for p in Plants:
             # loop over time periods
                 # add demand to dictionary with node, plant, and time period as keys
-                dict[(i, p, t)] = eval(f"node{i}_demands[t-1]")
+                dict[(i, p, t)] = eval(f"node{i}_costs[t-1]")
 
     return dict
-print(demands())
+print(gencosts())
 gas_price = 49.620 # 4/4/2023 TTF market
 def CHP_feasible_area(yA):
     xA = 0
@@ -74,7 +77,7 @@ model.c = Param(model.I, model.J, initialize={
     (1, 1): 0, (2, 2): 0, (3, 3): 0  # initialize diagonal elements to zero
 })  # transmission cost from i to j
 model.p_max_plant = Param(model.I, model.Plants, initialize={
-    (1, 'Plant1'): 200, (1, 'Plant2'): 200, (1, 'Plant3'): 200,
+    (1, 'Plant1'): 1000, (1, 'Plant2'): 500, (1, 'Plant3'): 500,
     (2, 'Plant1'): 500, (2, 'Plant2'): 500, (2, 'Plant3'): 500,
     (3, 'Plant1'): 500, (3, 'Plant2'): 500, (3, 'Plant3'): 500
 })
@@ -139,35 +142,53 @@ def capacity_constraint_rule(model, i, j,t):
 
 model.capacity_constraint = Constraint(model.I, model.J, model.T, rule=capacity_constraint_rule)
 
-for t in model.T:
-    for i in model.I:
-        for p in model.Plants:
-            if (i,p) in model.CHP_Plants:
-                    model.cons.add(model.P_el[p,i,t] - model.p_max_plant[i,p] - ((model.p_max_plant[i,p]-CHP_feasible_area(model.p_max_plant[i,p])[2])/(CHP_feasible_area(model.p_max_plant[i,p])[0]-CHP_feasible_area(model.p_max_plant[i,p])[1])) * (model.p[p,i,t] - CHP_feasible_area(model.p_max_plant[i,p])[0]) <= 0)
-                    model.cons.add(model.P_el[p,i,t] - CHP_feasible_area(model.p_max_plant[i,p])[2] - ((CHP_feasible_area(model.p_max_plant[i,p])[2]-CHP_feasible_area(model.p_max_plant[i,p])[4])/(CHP_feasible_area(model.p_max_plant[i,p])[1]-CHP_feasible_area(model.p_max_plant[i,p])[3])) * (model.p[p,i,t] - CHP_feasible_area(model.p_max_plant[i,p])[1]) >= M*(model.kappa[i,p,t] - 1))
-                    model.cons.add(model.P_el[p,i,t] - CHP_feasible_area(model.p_max_plant[i,p])[4] - ((CHP_feasible_area(model.p_max_plant[i,p])[4]-CHP_feasible_area(model.p_max_plant[i,p])[6])/(CHP_feasible_area(model.p_max_plant[i,p])[3]-CHP_feasible_area(model.p_max_plant[i,p])[5])) * (model.p[p,i,t] - CHP_feasible_area(model.p_max_plant[i,p])[3]) >= M*(model.kappa[i,p,t] - 1))
-                    model.cons.add(CHP_feasible_area(model.p_max_plant[i,p])[6]*model.kappa[i,p,t] <= model.P_el[p,i,t])
-                    model.cons.add(model.P_el[p,i,t] <= model.p_max_plant[i,p]*model.kappa[i,p,t])
-                    model.cons.add(0 <= model.p[p,i,t])
-                    model.cons.add(model.p[p,i,t] <= CHP_feasible_area(model.p_max_plant[i,p])[1]*model.kappa[i,p,t])
-for t in model.T:
-    for i in model.I:
-        for p in model.Plants:
-            if (i,p) in model.HOB_Plants:
-                model.cons.add(model.P_el[p,i,t]  ==  0)
-                model.cons.add(model.p[p,i,t] <= model.p_max_plant[i,p]*model.kappa[i,p,t])
+def CHP_1(model, t, i, p):
+    return model.P_el[p,i,t] - model.p_max_plant[i,p] - ((model.p_max_plant[i,p]-CHP_feasible_area(model.p_max_plant[i,p])[2])/(CHP_feasible_area(model.p_max_plant[i,p])[0]-CHP_feasible_area(model.p_max_plant[i,p])[1])) * (model.p[p,i,t] - CHP_feasible_area(model.p_max_plant[i,p])[0]) <= 0
+model.CHP_1_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_1)
+
+def CHP_2(model, t, i, p):
+    return model.P_el[p,i,t] - CHP_feasible_area(model.p_max_plant[i,p])[2] - ((CHP_feasible_area(model.p_max_plant[i,p])[2]-CHP_feasible_area(model.p_max_plant[i,p])[4])/(CHP_feasible_area(model.p_max_plant[i,p])[1]-CHP_feasible_area(model.p_max_plant[i,p])[3])) * (model.p[p,i,t] - CHP_feasible_area(model.p_max_plant[i,p])[1]) >= M*(model.kappa[i,p,t] - 1)
+model.CHP_2_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_2)
+
+def CHP_3(model, t, i, p):
+    return model.P_el[p,i,t] - CHP_feasible_area(model.p_max_plant[i,p])[4] - ((CHP_feasible_area(model.p_max_plant[i,p])[4]-CHP_feasible_area(model.p_max_plant[i,p])[6])/(CHP_feasible_area(model.p_max_plant[i,p])[3]-CHP_feasible_area(model.p_max_plant[i,p])[5])) * (model.p[p,i,t] - CHP_feasible_area(model.p_max_plant[i,p])[3]) >= M*(model.kappa[i,p,t] - 1)
+model.CHP_3_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_3)
+
+def CHP_4(model, t, i, p):
+    return CHP_feasible_area(model.p_max_plant[i,p])[6]*model.kappa[i,p,t] <= model.P_el[p,i,t]
+model.CHP_4_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_4)
+
+def CHP_5(model, t, i, p):
+    return model.P_el[p,i,t] <= model.p_max_plant[i,p]*model.kappa[i,p,t]
+model.CHP_5_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_5)
+
+def CHP_6(model, t, i, p):
+    return 0 <= model.p[p,i,t]
+model.CHP_6_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_6)
+
+def CHP_7(model, t, i, p):
+    return model.p[p,i,t] <= CHP_feasible_area(model.p_max_plant[i,p])[1]*model.kappa[i,p,t]
+model.CHP_7_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_7)
+
+def HOB_1(model, t, i, p):
+    return model.P_el[p,i,t]  ==  0
+model.HOB_1_constraint = Constraint(model.T,model.HOB_Plants, rule=HOB_1)
+
+def HOB_2(model, t, i, p):
+    return model.p[p,i,t] <= model.p_max_plant[i,p]*model.kappa[i,p,t]
+model.HOB_2_constraint = Constraint(model.T, model.HOB_Plants, rule=HOB_2)
 
 def heatloss_constraint(model, i, j,t):
     return model.Ql[i,j,t] == ((2.0*3.14*model.k[i,j]*model.L[i,j]*(model.Ts[i,j,t]-model.Tr[i,j,t]))/math.log(model.Do[i,j]/model.Di[i,j]))/1000
 model.heatloss_constraint = Constraint(model.I, model.J, model.T, rule=heatloss_constraint)
 
-def heatlosscost_constraint_rule(model, i, j):
+def heatlosscost_constraint_rule(model, i, j, t):
     return model.CQl[i,j,t] ==model.Ql[i,j,t]*(
         sum(model.p[p,i,t]*model.c_gen[i,p,t] for p in model.Plants for t in model.T) /
         (sum(model.p[p,i,t] for p in model.Plants for t in model.T) + M * (1 - model.y[i,t]))
     )
 
-model.heatlosscost_constraint = Constraint(model.I, model.J, rule=heatlosscost_constraint_rule)
+model.heatlosscost_constraint = Constraint(model.I, model.J, model.T, rule=heatlosscost_constraint_rule)
 
 def sum_power_generation_rule(model, i,t):
     return sum(model.p[p,i,t] for p in model.Plants) <= M* model.y[i,t]
@@ -178,9 +199,9 @@ def sum_power_generation_rule_2(model, i,t):
     return sum(model.p[p,i,t] for p in model.Plants) >= epsilon * model.y[i,t]
 
 model.sum_power_generation_constraint_2 = Constraint(model.I, model.T, rule=sum_power_generation_rule_2)
-
+model.write('test.nl')
 solver = SolverFactory('mindtpy')
-results = solver.solve(model,mip_solver='gurobi', nlp_solver='ipopt',tee=True)
+results = solver.solve(model,mip_solver='glpk', nlp_solver='ipopt',tee=True)
 
 #Results
 print(f"Objective value: {model.obj():.2f}")
