@@ -2,12 +2,12 @@ from pyomo.environ import *
 import math
 import random
 import matplotlib.pyplot as plt
-hours=10
+hours=200
 randomlist = []
 randomlist2 = []
 randomlist3 = []
 for i in range(0,hours):
-    n = random.randint(1300,1900)
+    n = random.randint(1300,1320)
     randomlist.append(n)
 
 for i in range(0,hours):
@@ -200,8 +200,9 @@ def sum_power_generation_rule_2(model, i,t):
 
 model.sum_power_generation_constraint_2 = Constraint(model.I, model.T, rule=sum_power_generation_rule_2)
 model.write('test.nl')
-solver = SolverFactory('mindtpy')
-results = solver.solve(model,mip_solver='glpk', nlp_solver='ipopt',tee=True)
+solver = SolverFactory('mindtpy');
+
+results = solver.solve(model,mip_solver='gurobi', nlp_solver='ipopt', time_limit=3600, tee=True, mip_solver_tee=True, nlp_solver_tee=True, mip_solver_mipgap=0.1)
 
 #Results
 print(f"Objective value: {model.obj():.2f}")
