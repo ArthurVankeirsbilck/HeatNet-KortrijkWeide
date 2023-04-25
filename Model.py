@@ -205,84 +205,84 @@ results = solver.solve(model,mip_solver='gurobi', nlp_solver='ipopt', time_limit
 
 #Results
 print(f"Objective value: {model.obj():.2f}")
-for t in model.T:
-    for i in model.I:
-        for j in model.J:
-            if model.x[i, j,t]() > 0:
-                print(f"From node {j} to node {i} at {t}: {model.x[i,j,t]():.2f} MWh")
+# for t in model.T:
+#     for i in model.I:
+#         for j in model.J:
+#             if model.x[i, j,t]() > 0:
+#                 print(f"From node {j} to node {i} at {t}: {model.x[i,j,t]():.2f} MWh")
 
-transmissions = {}
-for i in model.I:
-    for j in model.J:
-        if i==j:
-            pass
-        transmissions[(i,j)] = []
-        for t in model.T:
-            if model.x[i, j, t]() > 0:
-                transmissions[(i,j)].append(model.x[i, j, t]())
-            else:
-                transmissions[(i,j)].append(0)
-print(transmissions)
-# create the plot
-fig, ax = plt.subplots()
-ax.set_xlabel('Time')
-ax.set_ylabel('Transmitted power (MWh)')
-ax.set_title('Transmissions from all nodes')
+# transmissions = {}
+# for i in model.I:
+#     for j in model.J:
+#         if i==j:
+#             pass
+#         transmissions[(i,j)] = []
+#         for t in model.T:
+#             if model.x[i, j, t]() > 0:
+#                 transmissions[(i,j)].append(model.x[i, j, t]())
+#             else:
+#                 transmissions[(i,j)].append(0)
+# print(transmissions)
+# # create the plot
+# fig, ax = plt.subplots()
+# ax.set_xlabel('Time')
+# ax.set_ylabel('Transmitted power (MWh)')
+# ax.set_title('Transmissions from all nodes')
 
-# plot each transmission
-for i in model.I:
-    for j in model.J:
-        if i != j and transmissions[(i,j)]:
-            ax.plot(model.T, transmissions[(i,j)], label=f'From node {j} to node {i}')
+# # plot each transmission
+# for i in model.I:
+#     for j in model.J:
+#         if i != j and transmissions[(i,j)]:
+#             ax.plot(model.T, transmissions[(i,j)], label=f'From node {j} to node {i}')
 
 
-ax.legend()
-plt.show()
+# ax.legend()
+# plt.show()
 
-print("Production:")
-for t in model.T:
-    for i in model.I:
-        for p in model.Plants:
-            if model.p[p,i,t]() > 0:
-                print(f"At node {i} at pp {p} at {t}: {model.p[p,i,t]():.2f} MWh")
-            if model.P_el[p,i,t].value > 0:
-                print(f"At node {i} at pp {p} (ELEC) at {t}: {model.P_el[p,i,t].value:.2f} MWh")
+# print("Production:")
+# for t in model.T:
+#     for i in model.I:
+#         for p in model.Plants:
+#             if model.p[p,i,t]() > 0:
+#                 print(f"At node {i} at pp {p} at {t}: {model.p[p,i,t]():.2f} MWh")
+#             if model.P_el[p,i,t].value > 0:
+#                 print(f"At node {i} at pp {p} (ELEC) at {t}: {model.P_el[p,i,t].value:.2f} MWh")
 
-production = {}
-for p in model.Plants:
-    for i in model.I:
-        production[(p,i)] = []
+# production = {}
+# for p in model.Plants:
+#     for i in model.I:
+#         production[(p,i)] = []
 
-for t in model.T:
-    for i in model.I:
-        for p in model.Plants:
-            if model.p[p,i,t]() > 0:
-                production[(p,i)].append(model.p[p,i,t]())
-            else:
-                production[(p,i)].append(0)
+# for t in model.T:
+#     for i in model.I:
+#         for p in model.Plants:
+#             if model.p[p,i,t]() > 0:
+#                 production[(p,i)].append(model.p[p,i,t]())
+#             else:
+#                 production[(p,i)].append(0)
 
-fig, ax = plt.subplots()
-for p in model.Plants:
-    for i in model.I:
-        ax.plot(model.T, production[(p,i)], label=f'PP {p} - Node {i}')
-ax.set_xlabel('Time')
-ax.set_ylabel('Production (MWh)')
-ax.set_title('Production for all Power Plants and Nodes')
-ax.legend()
-plt.show()
-print("Generation costs:")
-for t in model.T:
-    for i in model.I:
-        for p in model.Plants:
-            if model.p[p,i,t].value > 0:
-                print(f"At node {i} at pp {p}: {model.p[p,i,t].value*model.c_gen[i,p,t]:.2f} $")
+# fig, ax = plt.subplots()
+# for p in model.Plants:
+#     for i in model.I:
+#         ax.plot(model.T, production[(p,i)], label=f'PP {p} - Node {i}')
+# ax.set_xlabel('Time')
+# ax.set_ylabel('Production (MWh)')
+# ax.set_title('Production for all Power Plants and Nodes')
+# ax.legend()
+# plt.show()
+# print("Generation costs:")
+# for t in model.T:
+#     for i in model.I:
+#         for p in model.Plants:
+#             if model.p[p,i,t].value > 0:
+#                 print(f"At node {i} at pp {p}: {model.p[p,i,t].value*model.c_gen[i,p,t]:.2f} $")
 
-print("Transmission costs:")
-for t in model.T:
-    for i in model.I:
-        for j in model.J:
-            if model.x[i, j,t]() > 0:
-                print(f"From node {j} to node {i}: {model.x[i,j,t].value*model.c[i, j]:.2f} $")
+# print("Transmission costs:")
+# for t in model.T:
+#     for i in model.I:
+#         for j in model.J:
+#             if model.x[i, j,t]() > 0:
+#                 print(f"From node {j} to node {i}: {model.x[i,j,t].value*model.c[i, j]:.2f} $")
 
 # print("Heatloss cost:")
 # for t in model.T:
