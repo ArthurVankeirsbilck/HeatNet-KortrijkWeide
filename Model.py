@@ -201,7 +201,7 @@ def sum_power_generation_rule_2(model, i,t):
 model.sum_power_generation_constraint_2 = Constraint(model.I, model.T, rule=sum_power_generation_rule_2)
 solver = SolverFactory('mindtpy');
 
-results = solver.solve(model,mip_solver='gurobi', nlp_solver='ipopt', time_limit=3600, tee=True, mip_solver_tee=True, nlp_solver_tee=True, mip_solver_args={"warmstart":True})
+results = solver.solve(model,mip_solver='gurobi', nlp_solver='ipopt', time_limit=3600, mip_solver_tee=True, nlp_solver_tee=True, mip_solver_args={"warmstart":True})
 
 #Results
 print(f"Objective value: {model.obj():.2f}")
