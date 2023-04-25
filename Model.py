@@ -2,6 +2,7 @@ from pyomo.environ import *
 import math
 import random
 import matplotlib.pyplot as plt
+random.seed(10)
 hours=40
 randomlist = []
 randomlist2 = []
@@ -198,7 +199,6 @@ def sum_power_generation_rule_2(model, i,t):
     return sum(model.p[p,i,t] for p in model.Plants) >= epsilon * model.y[i,t]
 
 model.sum_power_generation_constraint_2 = Constraint(model.I, model.T, rule=sum_power_generation_rule_2)
-model.write('test.nl')
 solver = SolverFactory('mindtpy');
 
 results = solver.solve(model,mip_solver='gurobi', nlp_solver='ipopt', time_limit=3600, tee=True, mip_solver_tee=True, nlp_solver_tee=True, mip_solver_args={"warmstart":True})
