@@ -2,7 +2,7 @@ from pyomo.environ import *
 import math
 import random
 import matplotlib.pyplot as plt
-hours=200
+hours=40
 randomlist = []
 randomlist2 = []
 randomlist3 = []
@@ -108,18 +108,17 @@ model.Do = Param(model.I, model.J, initialize={(1, 2): 0.4, (1, 3): 0.3, (2, 1):
 model.Di = Param(model.I, model.J, initialize={(1, 2): 0.3, (1, 3): 0.2, (2, 1): 0.3, (2, 3): 0.3, (3, 1): 0.2, (3, 2): 0.3,(1, 1): 0.1, (2, 2): 0.1, (3, 3): 0.1})
 model.cons = ConstraintList()
 # variables
-model.x = Var(model.I, model.J, model.T, bounds=(0, None),)  # power transmission from i to j
-model.p = Var(model.Plants, model.I, model.T, bounds=(0, None))  # production at node i
+model.x = Var(model.I, model.J, model.T, bounds=(0, 2000),)  # power transmission from i to j
+model.p = Var(model.Plants, model.I, model.T, bounds=(0, 2000))  # production at node i
 model.mean_c = Var()  # mean transmission cost
-model.CQl = Var(model.I, model.J, model.T, bounds=(0, None))
-model.Ql = Var(model.I, model.J, model.T, bounds=(0, None))
+model.CQl = Var(model.I, model.J, model.T, bounds=(0, 20000))
+model.Ql = Var(model.I, model.J, model.T, bounds=(0, 20000))
 model.z = Var(model.I, model.J, model.T, domain=Binary)
-model.demand_plus_loss = Var(model.I, bounds=(0, None))
 model.Ts = Var(model.I, model.J, model.T, bounds=(60, 120))
 model.Tr = Var(model.I, model.J, model.T, bounds=(30, 50))
 model.y = Var(model.I, model.T, domain=Binary)
-model.massflow = Var(model.I, model.J, model.T, bounds=(0, None))
-model.P_el = Var(model.Plants, model.I, model.T, bounds=(0, None))
+model.massflow = Var(model.I, model.J, model.T, bounds=(0, 20))
+model.P_el = Var(model.Plants, model.I, model.T, bounds=(0, 2000))
 model.kappa = Var(model.I, model.Plants, model.T, domain=Binary)
 M = 10000000
 epsilon = 0.0000001
@@ -202,7 +201,7 @@ model.sum_power_generation_constraint_2 = Constraint(model.I, model.T, rule=sum_
 model.write('test.nl')
 solver = SolverFactory('mindtpy');
 
-results = solver.solve(model,mip_solver='gurobi', nlp_solver='ipopt', time_limit=3600, tee=True, mip_solver_tee=True, nlp_solver_tee=True, mip_solver_mipgap=0.1)
+results = solver.solve(model,mip_solver='gurobi', nlp_solver='ipopt', time_limit=3600, tee=True, mip_solver_tee=True, nlp_solver_tee=True, mip_solver_args={"warmstart":True})
 
 #Results
 print(f"Objective value: {model.obj():.2f}")
