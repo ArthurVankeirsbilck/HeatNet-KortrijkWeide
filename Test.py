@@ -16,7 +16,7 @@ model.c = Param(model.I, model.J, initialize={
     (1, 1): 0, (2, 2): 0, (3, 3): 0  # initialize diagonal elements to zero
 })  # transmission cost from i to j
 model.p_max_plant = Param(model.I, model.Plants, initialize={
-    (1, 'Plant1'): 1500, (1, 'Plant2'): 300, (1, 'Plant3'): 0,
+    (1, 'Plant1'): 300, (1, 'Plant2'): 300, (1, 'Plant3'): 0,
     (2, 'Plant1'): 300, (2, 'Plant2'): 300, (2, 'Plant3'): 0,
     (3, 'Plant1'): 800, (3, 'Plant2'): 300, (3, 'Plant3'): 300
 })
@@ -38,7 +38,7 @@ Cp=4.18
 massflow = 2.4
 
 model.u = Param(model.I, model.J, initialize={(1, 2): M, (1, 3): M, (2, 1): M, (2, 3): M, (3, 1): M, (3, 2): M, (1, 1): 0, (2, 2): 0, (3, 3): 0})  # transmission capacity limit from i to j
-model.d = Param(model.I, initialize={1: 1500, 2: 200, 3: 400})  # net supply (supply - demand) in node i
+model.d = Param(model.I, initialize={1: 800, 2: 0, 3: 400})  # net supply (supply - demand) in node i
 # model.p_max = Param(model.I, initialize={1: 0, 2: 2000, 3: 0})  # maximum production capacity at node i
 # model.c_gen = Param(model.I, initialize={1: 30, 2: 10, 3: 30}) # generation cost at node i
 model.c_gen = Param(model.I, model.Plants, initialize={
@@ -80,10 +80,10 @@ def heat_flow_constraint(model, i, j):
 
 model.heat_flow_constraint = Constraint(model.I, model.J, rule=heat_flow_constraint)
 
-# def capacity_constraint_rule(model, i, j):
-#     return model.x[i, j] <= model.u[i, j]*model.z[i,j]
+def capacity_constraint_rule(model, i, j):
+    return model.x[i, j] <= model.u[i, j]*model.z[i,j]
 
-# model.capacity_constraint = Constraint(model.I, model.J, rule=capacity_constraint_rule)
+model.capacity_constraint = Constraint(model.I, model.J, rule=capacity_constraint_rule)
 
 def production_constraint_rule(model, i, p):
     return model.p[p,i] <= model.p_max_plant[i,p]
