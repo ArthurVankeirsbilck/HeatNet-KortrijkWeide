@@ -2,7 +2,7 @@ from pyomo.environ import *
 import math
 import random
 random.seed(10)
-hours=1
+hours=100
 randomlist = []
 randomlist2 = []
 randomlist3 = []
@@ -162,36 +162,36 @@ solver = SolverFactory("octeract");
 results = solver.solve(model, tee=True)
 
 print(f"Objective value: {model.obj():.2f}")
-for i in model.I:
-    for j in model.J:
-        if model.x[i, j]() > 0:
-            print(f"From node {j} to node {i}: {model.x[i, j]():.2f} MWh")
-print("Production:")
-for i in model.I:
-    for p in model.Plants:
-        if model.p[p,i]() > 0:
-            print(f"At node {i} at pp {p}: {model.p[p,i]():.2f} MWh")
+# for i in model.I:
+#     for j in model.J:
+#         if model.x[i, j]() > 0:
+#             print(f"From node {j} to node {i}: {model.x[i, j]():.2f} MWh")
+# print("Production:")
+# for i in model.I:
+#     for p in model.Plants:
+#         if model.p[p,i]() > 0:
+#             print(f"At node {i} at pp {p}: {model.p[p,i]():.2f} MWh")
 
-print("Generation costs:")
-for i in model.I:
-    for p in model.Plants:
-        if model.p[p,i].value > 0:
-            print(f"At node {i} at pp {p}: {model.p[p,i].value*model.c_gen[i,p]:.2f} $")
+# print("Generation costs:")
+# for i in model.I:
+#     for p in model.Plants:
+#         if model.p[p,i].value > 0:
+#             print(f"At node {i} at pp {p}: {model.p[p,i].value*model.c_gen[i,p]:.2f} $")
 
-print("Transmission costs:")
-for i in model.I:
-    for j in model.J:
-        if model.x[i, j]() > 0:
-            print(f"From node {j} to node {i}: {model.x[i, j].value*model.c[i, j]:.2f} $")
+# print("Transmission costs:")
+# for i in model.I:
+#     for j in model.J:
+#         if model.x[i, j]() > 0:
+#             print(f"From node {j} to node {i}: {model.x[i, j].value*model.c[i, j]:.2f} $")
 
-print("Temps:")
-for i in model.I:
-    for j in model.J:
-        if i == j:
-            pass
-        else:
-            if model.Tr[i,j].value > 0:
-                print("Supply-Return temp {} -> {}: {} <-> {}°C".format(j,i,model))
+# print("Temps:")
+# for i in model.I:
+#     for j in model.J:
+#         if i == j:
+#             pass
+#         else:
+#             if model.Tr[i,j].value > 0:
+#                 print("Supply-Return temp {} -> {}: {} <-> {}°C".format(j,i,model))
 
 # print("Massflows:")
 # for i in model.I:
