@@ -8,7 +8,7 @@ hours=20
 randomlist = []
 randomlist2 = []
 randomlist3 = []
-#Aanpassen nummers, numerical instability due to big numbers
+#Aanpassen nummers, numerical instability due to big
 for i in range(0,hours):
     n = random.randint(1300,1320)
     randomlist.append(n)
