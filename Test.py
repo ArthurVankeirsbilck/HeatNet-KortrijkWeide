@@ -1,14 +1,63 @@
 from pyomo.environ import *
 import math
-gas_price = 49.620 # 4/4/2023 TTF market
-#Powerplants in the system
+
+random.seed(10)
+hours=1
+randomlist = []
+randomlist2 = []
+randomlist3 = []
+#Aanpassen nummers, numerical instability due to big
+for i in range(0,hours):
+    n = random.randint(1300,1320)
+    randomlist.append(n)
+
+for i in range(0,hours):
+    n = random.randint(500,550)
+    randomlist2.append(n)
+
+for i in range(0,hours):
+    n = random.randint(600,650)
+    randomlist3.append(n)
+
+
+node1_demands = randomlist
+node2_demands = randomlist2
+node3_demands = randomlist3
+node1_costs = [1.8]*hours
+node2_costs = [1.4]*hours
+node3_costs = [1.0]*hours
+Plants = ['Plant1', 'Plant2', 'Plant3']
+def demands():
+    demands_dict = {}
+    #nodes
+    for i in range(1, 4):
+        #time periods
+        for t in range(0, len(node1_demands)+1):
+            # add demand to dictionary with node and time period as keys
+            demands_dict[(i, t)] = eval(f"node{i}_demands[t-1]")
+    return demands_dict
+
+def gencosts():
+    dict = {}
+    # loop over nodes
+    for i in range(1, 4):
+        # loop over plants
+        for t in range(0, len(node1_demands)+1):
+            for p in Plants:
+            # loop over time periods
+                # add demand to dictionary with node, plant, and time period as keys
+                dict[(i, p, t)] = eval(f"node{i}_costs[t-1]")
+    return dict
+print(gencosts())
+
+times = list(range(T))
 # create model object
 model = ConcreteModel()
-
 # sets
+model.T = Set(initialize=times)
 model.I = Set(initialize=[1, 2, 3])  # set of nodes
 model.J = Set(initialize=[1, 2, 3])  # set of nodes
-model.Plants = Set(initialize=['Plant1', 'Plant2', 'Plant3'])
+model.Plants = Set(initialize=Plants)
 
 # parameters
 model.c = Param(model.I, model.J, initialize={
@@ -16,83 +65,79 @@ model.c = Param(model.I, model.J, initialize={
     (1, 1): 0, (2, 2): 0, (3, 3): 0  # initialize diagonal elements to zero
 })  # transmission cost from i to j
 model.p_max_plant = Param(model.I, model.Plants, initialize={
-    (1, 'Plant1'): 300, (1, 'Plant2'): 300, (1, 'Plant3'): 0,
-    (2, 'Plant1'): 300, (2, 'Plant2'): 300, (2, 'Plant3'): 0,
-    (3, 'Plant1'): 800, (3, 'Plant2'): 300, (3, 'Plant3'): 300
+    (1, 'Plant1'): 1000, (1, 'Plant2'): 500, (1, 'Plant3'): 500,
+    (2, 'Plant1'): 500, (2, 'Plant2'): 500, (2, 'Plant3'): 500,
+    (3, 'Plant1'): 500, (3, 'Plant2'): 500, (3, 'Plant3'): 500
 })
 
 model.CHP_Plants = Set(within=model.I * model.Plants, initialize={
     (1, 'Plant1'), (1, 'Plant3'),
     (2, 'Plant1'), 
     (3, 'Plant1'), (3, 'Plant3')
+    # (1, 'Plant1')
 })
 
 model.HOB_Plants = Set(within=model.I * model.Plants, initialize={
-    (1, 'Plant2'),
-    (2, 'Plant2'),
-    (3, 'Plant2')
+    (1, 'Plant2'), (2, 'Plant2'), (2, 'Plant3'), (3, 'Plant2')
 })
 
-M=500
+M=8000
 Cp=4.18
-massflow = 2.4
+P_elec = 0.4 #Wordt aangeleverd door Jurgen
+# massflow = 2.4
 
 model.u = Param(model.I, model.J, initialize={(1, 2): M, (1, 3): M, (2, 1): M, (2, 3): M, (3, 1): M, (3, 2): M, (1, 1): 0, (2, 2): 0, (3, 3): 0})  # transmission capacity limit from i to j
-model.d = Param(model.I, initialize={1: 1400, 2: 0, 3: 400})  # net supply (supply - demand) in node i
-# model.p_max = Param(model.I, initialize={1: 0, 2: 2000, 3: 0})  # maximum production capacity at node i
-# model.c_gen = Param(model.I, initialize={1: 30, 2: 10, 3: 30}) # generation cost at node i
-model.c_gen = Param(model.I, model.Plants, initialize={
-    (1, 'Plant1'): 30, (1, 'Plant2'): 30, (1, 'Plant3'): 30,
-    (2, 'Plant1'): 10, (2, 'Plant2'): 30, (2, 'Plant3'): 15,
-    (3, 'Plant1'): 30, (3, 'Plant2'): 30, (3, 'Plant3'): 30
-})
+model.d = Param(model.I, model.T, initialize=demands())  # net supply (supply - demand) in node i
+model.c_gen = Param(model.I, model.Plants, model.T, initialize=gencosts())
 
-model.k = Param(model.I, model.J, initialize={(1, 2): 0.1, (1, 3): 0.2, (2, 1): 0.1, (2, 3): 0.3, (3, 1): 0.2, (3, 2): 0.3,(1, 1): 0, (2, 2): 0, (3, 3): 0})
-model.L = Param(model.I, model.J, initialize={(1, 2): 10, (1, 3): 20, (2, 1): 10, (2, 3): 30, (3, 1): 20, (3, 2): 30,(1, 1): 0, (2, 2): 0, (3, 3): 0})
-model.Do = Param(model.I, model.J, initialize={(1, 2): 0.2, (1, 3): 0.3, (2, 1): 0.2, (2, 3): 0.4, (3, 1): 0.3, (3, 2): 0.4,(1, 1): 0.4, (2, 2): 0.4, (3, 3): 0.4})
-model.Di = Param(model.I, model.J, initialize={(1, 2): 0.1, (1, 3): 0.2, (2, 1): 0.1, (2, 3): 0.3, (3, 1): 0.2, (3, 2): 0.3,(1, 1): 0.1, (2, 2): 0.1, (3, 3): 0.1})
-
+model.k = Param(model.I, model.J, initialize={(1, 2): 0.3, (1, 3): 0.2, (2, 1): 0.3, (2, 3): 0.3, (3, 1): 0.2, (3, 2): 0.3,(1, 1): 0, (2, 2): 0, (3, 3): 0})
+model.L = Param(model.I, model.J, initialize={(1, 2): 30, (1, 3): 20, (2, 1): 30, (2, 3): 30, (3, 1): 20, (3, 2): 30,(1, 1): 0, (2, 2): 0, (3, 3): 0})
+model.Do = Param(model.I, model.J, initialize={(1, 2): 0.4, (1, 3): 0.3, (2, 1): 0.4, (2, 3): 0.4, (3, 1): 0.3, (3, 2): 0.4,(1, 1): 0.4, (2, 2): 0.4, (3, 3): 0.4})
+model.Di = Param(model.I, model.J, initialize={(1, 2): 0.3, (1, 3): 0.2, (2, 1): 0.3, (2, 3): 0.3, (3, 1): 0.2, (3, 2): 0.3,(1, 1): 0.1, (2, 2): 0.1, (3, 3): 0.1})
+model.cons = ConstraintList()
 # variables
-model.x = Var(model.I, model.J, bounds=(0, None))  # power transmission from i to j
-model.p = Var(model.Plants, model.I, bounds=(0, None))  # production at node i
-model.CQl = Var(model.I, model.J, bounds=(0, None))
-model.Ql = Var(model.I, model.J, bounds=(0, None))
-model.z = Var(model.I, model.J, domain=Binary)
-model.demand_plus_loss = Var(model.I, bounds=(0, None))
-model.Ts = Var(model.I, model.J, bounds=(60, 150))
-model.Tr = Var(model.I, model.J, bounds=(50, 150))
-model.y = Var(model.I, domain=Binary)
-model.massflow = Var(model.I, model.J, bounds=(0, 20))
-M = 10000
-epsilon = 0.0001
-massflow:2.4
+model.x = Var(model.I, model.J, model.T, bounds=(0, None))  # power transmission from i to j
+model.p = Var(model.Plants, model.I, model.T, bounds=(0, None))  # production at node i
+model.mean_c = Var()  # mean transmission cost
+model.CQl = Var(model.I, model.J, model.T, bounds=(0, None))
+model.Ql = Var(model.I, model.J, model.T, bounds=(0, None))
+model.z = Var(model.I, model.J, model.T, domain=Binary)
+model.Ts = Var(model.I, model.J, model.T, bounds=(60, 120))
+model.Tr = Var(model.I, model.J, model.T, bounds=(30, 50))
+model.y = Var(model.I, model.T, domain=Binary)
+model.massflow = Var(model.I, model.J, model.T, bounds=(0, None))
+model.P_el = Var(model.Plants, model.I, model.T, bounds=(0, None))
+model.kappa = Var(model.I, model.Plants, model.T, domain=Binary)
+M = 10000000
+epsilon = 0.0000001
+
 # objective
 model.obj = Objective(
-    expr=summation(model.c, model.x) + sum(model.c_gen[i,p]*model.p[p,i] for p in model.Plants for i in model.I), sense=minimize)
+    expr=sum(model.c[i,j]*model.x[i,j,t] for j in model.J for i in model.I for t in model.T) + sum(model.c_gen[i,p]*model.p[p,i] for p in model.Plants for i in model.I), sense=minimize)
 
-def balance_constraint_rule(model, i,j):
-    return sum(model.x[i, j] - model.x[j, i] for j in model.J) + sum(model.p[p,i] for p in model.Plants) == model.d[i]
+def balance_constraint_rule(model, i,j,t):
+    return sum(model.x[i, j, t] - model.x[j, i, t] for j in model.J) + sum(model.p[p,i,t] for p in model.Plants) == model.d[i,t]
 
-model.balance_constraint = Constraint(model.I, model.J, rule=balance_constraint_rule)
+model.balance_constraint = Constraint(model.I, model.J, model.T , rule=balance_constraint_rule)
 
-def heat_flow_constraint(model, i, j):
-    return Cp*model.massflow[i,j]*(model.Ts[i,j]-model.Tr[i,j]) == model.d[i]
+def heat_flow_constraint(model, i, j,t):
+    return Cp*model.massflow[i,j,t]*(model.Ts[i,j,t]-model.Tr[i,j,t]) == model.d[i,t]
 
-model.heat_flow_constraint = Constraint(model.I, model.J, rule=heat_flow_constraint)
+model.heat_flow_constraint = Constraint(model.I, model.J, model.T, rule=heat_flow_constraint)
 
-def capacity_constraint_rule(model, i, j):
-    return model.x[i, j] <= model.u[i, j]*model.z[i,j]
+def capacity_constraint_rule(model, i, j,t):
+    return model.x[i, j,t] <= model.u[i, j]*model.z[i,j,t]
 
-model.capacity_constraint = Constraint(model.I, model.J, rule=capacity_constraint_rule)
+model.capacity_constraint = Constraint(model.I, model.J, model.T, rule=capacity_constraint_rule)
 
-def production_constraint_rule(model, i, p):
-    return model.p[p,i] <= model.p_max_plant[i,p]
+def production_constraint_rule(model, i, p ,t):
+    return model.p[p,i,t] <= model.p_max_plant[i,p]
 
-model.production_constraint = Constraint(model.I, model.Plants, rule=production_constraint_rule)
+model.production_constraint = Constraint(model.I, model.Plants, model.T, rule=production_constraint_rule)
 
-def heatloss_constraint(model, i, j):
-    return model.Ql[i,j] == (((2.0*3.14*model.k[i,j]*model.L[i,j]*(model.Ts[i,j]-model.Tr[i,j]))/math.log(model.Do[i,j]/model.Di[i,j]))/1000)*model.z[i,j]
-model.heatloss_constraint = Constraint(model.I, model.J, rule=heatloss_constraint)
+# def heatloss_constraint(model, i, j):
+#     return model.Ql[i,j] == (((2.0*3.14*model.k[i,j]*model.L[i,j]*(model.Ts[i,j]-model.Tr[i,j]))/math.log(model.Do[i,j]/model.Di[i,j]))/1000)*model.z[i,j]
+# model.heatloss_constraint = Constraint(model.I, model.J, rule=heatloss_constraint)
 
 
 # def heatlosscost_constraint_rule(model, i, j):
