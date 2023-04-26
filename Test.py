@@ -1,6 +1,18 @@
 from pyomo.environ import *
 import math
 import random
+
+def CHP_feasible_area(yA):
+    xA = 0
+    xB = round(yA*(180/247))
+    yB = round(yA*(215/247))
+    xC = round(yA*(104.8/247))
+    yC = round(yA*(81/247))
+    xD = 0
+    yD = round(yA*(81/247));
+
+    return xA, xB, yB, xC, yC, xD, yD
+
 random.seed(10)
 hours=10
 randomlist = []
