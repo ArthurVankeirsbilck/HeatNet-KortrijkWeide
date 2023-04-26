@@ -148,6 +148,3 @@ for i in model.I:
                 print("Supply-Return temp {} -> {}: {} <-> {}°C".format(j,i,model.Ts[i,j].value,model.Tr[i,j].value))
 
 print("Massflows:")
-for i in model.I:
-    for j in model.J:
-        print("From node {j} to node {i}:".format(model.massflow[i,j]))
