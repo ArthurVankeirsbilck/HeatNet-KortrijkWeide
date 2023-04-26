@@ -150,8 +150,4 @@ for i in model.I:
 print("Massflows:")
 for i in model.I:
     for j in model.J:
-        if i == j:
-            pass
-        else:
-            if model.massflow[i,j].value > 0:
-                print("From node {j} to node {i}:".format(model.massflow[i,j]))
+        print("From node {j} to node {i}:".format(model.massflow[i,j]))
