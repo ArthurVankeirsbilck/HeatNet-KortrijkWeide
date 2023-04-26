@@ -15,13 +15,13 @@ def CHP_feasible_area(yA):
     return xA, xB, yB, xC, yC, xD, yD
 
 random.seed(10)
-hours=10
+hours=500
 randomlist = []
 randomlist2 = []
 randomlist3 = []
 #Aanpassen nummers, numerical instability due to big
 for i in range(0,hours):
-    n = random.randint(900,1000)
+    n = random.randint(900,2500)
     randomlist.append(n)
 
 for i in range(0,hours):
@@ -29,7 +29,7 @@ for i in range(0,hours):
     randomlist2.append(n)
 
 for i in range(0,hours):
-    n = random.randint(1500,1600)
+    n = random.randint(1500,2000)
     randomlist3.append(n)
 
 
@@ -78,9 +78,9 @@ model.c = Param(model.I, model.J, initialize={
     (1, 1): 0, (2, 2): 0, (3, 3): 0  # initialize diagonal elements to zero
 })  # transmission cost from i to j
 model.p_max_plant = Param(model.I, model.Plants, initialize={
-    (1, 'Plant1'): 1000, (1, 'Plant2'): 500, (1, 'Plant3'): 500,
-    (2, 'Plant1'): 500, (2, 'Plant2'): 500, (2, 'Plant3'): 500,
-    (3, 'Plant1'): 500, (3, 'Plant2'): 500, (3, 'Plant3'): 500
+    (1, 'Plant1'): 1000, (1, 'Plant2'): 1000, (1, 'Plant3'): 1000,
+    (2, 'Plant1'): 1000, (2, 'Plant2'): 1000, (2, 'Plant3'): 1000,
+    (3, 'Plant1'): 1000, (3, 'Plant2'): 1000, (3, 'Plant3'): 1000
 })
 
 model.CHP_Plants = Set(within=model.I * model.Plants, initialize={
@@ -129,12 +129,12 @@ model.obj = Objective(
     expr=sum(model.c[i,j]*model.x[i,j,t] + model.Ql[i,j,t]*model.z[i,j,t]  for j in model.J for i in model.I for t in model.T) + sum(model.c_gen[i,p,t]*model.p[p,i,t] - P_elec*model.P_el[p,i,t] for p in model.Plants for i in model.I for t in model.T), sense=minimize)
 
 def balance_constraint_rule(model, i,j,t):
-    return sum(model.x[i, j, t] - model.x[j, i, t] for j in model.J) + sum(model.p[p,i,t] for p in model.Plants) == model.d[i,t]+model.Ql[i,j,t]
+    return sum(model.x[i, j, t] - model.x[j, i, t] for j in model.J) + sum(model.p[p,i,t] for p in model.Plants) == model.d[i,t]
 
 model.balance_constraint = Constraint(model.I, model.J, model.T , rule=balance_constraint_rule)
 
 def heat_flow_constraint(model, i, j,t):
-    return Cp*model.massflow[i,j,t]*(model.Ts[i,j,t]-model.Tr[i,j,t]) == model.d[i,t]+model.Ql[i,j,t]
+    return Cp*model.massflow[i,j,t]*(model.Ts[i,j,t]-model.Tr[i,j,t]) == model.d[i,t]
 
 model.heat_flow_constraint = Constraint(model.I, model.J, model.T, rule=heat_flow_constraint)
 
