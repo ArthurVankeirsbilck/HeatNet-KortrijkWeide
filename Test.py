@@ -25,7 +25,7 @@ for i in range(0,hours):
     randomlist.append(n)
 
 for i in range(0,hours):
-    n = random.randint(300,2000)
+    n = random.randint(300,800)
     randomlist2.append(n)
 
 for i in range(0,hours):
