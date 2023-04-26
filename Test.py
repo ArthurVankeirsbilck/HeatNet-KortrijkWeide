@@ -234,8 +234,8 @@ with open('temps.csv', 'w', newline='') as csvfile:
     for j in model.J:
         for i in model.I:
             if i != j:
-                header_row.append('{}_s'.format(i,j))
-                header_row.append('{}_r'.format(i,j))
+                header_row.append('{}_{}_s'.format(j,i))
+                header_row.append('{}_{}_r'.format(j,i))
     writer.writerow(header_row)
 
     # Write data rows
