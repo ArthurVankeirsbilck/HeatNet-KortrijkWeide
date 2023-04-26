@@ -146,3 +146,12 @@ for i in model.I:
         else:
             if model.Tr[i,j].value > 0:
                 print("Supply-Return temp {} -> {}: {} <-> {}°C".format(j,i,model.Ts[i,j].value,model.Tr[i,j].value))
+
+print("Massflows:")
+for i in model.I:
+    for j in model.J:
+        if i == j:
+            pass
+        else:
+            if model.massflow[i,j].value > 0:
+                print("From node {j} to node {i}:".format(model.massflow[i,j]))
