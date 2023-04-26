@@ -214,4 +214,4 @@ print("Heatloss cost:")
 for t in model.T:
     for i in model.I:
         for j in model.J:
-                print(model.z[i,j,t]())
+                print("from {} to {}: {}".format(j,i,model.z[i,j,t]()))
