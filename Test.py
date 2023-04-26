@@ -247,3 +247,23 @@ with open('temps.csv', 'w', newline='') as csvfile:
                     data_row.append(model.Ts[i,j,t].value)
                     data_row.append(model.Tr[i,j,t].value)
         writer.writerow(data_row)
+
+with open('x.csv', 'w', newline='') as csvfile:
+    writer = csv.writer(csvfile)
+
+    # Write header row
+    header_row = ['']
+    for j in model.J:
+        for i in model.I:
+            if i != j:
+                header_row.append('{}_{}_x'.format(j,i))
+    writer.writerow(header_row)
+
+    # Write data rows   
+    for t in model.T:
+        data_row = [t]
+        for j in model.J:
+            for i in model.I:
+                if i != j:
+                    data_row.append(model.x[i, j,t].value)
+        writer.writerow(data_row)
