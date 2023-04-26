@@ -14,7 +14,7 @@ def CHP_feasible_area(yA):
     return xA, xB, yB, xC, yC, xD, yD
 
 random.seed(10)
-hours=50
+hours=1
 randomlist = []
 randomlist2 = []
 randomlist3 = []
@@ -188,11 +188,11 @@ results = solver.solve(model, tee=True)
 
 print(f"Objective value: {model.obj():.2f}")
 
-# for t in model.T:
-#     for i in model.I:
-#         for j in model.J:
-#             if model.x[i, j,t]() > 0:
-#                 print(f"From node {j} to node {i} at {t}: {model.x[i,j,t]():.2f} MWh")
+for t in model.T:
+    for i in model.I:
+        for j in model.J:
+            if model.x[i, j,t]() > 0:
+                print(f"From node {j} to node {i} at {t}: {model.x[i,j,t]():.2f} MWh")
 
 # print("Production:")
 # for t in model.T:
