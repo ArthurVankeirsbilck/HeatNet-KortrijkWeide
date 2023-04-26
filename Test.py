@@ -38,7 +38,7 @@ Cp=4.18
 massflow = 2.4
 
 model.u = Param(model.I, model.J, initialize={(1, 2): M, (1, 3): M, (2, 1): M, (2, 3): M, (3, 1): M, (3, 2): M, (1, 1): 0, (2, 2): 0, (3, 3): 0})  # transmission capacity limit from i to j
-model.d = Param(model.I, initialize={1: 800, 2: 0, 3: 400})  # net supply (supply - demand) in node i
+model.d = Param(model.I, initialize={1: 700, 2: 0, 3: 400})  # net supply (supply - demand) in node i
 # model.p_max = Param(model.I, initialize={1: 0, 2: 2000, 3: 0})  # maximum production capacity at node i
 # model.c_gen = Param(model.I, initialize={1: 30, 2: 10, 3: 30}) # generation cost at node i
 model.c_gen = Param(model.I, model.Plants, initialize={
