@@ -1,6 +1,6 @@
 from pyomo.environ import *
 import math
-
+import random
 random.seed(10)
 hours=1
 randomlist = []
@@ -8,15 +8,15 @@ randomlist2 = []
 randomlist3 = []
 #Aanpassen nummers, numerical instability due to big
 for i in range(0,hours):
-    n = random.randint(1300,1320)
+    n = random.randint(1300,1301)
     randomlist.append(n)
 
 for i in range(0,hours):
-    n = random.randint(500,550)
+    n = random.randint(500,501)
     randomlist2.append(n)
 
 for i in range(0,hours):
-    n = random.randint(600,650)
+    n = random.randint(600,601)
     randomlist3.append(n)
 
 
@@ -103,7 +103,7 @@ model.CQl = Var(model.I, model.J, model.T, bounds=(0, None))
 model.Ql = Var(model.I, model.J, model.T, bounds=(0, None))
 model.z = Var(model.I, model.J, model.T, domain=Binary)
 model.Ts = Var(model.I, model.J, model.T, bounds=(60, 120))
-model.Tr = Var(model.I, model.J, model.T, bounds=(30, 50))
+model.Tr = Var(model.I, model.J, model.T, bounds=(30, 120))
 model.y = Var(model.I, model.T, domain=Binary)
 model.massflow = Var(model.I, model.J, model.T, bounds=(0, None))
 model.P_el = Var(model.Plants, model.I, model.T, bounds=(0, None))
