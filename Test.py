@@ -77,17 +77,6 @@ M=8000
 Cp=4.18
 P_elec = 0.4 #Wordt aangeleverd door Jurgen
 
-
-model.u = Param(model.I, model.J, initialize={(1, 2): M, (1, 3): M, (2, 1): M, (2, 3): M, (3, 1): M, (3, 2): M, (1, 1): 0, (2, 2): 0, (3, 3): 0})  # transmission capacity limit from i to j
-model.d = Param(model.I, initialize={1: 400, 2: 0, 3: 400})  # net supply (supply - demand) in node i
-# model.p_max = Param(model.I, initialize={1: 0, 2: 2000, 3: 0})  # maximum production capacity at node i
-# model.c_gen = Param(model.I, initialize={1: 30, 2: 10, 3: 30}) # generation cost at node i
-model.c_gen = Param(model.I, model.Plants, initialize={
-    (1, 'Plant1'): 30, (1, 'Plant2'): 30, (1, 'Plant3'): 30,
-    (2, 'Plant1'): 10, (2, 'Plant2'): 30, (2, 'Plant3'): 15,
-    (3, 'Plant1'): 30, (3, 'Plant2'): 30, (3, 'Plant3'): 30
-})
-
 model.u = Param(model.I, model.J, initialize={(1, 2): M, (1, 3): M, (2, 1): M, (2, 3): M, (3, 1): M, (3, 2): M, (1, 1): 0, (2, 2): 0, (3, 3): 0})  # transmission capacity limit from i to j
 model.d = Param(model.I, model.T, initialize=demands())  # net supply (supply - demand) in node i
 model.c_gen = Param(model.I, model.Plants, model.T, initialize=gencosts())
