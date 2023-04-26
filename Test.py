@@ -179,7 +179,7 @@ def HOB_2(model, t, i, p):
 model.HOB_2_constraint = Constraint(model.T, model.HOB_Plants, rule=HOB_2)
 
 def heatloss_constraint(model, i, j,t):
-    return model.Ql[i,j,t] == (((2.0*3.14*model.k[i,j]*model.L[i,j]*(model.Ts[i,j,t]-model.Tr[i,j,t]))/math.log(model.Do[i,j]/model.Di[i,j]))/1000)
+    return model.Ql[i,j,t] == (((2.0*3.14*model.k[i,j]*model.L[i,j]*(model.Ts[i,j,t]-model.Tr[i,j,t]))/math.log(model.Do[i,j]/model.Di[i,j]))/1000)*model.z[i,j,t]
 model.heatloss_constraint = Constraint(model.I, model.J, model.T, rule=heatloss_constraint)
 
 # solve the model
@@ -207,4 +207,4 @@ for t in model.T:
     for i in model.I:
         for j in model.J:
             if model.Ql[i,j,t].value > 0:
-                print(f"Loss from node {j} to node {i}: {model.Ql[i,j,t].value:.2f} $")
+                print(f"Loss from node {j} to node {i}: {model.Ql[i,j,t].value:.2f}")
