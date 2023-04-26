@@ -191,7 +191,7 @@ for i in model.I:
             pass
         else:
             if model.Tr[i,j].value > 0:
-                print("Supply-Return temp {} -> {}: {} <-> {}°C".format(j,i,model   
+                print("Supply-Return temp {} -> {}: {} <-> {}°C".format(j,i,model))
 
 # print("Massflows:")
 # for i in model.I:
