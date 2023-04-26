@@ -217,7 +217,6 @@ print("Heatloss cost:")
 for t in model.T:
     for i in model.I:
         for j in model.J:
-            if model.Ql[i,j,t].value > 0:
                 print(f"Loss from node {j} to node {i}: {model.Ql[i,j,t].value:.2f}")
 
 print("z:")
