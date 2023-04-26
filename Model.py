@@ -110,17 +110,17 @@ model.Do = Param(model.I, model.J, initialize={(1, 2): 0.4, (1, 3): 0.3, (2, 1):
 model.Di = Param(model.I, model.J, initialize={(1, 2): 0.3, (1, 3): 0.2, (2, 1): 0.3, (2, 3): 0.3, (3, 1): 0.2, (3, 2): 0.3,(1, 1): 0.1, (2, 2): 0.1, (3, 3): 0.1})
 model.cons = ConstraintList()
 # variables
-model.x = Var(model.I, model.J, model.T, bounds=(0, 2000),)  # power transmission from i to j
-model.p = Var(model.Plants, model.I, model.T, bounds=(0, 2000))  # production at node i
+model.x = Var(model.I, model.J, model.T, bounds=(0, None))  # power transmission from i to j
+model.p = Var(model.Plants, model.I, model.T, bounds=(0, None))  # production at node i
 model.mean_c = Var()  # mean transmission cost
-model.CQl = Var(model.I, model.J, model.T, bounds=(0, 20000))
-model.Ql = Var(model.I, model.J, model.T, bounds=(0, 20000))
+model.CQl = Var(model.I, model.J, model.T, bounds=(0, None))
+model.Ql = Var(model.I, model.J, model.T, bounds=(0, None))
 model.z = Var(model.I, model.J, model.T, domain=Binary)
 model.Ts = Var(model.I, model.J, model.T, bounds=(60, 120))
 model.Tr = Var(model.I, model.J, model.T, bounds=(30, 50))
 model.y = Var(model.I, model.T, domain=Binary)
-model.massflow = Var(model.I, model.J, model.T, bounds=(0, 20))
-model.P_el = Var(model.Plants, model.I, model.T, bounds=(0, 2000))
+model.massflow = Var(model.I, model.J, model.T, bounds=(0, None))
+model.P_el = Var(model.Plants, model.I, model.T, bounds=(0, None))
 model.kappa = Var(model.I, model.Plants, model.T, domain=Binary)
 M = 10000000
 epsilon = 0.0000001
@@ -200,10 +200,10 @@ def sum_power_generation_rule_2(model, i,t):
     return sum(model.p[p,i,t] for p in model.Plants) >= epsilon * model.y[i,t]
 
 model.sum_power_generation_constraint_2 = Constraint(model.I, model.T, rule=sum_power_generation_rule_2)
-os.environ["octeract_options"] = "num_cores=8"
-solver = SolverFactory("octeract-engine");
 
-results = solver.solve(model, tee=True)
+solver = SolverFactory("mindtpy");
+
+results = solver.solve(model, mip_solver="glpk", nlp_solver="ipopt",tee=True)
 
 #Results
 print(f"Objective value: {model.obj():.2f}")

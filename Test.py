@@ -138,12 +138,6 @@ for i in model.I:
         if model.x[i, j]() > 0:
             print(f"From node {j} to node {i}: {model.x[i, j].value*model.c[i, j]:.2f} $")
 
-print("Heatloss cost:")
-for i in model.I:
-    for j in model.J:
-        if model.CQl[i,j].value > 0:
-            print(f"Loss from node {j} to node {i}: {model.CQl[i,j].value*model.z[i,j].value:.2f} $")
-
 print("Temps:")
 for i in model.I:
     for j in model.J:
