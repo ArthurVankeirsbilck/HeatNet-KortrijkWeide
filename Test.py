@@ -49,7 +49,7 @@ def gencosts():
                 dict[(i, p, t)] = eval(f"node{i}_costs[t-1]")
     return dict
 print(gencosts())
-
+T = len(node1_demands)+1
 times = list(range(T))
 # create model object
 model = ConcreteModel()
