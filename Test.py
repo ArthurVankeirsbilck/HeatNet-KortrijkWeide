@@ -16,7 +16,7 @@ model.c = Param(model.I, model.J, initialize={
     (1, 1): 0, (2, 2): 0, (3, 3): 0  # initialize diagonal elements to zero
 })  # transmission cost from i to j
 model.p_max_plant = Param(model.I, model.Plants, initialize={
-    (1, 'Plant1'): 300, (1, 'Plant2'): 300, (1, 'Plant3'): 300,
+    (1, 'Plant1'): 0, (1, 'Plant2'): 0, (1, 'Plant3'): 0,
     (2, 'Plant1'): 300, (2, 'Plant2'): 0, (2, 'Plant3'): 0,
     (3, 'Plant1'): 800, (3, 'Plant2'): 0, (3, 'Plant3'): 0
 })
