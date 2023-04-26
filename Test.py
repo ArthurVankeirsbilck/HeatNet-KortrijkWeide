@@ -79,7 +79,7 @@ model.c = Param(model.I, model.J, initialize={
 })  # transmission cost from i to j
 model.p_max_plant = Param(model.I, model.Plants, initialize={
     (1, 'Plant1'): 1000, (1, 'Plant2'): 1000, (1, 'Plant3'): 1000,
-    (2, 'Plant1'): 0, (2, 'Plant2'): 200, (2, 'Plant3'): 200,
+    (2, 'Plant1'): 200, (2, 'Plant2'): 200, (2, 'Plant3'): 200,
     (3, 'Plant1'): 1000, (3, 'Plant2'): 1000, (3, 'Plant3'): 1000
 })
 
