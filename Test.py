@@ -179,7 +179,7 @@ def HOB_2(model, t, i, p):
 model.HOB_2_constraint = Constraint(model.T, model.HOB_Plants, rule=HOB_2)
 
 def heatloss_constraint(model, i, j,t ,p):
-    return model.Ql[i,j,t] == (model.c_gen[i,p,t]*(((2.0*3.14*model.k[i,j]*model.L[i,j]*(model.Ts[i,j,t]-model.Tr[i,j,t]))/math.log(model.Do[i,j]/model.Di[i,j]))/1000))*model.z[i,j,t]
+    return model.Ql[i,j,t] == (((2.0*3.14*model.k[i,j]*model.L[i,j]*(model.Ts[i,j,t]-model.Tr[i,j,t]))/math.log(model.Do[i,j]/model.Di[i,j]))/1000)
 
 # solve the model
 solver = SolverFactory("octeract");
@@ -201,18 +201,3 @@ for t in model.T:
 #                 print(f"At node {i} at pp {p} at {t}: {model.p[p,i,t]():.2f} MWh")
 #             if model.P_el[p,i,t].value > 0:
 #                 print(f"At node {i} at pp {p} (ELEC) at {t}: {model.P_el[p,i,t].value:.2f} MWh")
-
-print("Heatloss cost:")
-for t in model.T:
-    for i in model.I:
-        for j in model.J:
-            if i==j:
-                    pass
-            else:
-                print("from {} to {}: {}".format(j,i,model.Ql[i,j,t]()))
-
-print("Heatloss cost:")
-for t in model.T:
-    for i in model.I:
-        for j in model.J:
-                print("from {} to {}: {}".format(j,i,model.z[i,j,t]()))
