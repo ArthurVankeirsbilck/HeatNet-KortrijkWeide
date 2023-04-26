@@ -16,9 +16,9 @@ model.c = Param(model.I, model.J, initialize={
     (1, 1): 0, (2, 2): 0, (3, 3): 0  # initialize diagonal elements to zero
 })  # transmission cost from i to j
 model.p_max_plant = Param(model.I, model.Plants, initialize={
-    (1, 'Plant1'): 0.800, (1, 'Plant2'): 0.800, (1, 'Plant3'): 0,
-    (2, 'Plant1'): 0.300, (2, 'Plant2'): 0, (2, 'Plant3'): 0,
-    (3, 'Plant1'): 0.800, (3, 'Plant2'): 0, (3, 'Plant3'): 0
+    (1, 'Plant1'): 0, (1, 'Plant2'): 0, (1, 'Plant3'): 0,
+    (2, 'Plant1'): 300, (2, 'Plant2'): 0, (2, 'Plant3'): 0,
+    (3, 'Plant1'): 800, (3, 'Plant2'): 0, (3, 'Plant3'): 0
 })
 
 model.CHP_Plants = Set(within=model.I * model.Plants, initialize={
@@ -38,7 +38,7 @@ Cp=4.18
 massflow = 2.4
 
 model.u = Param(model.I, model.J, initialize={(1, 2): M, (1, 3): M, (2, 1): M, (2, 3): M, (3, 1): M, (3, 2): M, (1, 1): 0, (2, 2): 0, (3, 3): 0})  # transmission capacity limit from i to j
-model.d = Param(model.I, initialize={1: 0.200, 2: 0.800, 3: 0.400})  # net supply (supply - demand) in node i
+model.d = Param(model.I, initialize={1: 400, 2: 0, 3: 400})  # net supply (supply - demand) in node i
 # model.p_max = Param(model.I, initialize={1: 0, 2: 2000, 3: 0})  # maximum production capacity at node i
 # model.c_gen = Param(model.I, initialize={1: 30, 2: 10, 3: 30}) # generation cost at node i
 model.c_gen = Param(model.I, model.Plants, initialize={
@@ -62,9 +62,10 @@ model.demand_plus_loss = Var(model.I, bounds=(0, None))
 model.Ts = Var(model.I, model.J, bounds=(60, 90))
 model.Tr = Var(model.I, model.J, bounds=(50, 70))
 model.y = Var(model.I, domain=Binary)
-model.massflow = Var(model.I, model.J, bounds=(0, None))
+# model.massflow = Var(model.I, model.J, bounds=(0, None))
 M = 10000
 epsilon = 0.0001
+massflow:2.4
 # objective
 model.obj = Objective(
     expr=summation(model.c, model.x) + sum(model.c_gen[i,p]*model.p[p,i] for p in model.Plants for i in model.I) + sum(model.CQl[i,j]*model.Ql[i,j] for i in model.I for j in model.J))
@@ -75,7 +76,7 @@ def balance_constraint_rule(model, i,j):
 model.balance_constraint = Constraint(model.I, model.J, rule=balance_constraint_rule)
 
 def heat_flow_constraint(model, i, j):
-    return Cp*model.massflow[i,j]*(model.Ts[i,j]-model.Tr[i,j]) == model.d[i]
+    return Cp*massflow*(model.Ts[i,j]-model.Tr[i,j]) == model.d[i]
 
 model.heat_flow_constraint = Constraint(model.I, model.J, rule=heat_flow_constraint)
 
@@ -147,7 +148,7 @@ for i in model.I:
             if model.Tr[i,j].value > 0:
                 print("Supply-Return temp {} -> {}: {} <-> {}°C".format(j,i,model.Ts[i,j].value,model.Tr[i,j].value))
 
-print("Massflows:")
-for i in model.I:
-    for j in model.J:
-        print("From node {} to node {}: {}".format(j,i,model.massflow[i,j].value))
+# print("Massflows:")
+# for i in model.I:
+#     for j in model.J:
+#         print("From node {} to node {}: {}".format(j,i,model.massflow[i,j].value))
