@@ -194,12 +194,18 @@ for t in model.T:
             if model.x[i, j,t]() > 0:
                 print(f"From node {j} to node {i} at {t}: {model.x[i,j,t]():.2f} MWh")
 
-print("Production:")
+# print("Production:")
+# for t in model.T:
+#     for i in model.I:
+#         for p in model.Plants:
+#             if model.p[p,i,t]() > 0:
+#                 print(f"At node {i} at pp {p} at {t}: {model.p[p,i,t]():.2f} MWh")
+#             if model.P_el[p,i,t].value > 0:
+#                 print(f"At node {i} at pp {p} (ELEC) at {t}: {model.P_el[p,i,t].value:.2f} MWh")
+
+print("Heatloss cost:")
 for t in model.T:
     for i in model.I:
-        for p in model.Plants:
-            if model.p[p,i,t]() > 0:
-                print(f"At node {i} at pp {p} at {t}: {model.p[p,i,t]():.2f} MWh")
-            if model.P_el[p,i,t].value > 0:
-                print(f"At node {i} at pp {p} (ELEC) at {t}: {model.P_el[p,i,t].value:.2f} MWh")
-print(transmissions)
+        for j in model.J:
+            if model.Ql[i,j,t].value > 0:
+                print(f"Loss from node {j} to node {i}: {model.CQl[i,j].value:.2f} $")
