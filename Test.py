@@ -20,7 +20,7 @@ randomlist2 = []
 randomlist3 = []
 #Aanpassen nummers, numerical instability due to big
 for i in range(0,hours):
-    n = random.randint(900,1301)
+    n = random.randint(900,100)
     randomlist.append(n)
 
 for i in range(0,hours):
@@ -28,7 +28,7 @@ for i in range(0,hours):
     randomlist2.append(n)
 
 for i in range(0,hours):
-    n = random.randint(2000,2601)
+    n = random.randint(1500,1600)
     randomlist3.append(n)
 
 
