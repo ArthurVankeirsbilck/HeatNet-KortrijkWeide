@@ -8,15 +8,15 @@ randomlist2 = []
 randomlist3 = []
 #Aanpassen nummers, numerical instability due to big
 for i in range(0,hours):
-    n = random.randint(1300,1301)
+    n = random.randint(900,1301)
     randomlist.append(n)
 
 for i in range(0,hours):
-    n = random.randint(500,501)
+    n = random.randint(300,501)
     randomlist2.append(n)
 
 for i in range(0,hours):
-    n = random.randint(600,601)
+    n = random.randint(200,601)
     randomlist3.append(n)
 
 
