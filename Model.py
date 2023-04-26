@@ -4,7 +4,7 @@ import random
 import matplotlib.pyplot as plt
 import os
 random.seed(10)
-hours=20
+hours=1
 randomlist = []
 randomlist2 = []
 randomlist3 = []
