@@ -188,11 +188,11 @@ results = solver.solve(model, tee=True)
 
 print(f"Objective value: {model.obj():.2f}")
 
-for t in model.T:
-    for i in model.I:
-        for j in model.J:
-            if model.x[i, j,t]() > 0:
-                print(f"From node {j} to node {i} at {t}: {model.x[i,j,t]():.2f} MWh")
+# for t in model.T:
+#     for i in model.I:
+#         for j in model.J:
+#             if model.x[i, j,t]() > 0:
+#                 print(f"From node {j} to node {i} at {t}: {model.x[i,j,t]():.2f} MWh")
 
 # print("Production:")
 # for t in model.T:
@@ -208,4 +208,4 @@ for t in model.T:
     for i in model.I:
         for j in model.J:
             if model.Ql[i,j,t].value > 0:
-                print(f"Loss from node {j} to node {i}: {model.CQl[i,j].value:.2f} $")
+                print(f"Loss from node {j} to node {i}: {model.Ql[i,j,t].value:.2f} $")
