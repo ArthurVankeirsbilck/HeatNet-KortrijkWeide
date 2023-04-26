@@ -1,6 +1,7 @@
 from pyomo.environ import *
 import math
 import random
+import csv
 
 def CHP_feasible_area(yA):
     xA = 0
@@ -224,3 +225,25 @@ for t in model.T:
     for i in model.I:
         for j in model.J:
                 print(model.z[i,j,t].value)
+
+with open('temps.csv', 'w', newline='') as csvfile:
+    writer = csv.writer(csvfile)
+
+    # Write header row
+    header_row = ['']
+    for j in model.J:
+        for i in model.I:
+            if i != j:
+                header_row.append('{}_s'.format(i,j))
+                header_row.append('{}_r'.format(i,j))
+    writer.writerow(header_row)
+
+    # Write data rows
+    for t in model.T:
+        data_row = [t]
+        for j in model.J:
+            for i in model.I:
+                if i != j:
+                    data_row.append(model.Ts[i,j,t].value)
+                    data_row.append(model.Tr[i,j,t].value)
+        writer.writerow(data_row)
