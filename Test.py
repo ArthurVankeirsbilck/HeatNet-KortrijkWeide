@@ -138,7 +138,7 @@ def heat_flow_constraint(model, i, j,t):
 model.heat_flow_constraint = Constraint(model.I, model.J, model.T, rule=heat_flow_constraint)
 
 def capacity_constraint_rule(model, i, j,t):
-    return model.x[i, j,t] <= model.u[i, j]*model.z[i,j,t]
+    return model.x[i, j,t] <= model.u[i, j]
 
 model.capacity_constraint = Constraint(model.I, model.J, model.T, rule=capacity_constraint_rule)
 
