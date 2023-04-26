@@ -16,9 +16,9 @@ model.c = Param(model.I, model.J, initialize={
     (1, 1): 0, (2, 2): 0, (3, 3): 0  # initialize diagonal elements to zero
 })  # transmission cost from i to j
 model.p_max_plant = Param(model.I, model.Plants, initialize={
-    (1, 'Plant1'): 400, (1, 'Plant2'): 400, (1, 'Plant3'): 400,
-    (2, 'Plant1'): 300, (2, 'Plant2'): 400, (2, 'Plant3'): 400,
-    (3, 'Plant1'): 800, (3, 'Plant2'): 400, (3, 'Plant3'): 400
+    (1, 'Plant1'): 0, (1, 'Plant2'): 0, (1, 'Plant3'): 0,
+    (2, 'Plant1'): 300, (2, 'Plant2'): 0, (2, 'Plant3'): 0,
+    (3, 'Plant1'): 800, (3, 'Plant2'): 0, (3, 'Plant3'): 0
 })
 
 model.CHP_Plants = Set(within=model.I * model.Plants, initialize={
@@ -62,7 +62,7 @@ model.demand_plus_loss = Var(model.I, bounds=(0, None))
 model.Ts = Var(model.I, model.J, bounds=(60, 90))
 model.Tr = Var(model.I, model.J, bounds=(50, 70))
 model.y = Var(model.I, domain=Binary)
-model.massflow = Var(model.I, model.J, bounds=(0, 10))
+model.massflow = Var(model.I, model.J, bounds=(0, 20))
 M = 10000
 epsilon = 0.0001
 # objective
