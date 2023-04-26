@@ -183,8 +183,12 @@ def heatloss_constraint(model, i, j,t, p):
 model.heatloss_constraint = Constraint(model.I, model.J, model.T, model.Plants, rule=heatloss_constraint)
 
 def heatloss_bin1(model, i,j,t):
-    return model.z[i,j,t] >= model.x[i,j,t]/M
+    return model.x[i,j,t] >= 1- M*(1-model.z[i,j,t])
 model.heatloss_bin1 = Constraint(model.I, model.J, model.T, rule=heatloss_bin1)
+
+def heatloss_bin2(model, i,j,t):
+    return model.x[i,j,t] <= m*model.z[i,j,t]
+model.heatloss_bin2 = Constraint(model.I, model.J, model.T, rule=heatloss_bin2)
 
 
 # solve the model
