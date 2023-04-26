@@ -205,5 +205,5 @@ print("Heatloss cost:")
 for t in model.T:
     for i in model.I:
         for j in model.J:
-            if model.CQl[i,j,t].value*model.z[i,j,t].value > 0:
+            if model.Ql[i,j,t].value > 0:
                 print(f"Loss from node {j} to node {i}: {model.Ql[i,j].value:.2f} $")
