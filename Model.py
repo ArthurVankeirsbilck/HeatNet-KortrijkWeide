@@ -2,11 +2,13 @@ from pyomo.environ import *
 import math
 import random
 import matplotlib.pyplot as plt
+import os
 random.seed(10)
 hours=20
 randomlist = []
 randomlist2 = []
 randomlist3 = []
+#Aanpassen nummers, numerical instability due to big numbers
 for i in range(0,hours):
     n = random.randint(1300,1320)
     randomlist.append(n)
@@ -199,7 +201,8 @@ def sum_power_generation_rule_2(model, i,t):
     return sum(model.p[p,i,t] for p in model.Plants) >= epsilon * model.y[i,t]
 
 model.sum_power_generation_constraint_2 = Constraint(model.I, model.T, rule=sum_power_generation_rule_2)
-solver = SolverFactory("octeract");
+os.environ["octeract_options"] = "num_cores=8"
+solver = SolverFactory("octeract-engine");
 
 results = solver.solve(model, tee=True)
 
