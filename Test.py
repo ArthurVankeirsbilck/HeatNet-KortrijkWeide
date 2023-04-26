@@ -33,7 +33,7 @@ model.HOB_Plants = Set(within=model.I * model.Plants, initialize={
     (3, 'Plant2')
 })
 
-M=3000
+M=8000
 Cp=4.18
 massflow = 2.4
 
@@ -55,7 +55,6 @@ model.Di = Param(model.I, model.J, initialize={(1, 2): 0.1, (1, 3): 0.2, (2, 1):
 # variables
 model.x = Var(model.I, model.J, bounds=(0, None))  # power transmission from i to j
 model.p = Var(model.Plants, model.I, bounds=(0, None))  # production at node i
-model.mean_c = Var()  # mean transmission cost
 model.CQl = Var(model.I, model.J, bounds=(0, None))
 model.Ql = Var(model.I, model.J, bounds=(0, None))
 model.z = Var(model.I, model.J, domain=Binary)
@@ -63,6 +62,7 @@ model.demand_plus_loss = Var(model.I, bounds=(0, None))
 model.Ts = Var(model.I, model.J, bounds=(60, 90))
 model.Tr = Var(model.I, model.J, bounds=(50, 70))
 model.y = Var(model.I, domain=Binary)
+model.massflow = Var(model.I, model.J, bounds=(0, None))
 M = 10000
 epsilon = 0.0001
 # objective
@@ -75,7 +75,7 @@ def balance_constraint_rule(model, i,j):
 model.balance_constraint = Constraint(model.I, model.J, rule=balance_constraint_rule)
 
 def heat_flow_constraint(model, i, j):
-    return Cp*massflow*(model.Ts[i,j]-model.Tr[i,j]) == model.d[i]
+    return Cp*model.massflow[i,j]*(model.Ts[i,j]-model.Tr[i,j]) == model.d[i]
 
 model.heat_flow_constraint = Constraint(model.I, model.J, rule=heat_flow_constraint)
 
