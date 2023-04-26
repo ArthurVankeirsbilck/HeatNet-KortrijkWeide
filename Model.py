@@ -3,7 +3,7 @@ import math
 import random
 import matplotlib.pyplot as plt
 random.seed(10)
-hours=40
+hours=20
 randomlist = []
 randomlist2 = []
 randomlist3 = []
@@ -199,7 +199,7 @@ def sum_power_generation_rule_2(model, i,t):
     return sum(model.p[p,i,t] for p in model.Plants) >= epsilon * model.y[i,t]
 
 model.sum_power_generation_constraint_2 = Constraint(model.I, model.T, rule=sum_power_generation_rule_2)
-solver = SolverFactory('octeract-engine');
+solver = SolverFactory("octeract");
 
 results = solver.solve(model, tee=True)
 
