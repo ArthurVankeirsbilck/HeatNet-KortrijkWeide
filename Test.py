@@ -3,7 +3,7 @@ import math
 import random
 
 random.seed(10)
-hours=1
+hours=200
 randomlist = []
 randomlist2 = []
 randomlist3 = []
