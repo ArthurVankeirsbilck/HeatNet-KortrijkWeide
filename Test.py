@@ -203,14 +203,16 @@ for t in model.T:
             if model.x[i, j,t]() > 0:
                 print(f"From node {j} to node {i} at {t}: {model.x[i,j,t]():.2f} MWh")
 
-# print("Production:")
-# for t in model.T:
-#     for i in model.I:
-#         for p in model.Plants:
-#             if model.p[p,i,t]() > 0:
-#                 print(f"At node {i} at pp {p} at {t}: {model.p[p,i,t]():.2f} MWh")
-#             if model.P_el[p,i,t].value > 0:
-#                 print(f"At node {i} at pp {p} (ELEC) at {t}: {model.P_el[p,i,t].value:.2f} MWh")
+print("Temps:")
+for t in model.T:
+    for i in model.I:
+        for j in model.J:
+            if i == j:
+                pass
+            else:
+                if model.Tr[i,j,t].value > 0:
+                    print("Supply-Return temp {} -> {}: {} <-> {}°C".format(j,i,model.Ts[i,j,t].value,model.Tr[i,j,t].value))
+
 print("Heatloss cost:")
 for t in model.T:
     for i in model.I:
