@@ -2,7 +2,7 @@ from pyomo.environ import *
 import math
 import random
 random.seed(10)
-hours=100
+hours=1000
 randomlist = []
 randomlist2 = []
 randomlist3 = []
@@ -162,38 +162,19 @@ solver = SolverFactory("octeract");
 results = solver.solve(model, tee=True)
 
 print(f"Objective value: {model.obj():.2f}")
-# for i in model.I:
-#     for j in model.J:
-#         if model.x[i, j]() > 0:
-#             print(f"From node {j} to node {i}: {model.x[i, j]():.2f} MWh")
-# print("Production:")
-# for i in model.I:
-#     for p in model.Plants:
-#         if model.p[p,i]() > 0:
-#             print(f"At node {i} at pp {p}: {model.p[p,i]():.2f} MWh")
 
-# print("Generation costs:")
-# for i in model.I:
-#     for p in model.Plants:
-#         if model.p[p,i].value > 0:
-#             print(f"At node {i} at pp {p}: {model.p[p,i].value*model.c_gen[i,p]:.2f} $")
+for t in model.T:
+    for i in model.I:
+        for j in model.J:
+            if model.x[i, j,t]() > 0:
+                print(f"From node {j} to node {i} at {t}: {model.x[i,j,t]():.2f} MWh")
 
-# print("Transmission costs:")
-# for i in model.I:
-#     for j in model.J:
-#         if model.x[i, j]() > 0:
-#             print(f"From node {j} to node {i}: {model.x[i, j].value*model.c[i, j]:.2f} $")
-
-# print("Temps:")
-# for i in model.I:
-#     for j in model.J:
-#         if i == j:
-#             pass
-#         else:
-#             if model.Tr[i,j].value > 0:
-#                 print("Supply-Return temp {} -> {}: {} <-> {}°C".format(j,i,model))
-
-# print("Massflows:")
-# for i in model.I:
-#     for j in model.J:
-#         print("From node {} to node {}: {}".format(j,i,model.massflow[i,j].value))
+print("Production:")
+for t in model.T:
+    for i in model.I:
+        for p in model.Plants:
+            if model.p[p,i,t]() > 0:
+                print(f"At node {i} at pp {p} at {t}: {model.p[p,i,t]():.2f} MWh")
+            if model.P_el[p,i,t].value > 0:
+                print(f"At node {i} at pp {p} (ELEC) at {t}: {model.P_el[p,i,t].value:.2f} MWh")
+print(transmissions)
