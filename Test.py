@@ -68,7 +68,7 @@ epsilon = 0.0001
 massflow:2.4
 # objective
 model.obj = Objective(
-    expr=summation(model.c, model.x) + sum(model.c_gen[i,p]*model.p[p,i] for p in model.Plants for i in model.I))
+    expr=summation(model.c, model.x) + sum(model.c_gen[i,p]*model.p[p,i] for p in model.Plants for i in model.I) + summation(model.CQl, model.z), sense=minimize)
 
 def balance_constraint_rule(model, i,j):
     return sum(model.x[i, j] - model.x[j, i] for j in model.J) + sum(model.p[p,i] for p in model.Plants) == model.d[i]
@@ -90,28 +90,28 @@ def production_constraint_rule(model, i, p):
 
 model.production_constraint = Constraint(model.I, model.Plants, rule=production_constraint_rule)
 
-# def heatloss_constraint(model, i, j):
-#     return model.Ql[i,j] == (((2.0*3.14*model.k[i,j]*model.L[i,j]*(model.Ts[i,j]-model.Tr[i,j]))/math.log(model.Do[i,j]/model.Di[i,j]))/1000)*model.z[i,j]
-# model.heatloss_constraint = Constraint(model.I, model.J, rule=heatloss_constraint)
+def heatloss_constraint(model, i, j):
+    return model.Ql[i,j] == (((2.0*3.14*model.k[i,j]*model.L[i,j]*(model.Ts[i,j]-model.Tr[i,j]))/math.log(model.Do[i,j]/model.Di[i,j]))/1000)*model.z[i,j]
+model.heatloss_constraint = Constraint(model.I, model.J, rule=heatloss_constraint)
 
 
-# def heatlosscost_constraint_rule(model, i, j):
-#     return model.CQl[i,j] == (
-#         sum(model.p[p,i]*model.c_gen[i,p] for p in model.Plants) /
-#         (sum(model.p[p,i] for p in model.Plants) + M * (1 - model.y[i]))
-#     )
+def heatlosscost_constraint_rule(model, i, j):
+    return model.CQl[i,j] == model.Ql[i,j]*(
+        sum(model.p[p,i]*model.c_gen[i,p] for p in model.Plants) /
+        (sum(model.p[p,i] for p in model.Plants) + M * (1 - model.y[i]))
+    )
 
-# model.heatlosscost_constraint = Constraint(model.I, model.J, rule=heatlosscost_constraint_rule)
+model.heatlosscost_constraint = Constraint(model.I, model.J, rule=heatlosscost_constraint_rule)
 
-# def sum_power_generation_rule(model, i):
-#     return sum(model.p[p,i] for p in model.Plants) <= M* model.y[i]
+def sum_power_generation_rule(model, i):
+    return sum(model.p[p,i] for p in model.Plants) <= M* model.y[i]
 
-# model.sum_power_generation_constraint = Constraint(model.I, rule=sum_power_generation_rule)
+model.sum_power_generation_constraint = Constraint(model.I, rule=sum_power_generation_rule)
 
-# def sum_power_generation_rule_2(model, i):
-#     return sum(model.p[p,i] for p in model.Plants) >= epsilon * model.y[i]
+def sum_power_generation_rule_2(model, i):
+    return sum(model.p[p,i] for p in model.Plants) >= epsilon * model.y[i]
 
-# model.sum_power_generation_constraint_2 = Constraint(model.I, rule=sum_power_generation_rule_2)
+model.sum_power_generation_constraint_2 = Constraint(model.I, rule=sum_power_generation_rule_2)
 # solve the model
 solver = SolverFactory("octeract");
 results = solver.solve(model, tee=True)
