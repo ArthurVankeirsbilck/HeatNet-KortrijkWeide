@@ -150,4 +150,4 @@ for i in model.I:
 print("Massflows:")
 for i in model.I:
     for j in model.J:
-        print("From node {} to node {}:".format(j,i,model.massflow[i,j]))
+        print("From node {} to node {}: {}".format(j,i,model.massflow[i,j]))
