@@ -238,7 +238,7 @@ with open('temps.csv', 'w', newline='') as csvfile:
                 header_row.append('{}_{}_r'.format(j,i))
     writer.writerow(header_row)
 
-    # Write data rows
+    # Write data rows   
     for t in model.T:
         data_row = [t]
         for j in model.J:
