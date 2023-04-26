@@ -182,6 +182,15 @@ def heatloss_constraint(model, i, j,t):
     return model.Ql[i,j,t] == (((2.0*3.14*model.k[i,j]*model.L[i,j]*(model.Ts[i,j,t]-model.Tr[i,j,t]))/math.log(model.Do[i,j]/model.Di[i,j]))/1000)*model.z[i,j,t]
 model.heatloss_constraint = Constraint(model.I, model.J, model.T, rule=heatloss_constraint)
 
+def heatloss_bin1(model, i,j,t):
+    return z[i,j,t] >= x[i,j,t]/M
+model.heatloss_bin1 = Constraint(model.I, model.J, model.T, rule=heatloss_bin1)
+
+def heatloss_bin2(model, i,j,t):
+    return z[i,j,t] <= x[i,j,t]
+model.heatloss_bin2 = Constraint(model.I, model.J, model.T, rule=heatloss_bin2)
+
+
 # solve the model
 solver = SolverFactory("octeract");
 results = solver.solve(model, tee=True)
