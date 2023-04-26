@@ -130,33 +130,42 @@ def capacity_constraint_rule(model, i, j,t):
 
 model.capacity_constraint = Constraint(model.I, model.J, model.T, rule=capacity_constraint_rule)
 
-def production_constraint_rule(model, i, p ,t):
-    return model.p[p,i,t] <= model.p_max_plant[i,p]
+def CHP_1(model, t, i, p):
+    return model.P_el[p,i,t] - model.p_max_plant[i,p] - ((model.p_max_plant[i,p]-CHP_feasible_area(model.p_max_plant[i,p])[2])/(CHP_feasible_area(model.p_max_plant[i,p])[0]-CHP_feasible_area(model.p_max_plant[i,p])[1])) * (model.p[p,i,t] - CHP_feasible_area(model.p_max_plant[i,p])[0]) <= 0
+model.CHP_1_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_1)
 
-model.production_constraint = Constraint(model.I, model.Plants, model.T, rule=production_constraint_rule)
+def CHP_2(model, t, i, p):
+    return model.P_el[p,i,t] - CHP_feasible_area(model.p_max_plant[i,p])[2] - ((CHP_feasible_area(model.p_max_plant[i,p])[2]-CHP_feasible_area(model.p_max_plant[i,p])[4])/(CHP_feasible_area(model.p_max_plant[i,p])[1]-CHP_feasible_area(model.p_max_plant[i,p])[3])) * (model.p[p,i,t] - CHP_feasible_area(model.p_max_plant[i,p])[1]) >= M*(model.kappa[i,p,t] - 1)
+model.CHP_2_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_2)
 
-# def heatloss_constraint(model, i, j):
-#     return model.Ql[i,j] == (((2.0*3.14*model.k[i,j]*model.L[i,j]*(model.Ts[i,j]-model.Tr[i,j]))/math.log(model.Do[i,j]/model.Di[i,j]))/1000)*model.z[i,j]
-# model.heatloss_constraint = Constraint(model.I, model.J, rule=heatloss_constraint)
+def CHP_3(model, t, i, p):
+    return model.P_el[p,i,t] - CHP_feasible_area(model.p_max_plant[i,p])[4] - ((CHP_feasible_area(model.p_max_plant[i,p])[4]-CHP_feasible_area(model.p_max_plant[i,p])[6])/(CHP_feasible_area(model.p_max_plant[i,p])[3]-CHP_feasible_area(model.p_max_plant[i,p])[5])) * (model.p[p,i,t] - CHP_feasible_area(model.p_max_plant[i,p])[3]) >= M*(model.kappa[i,p,t] - 1)
+model.CHP_3_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_3)
 
+def CHP_4(model, t, i, p):
+    return CHP_feasible_area(model.p_max_plant[i,p])[6]*model.kappa[i,p,t] <= model.P_el[p,i,t]
+model.CHP_4_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_4)
 
-# def heatlosscost_constraint_rule(model, i, j):
-#     return model.CQl[i,j] == model.Ql[i,j]*(
-#         sum(model.p[p,i]*model.c_gen[i,p] for p in model.Plants) /
-#         (sum(model.p[p,i] for p in model.Plants) + M * (1 - model.y[i]))
-#     )
+def CHP_5(model, t, i, p):
+    return model.P_el[p,i,t] <= model.p_max_plant[i,p]*model.kappa[i,p,t]
+model.CHP_5_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_5)
 
-# model.heatlosscost_constraint = Constraint(model.I, model.J, rule=heatlosscost_constraint_rule)
+def CHP_6(model, t, i, p):
+    return 0 <= model.p[p,i,t]
+model.CHP_6_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_6)
 
-# def sum_power_generation_rule(model, i):
-#     return sum(model.p[p,i] for p in model.Plants) <= M* model.y[i]
+def CHP_7(model, t, i, p):
+    return model.p[p,i,t] <= CHP_feasible_area(model.p_max_plant[i,p])[1]*model.kappa[i,p,t]
+model.CHP_7_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_7)
 
-# model.sum_power_generation_constraint = Constraint(model.I, rule=sum_power_generation_rule)
+def HOB_1(model, t, i, p):
+    return model.P_el[p,i,t]  ==  0
+model.HOB_1_constraint = Constraint(model.T,model.HOB_Plants, rule=HOB_1)
 
-# def sum_power_generation_rule_2(model, i):
-#     return sum(model.p[p,i] for p in model.Plants) >= epsilon * model.y[i]
+def HOB_2(model, t, i, p):
+    return model.p[p,i,t] <= model.p_max_plant[i,p]*model.kappa[i,p,t]
+model.HOB_2_constraint = Constraint(model.T, model.HOB_Plants, rule=HOB_2)
 
-# model.sum_power_generation_constraint_2 = Constraint(model.I, rule=sum_power_generation_rule_2)
 # solve the model
 solver = SolverFactory("octeract");
 results = solver.solve(model, tee=True)
