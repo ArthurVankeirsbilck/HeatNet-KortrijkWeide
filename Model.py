@@ -49,7 +49,6 @@ def gencosts():
             # loop over time periods
                 # add demand to dictionary with node, plant, and time period as keys
                 dict[(i, p, t)] = eval(f"node{i}_costs[t-1]")
-
     return dict
 print(gencosts())
 gas_price = 49.620 # 4/4/2023 TTF market
