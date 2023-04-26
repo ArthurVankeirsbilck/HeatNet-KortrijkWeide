@@ -33,7 +33,7 @@ model.HOB_Plants = Set(within=model.I * model.Plants, initialize={
     (3, 'Plant2')
 })
 
-M=8000
+M=500
 Cp=4.18
 massflow = 2.4
 
@@ -71,7 +71,7 @@ model.obj = Objective(
     expr=summation(model.c, model.x) + sum(model.c_gen[i,p]*model.p[p,i] for p in model.Plants for i in model.I) + sum(model.CQl[i,j]*model.Ql[i,j] for i in model.I for j in model.J))
 
 def balance_constraint_rule(model, i,j):
-    return sum(sum(model.x[i, j] - model.x[j, i] for j in model.J)for i in model.I) + sum(model.p[p,i] for p in model.Plants) == model.d[i]
+    return sum(model.x[i, j] - model.x[j, i] for j in model.J) + sum(model.p[p,i] for p in model.Plants) == model.d[i]
 
 model.balance_constraint = Constraint(model.I, model.J, rule=balance_constraint_rule)
 
