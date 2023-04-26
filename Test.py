@@ -187,7 +187,7 @@ def heatloss_bin1(model, i,j,t):
 model.heatloss_bin1 = Constraint(model.I, model.J, model.T, rule=heatloss_bin1)
 
 def heatloss_bin2(model, i,j,t):
-    return model.x[i,j,t] <= m*model.z[i,j,t]
+    return model.x[i,j,t] <= M*model.z[i,j,t]
 model.heatloss_bin2 = Constraint(model.I, model.J, model.T, rule=heatloss_bin2)
 
 
