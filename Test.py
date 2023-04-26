@@ -115,5 +115,40 @@ model.sum_power_generation_constraint_2 = Constraint(model.I, rule=sum_power_gen
 solver = SolverFactory("octeract");
 results = solver.solve(model, tee=True)
 
-#Results
 print(f"Objective value: {model.obj():.2f}")
+for i in model.I:
+    for j in model.J:
+        if model.x[i, j]() > 0:
+            print(f"From node {j} to node {i}: {model.x[i, j]():.2f} MWh")
+print("Production:")
+for i in model.I:
+    for p in model.Plants:
+        if model.p[p,i]() > 0:
+            print(f"At node {i} at pp {p}: {model.p[p,i]():.2f} MWh")
+
+print("Generation costs:")
+for i in model.I:
+    for p in model.Plants:
+        if model.p[p,i].value > 0:
+            print(f"At node {i} at pp {p}: {model.p[p,i].value*model.c_gen[i,p]:.2f} $")
+
+print("Transmission costs:")
+for i in model.I:
+    for j in model.J:
+        if model.x[i, j]() > 0:
+            print(f"From node {j} to node {i}: {model.x[i, j].value*model.c[i, j]:.2f} $")
+
+print("Heatloss cost:")
+for i in model.I:
+    for j in model.J:
+        if model.CQl[i,j].value > 0:
+            print(f"Loss from node {j} to node {i}: {model.CQl[i,j].value*model.z[i,j].value:.2f} $")
+
+print("Temps:")
+for i in model.I:
+    for j in model.J:
+        if i == j:
+            pass
+        else:
+            if model.Tr[i,j].value > 0:
+                print("Supply-Return temp {} -> {}: {} <-> {}°C".format(j,i,model.Ts[i,j].value,model.Tr[i,j].value))
