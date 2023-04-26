@@ -125,7 +125,7 @@ epsilon = 0.0000001
 
 # objective
 model.obj = Objective(
-    expr=sum(model.c[i,j]*model.x[i,j,t] - model.Ql[i,j,t]  for j in model.J for i in model.I for t in model.T) + sum(model.c_gen[i,p,t]*model.p[p,i,t] - P_elec*model.P_el[p,i,t] for p in model.Plants for i in model.I for t in model.T), sense=minimize)
+    expr=sum(model.c[i,j]*model.x[i,j,t] + model.Ql[i,j,t]  for j in model.J for i in model.I for t in model.T) + sum(model.c_gen[i,p,t]*model.p[p,i,t] - P_elec*model.P_el[p,i,t] for p in model.Plants for i in model.I for t in model.T), sense=minimize)
 
 def balance_constraint_rule(model, i,j,t):
     return sum(model.x[i, j, t] - model.x[j, i, t] for j in model.J) + sum(model.p[p,i,t] for p in model.Plants) == model.d[i,t]
@@ -178,9 +178,9 @@ def HOB_2(model, t, i, p):
     return model.p[p,i,t] <= model.p_max_plant[i,p]*model.kappa[i,p,t]
 model.HOB_2_constraint = Constraint(model.T, model.HOB_Plants, rule=HOB_2)
 
-def heatloss_constraint(model, i, j,t):
-    return model.Ql[i,j,t] == (((2.0*3.14*model.k[i,j]*model.L[i,j]*(model.Ts[i,j,t]-model.Tr[i,j,t]))/math.log(model.Do[i,j]/model.Di[i,j]))/1000)*model.z[i,j,t]
-model.heatloss_constraint = Constraint(model.I, model.J, model.T, rule=heatloss_constraint)
+def heatloss_constraint(model, i, j,t, p):
+    return model.Ql[i,j,t] == (model.c_gen[i,p,t]*(((2.0*3.14*model.k[i,j]*model.L[i,j]*(model.Ts[i,j,t]-model.Tr[i,j,t]))/math.log(model.Do[i,j]/model.Di[i,j]))/1000))*model.z[i,j,t]
+model.heatloss_constraint = Constraint(model.I, model.J, model.T, model.Plants, rule=heatloss_constraint)
 
 def heatloss_bin1(model, i,j,t):
     return model.z[i,j,t] >= model.x[i,j,t]/M
@@ -217,9 +217,3 @@ for t in model.T:
         for j in model.J:
             if model.Ql[i,j,t].value > 0:
                 print(f"Loss from node {j} to node {i}: {model.Ql[i,j,t].value:.2f}")
-
-print("z:")
-for t in model.T:
-    for i in model.I:
-        for j in model.J:
-                print(model.z[i,j,t].value)
