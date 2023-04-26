@@ -10,15 +10,15 @@ randomlist3 = []
 Plants = ['Plant1', 'Plant2', 'Plant3']
 #Aanpassen nummers, numerical instability due to big
 for i in range(0,hours):
-    n = random.randint(1300,1320)
+    n = random.randint(1300,1301)
     randomlist.append(n)
 
 for i in range(0,hours):
-    n = random.randint(500,550)
+    n = random.randint(500,505)
     randomlist2.append(n)
 
 for i in range(0,hours):
-    n = random.randint(600,650)
+    n = random.randint(600,601)
     randomlist3.append(n)
 
 
