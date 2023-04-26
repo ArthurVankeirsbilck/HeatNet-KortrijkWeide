@@ -113,7 +113,7 @@ epsilon = 0.0000001
 
 # objective
 model.obj = Objective(
-    expr=sum(model.c[i,j]*model.x[i,j,t] for j in model.J for i in model.I for t in model.T) + sum(model.c_gen[i,p]*model.p[p,i] for p in model.Plants for i in model.I), sense=minimize)
+    expr=sum(model.c[i,j]*model.x[i,j,t] for j in model.J for i in model.I for t in model.T) + sum(model.c_gen[i,p,t]*model.p[p,i,t] for p in model.Plants for i in model.I for t in model.T), sense=minimize)
 
 def balance_constraint_rule(model, i,j,t):
     return sum(model.x[i, j, t] - model.x[j, i, t] for j in model.J) + sum(model.p[p,i,t] for p in model.Plants) == model.d[i,t]
@@ -191,7 +191,7 @@ for i in model.I:
             pass
         else:
             if model.Tr[i,j].value > 0:
-                print("Supply-Return temp {} -> {}: {} <-> {}°C".format(j,i,model.Ts[i,j].value,model.Tr[i,j].value))
+                print("Supply-Return temp {} -> {}: {} <-> {}°C".format(j,i,model   
 
 # print("Massflows:")
 # for i in model.I:
