@@ -209,7 +209,7 @@ for t in model.T:
             if i==j:
                     pass
             else:
-                print(f"Loss from node {j} to node {i}: {model.Ql[i,j,t].value:.2f} $")
+                print("from {} to {}: {}".format(j,i,model.Ql[i,j,t]()))
 
 print("Heatloss cost:")
 for t in model.T:
