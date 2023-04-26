@@ -14,7 +14,7 @@ def CHP_feasible_area(yA):
     return xA, xB, yB, xC, yC, xD, yD
 
 random.seed(10)
-hours=1
+hours=100
 randomlist = []
 randomlist2 = []
 randomlist3 = []
