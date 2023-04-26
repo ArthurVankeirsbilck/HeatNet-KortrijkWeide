@@ -62,7 +62,7 @@ model.demand_plus_loss = Var(model.I, bounds=(0, None))
 model.Ts = Var(model.I, model.J, bounds=(60, 90))
 model.Tr = Var(model.I, model.J, bounds=(50, 70))
 model.y = Var(model.I, domain=Binary)
-model.massflow = Var(model.I, model.J, bounds=(0, 20))
+model.massflow = Var(model.I, model.J, bounds=(0, 10))
 M = 10000
 epsilon = 0.0001
 # objective
