@@ -201,3 +201,9 @@ for t in model.T:
 #                 print(f"At node {i} at pp {p} at {t}: {model.p[p,i,t]():.2f} MWh")
 #             if model.P_el[p,i,t].value > 0:
 #                 print(f"At node {i} at pp {p} (ELEC) at {t}: {model.P_el[p,i,t].value:.2f} MWh")
+print("Heatloss cost:")
+for t in model.T:
+    for i in model.I:
+        for j in model.J:
+            if model.CQl[i,j,t].value*model.z[i,j,t].value > 0:
+                print(f"Loss from node {j} to node {i}: {model.Ql[i,j].value:.2f} $")
