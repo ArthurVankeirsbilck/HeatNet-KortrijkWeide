@@ -62,7 +62,7 @@ model.demand_plus_loss = Var(model.I, bounds=(0, None))
 model.Ts = Var(model.I, model.J, bounds=(60, 150))
 model.Tr = Var(model.I, model.J, bounds=(50, 150))
 model.y = Var(model.I, domain=Binary)
-# model.massflow = Var(model.I, model.J, bounds=(0, None))
+model.massflow = Var(model.I, model.J, bounds=(0, 20))
 M = 10000
 epsilon = 0.0001
 massflow:2.4
@@ -76,7 +76,7 @@ def balance_constraint_rule(model, i,j):
 model.balance_constraint = Constraint(model.I, model.J, rule=balance_constraint_rule)
 
 def heat_flow_constraint(model, i, j):
-    return Cp*massflow*(model.Ts[i,j]-model.Tr[i,j]) == model.d[i]
+    return Cp*model.massflow*(model.Ts[i,j]-model.Tr[i,j]) == model.d[i]
 
 model.heat_flow_constraint = Constraint(model.I, model.J, rule=heat_flow_constraint)
 
