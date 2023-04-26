@@ -119,7 +119,7 @@ model.z = Var(model.I, model.J, model.T, domain=Binary)
 model.Ts = Var(model.I, model.J, model.T, bounds=(60, 120))
 model.Tr = Var(model.I, model.J, model.T, bounds=(30, 50))
 model.y = Var(model.I, model.T, domain=Binary)
-model.massflow = Var(model.I, model.J, model.T, bounds=(0, None))
+# model.massflow = Var(model.I, model.J, model.T, bounds=(0, None))
 model.P_el = Var(model.Plants, model.I, model.T, bounds=(0, None))
 model.kappa = Var(model.I, model.Plants, model.T, domain=Binary)
 M = 10000000
@@ -134,7 +134,7 @@ def balance_constraint_rule(model, i,j,t):
 model.balance_constraint = Constraint(model.I, model.J, model.T , rule=balance_constraint_rule)
 
 def heat_flow_constraint(model, i, j,t):
-    return Cp*model.massflow[i,j,t]*(model.Ts[i,j,t]-model.Tr[i,j,t]) == model.d[i,t]
+    return Cp*2.4*(model.Ts[i,j,t]-model.Tr[i,j,t]) == model.d[i,t]
 
 model.heat_flow_constraint = Constraint(model.I, model.J, model.T, rule=heat_flow_constraint)
 
