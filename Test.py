@@ -80,10 +80,10 @@ def heat_flow_constraint(model, i, j):
 
 model.heat_flow_constraint = Constraint(model.I, model.J, rule=heat_flow_constraint)
 
-def capacity_constraint_rule(model, i, j):
-    return model.x[i, j] <= model.u[i, j]*model.z[i,j]
+# def capacity_constraint_rule(model, i, j):
+#     return model.x[i, j] <= model.u[i, j]*model.z[i,j]
 
-model.capacity_constraint = Constraint(model.I, model.J, rule=capacity_constraint_rule)
+# model.capacity_constraint = Constraint(model.I, model.J, rule=capacity_constraint_rule)
 
 def production_constraint_rule(model, i, p):
     return model.p[p,i] <= model.p_max_plant[i,p]
