@@ -1,7 +1,9 @@
 from pyomo.environ import *
 import math
+import random
+
 random.seed(10)
-hours=20
+hours=1
 randomlist = []
 randomlist2 = []
 randomlist3 = []
