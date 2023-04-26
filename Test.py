@@ -190,11 +190,8 @@ print(f"Objective value: {model.obj():.2f}")
 for t in model.T:
     for i in model.I:
         for j in model.J:
-            if i==j:
-                pass
-            else:
-                if model.x[i, j,t]() > 0:
-                    print(f"From node {j} to node {i} at {t}: {model.x[i,j,t]():.2f} MWh")
+            if model.x[i, j,t]() > 0:
+                print(f"From node {j} to node {i} at {t}: {model.x[i,j,t]():.2f} MWh")
 
 # print("Production:")
 # for t in model.T:
@@ -209,6 +206,9 @@ print("Heatloss cost:")
 for t in model.T:
     for i in model.I:
         for j in model.J:
+            if i==j:
+                    pass
+            else:
                 print(f"Loss from node {j} to node {i}: {model.Ql[i,j,t]():.2f} $")
 
 print("Heatloss cost:")
