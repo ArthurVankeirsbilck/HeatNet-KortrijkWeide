@@ -15,7 +15,7 @@ def CHP_feasible_area(yA):
     return xA, xB, yB, xC, yC, xD, yD
 
 random.seed(10)
-hours=2000
+hours=1000
 randomlist = []
 randomlist2 = []
 randomlist3 = []
@@ -82,17 +82,16 @@ model.p_max_plant = Param(model.I, model.Plants, initialize={
     (2, 'Plant1'): 200,  (2, 'Plant2'):200, (2, 'Plant3'):200,
     (3, 'Plant1'): 1000, (3, 'Plant2'):200,(3, 'Plant3'):0,
 })
-
-model.CHP_Plants = Set(within=model.I * model.Plants, initialize={
+CHP_plants ={
     (1, 'Plant1'),(1, 'Plant2'), (1, 'Plant3'),
     (2, 'Plant1'), (2, 'Plant2'), (2, 'Plant3')
-
-    # (1, 'Plant1')
-})
-
-model.HOB_Plants = Set(within=model.I * model.Plants, initialize={
+}
+HOB_plants ={
     (3, 'Plant1'), (3, 'Plant2'), (3, 'Plant3')
-})
+}
+model.CHP_Plants = Set(within=model.I * model.Plants, initialize=CHP_plants)
+
+model.HOB_Plants = Set(within=model.I * model.Plants, initialize=HOB_plants)
 
 M=8000
 Cp=4.18
@@ -194,11 +193,11 @@ model.heatloss_bin2 = Constraint(model.I, model.J, model.T, rule=heatloss_bin2)
 
 
 # solve the model
-# solver = SolverFactory("octeract");
-# results = solver.solve(model, tee=True)
+solver = SolverFactory("mindtpy");
+results = solver.solve(model, mip_solver="gurobi", nlp_solver="ipopt", tee=True)
 
-solver = SolverFactory("octeract");
-results = solver.solve(model,tee=True)
+# solver = SolverFactory("octeract");
+# results = solver.solve(model,tee=True)
 
 print(f"Objective value: {model.obj():.2f}")
 
