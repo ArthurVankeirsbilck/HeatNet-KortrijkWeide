@@ -15,7 +15,7 @@ def CHP_feasible_area(yA):
     return xA, xB, yB, xC, yC, xD, yD
 
 random.seed(10)
-hours=1000
+hours=1
 randomlist = []
 randomlist2 = []
 randomlist3 = []
@@ -190,12 +190,7 @@ model.heatloss_bin1 = Constraint(model.I, model.J, model.T, rule=heatloss_bin1)
 def heatloss_bin2(model, i,j,t):
     return model.x[i,j,t] <= M*model.z[i,j,t]
 model.heatloss_bin2 = Constraint(model.I, model.J, model.T, rule=heatloss_bin2)
-
-
-# solve the model
-# solver = SolverFactory("mindtpy");
-# results = solver.solve(model, mip_solver="gurobi", nlp_solver="ipopt", tee=True)
-
+#Add Fairness constraint 
 solver = SolverFactory("octeract");
 results = solver.solve(model,tee=True)
 
