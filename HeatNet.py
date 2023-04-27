@@ -193,11 +193,11 @@ model.heatloss_bin2 = Constraint(model.I, model.J, model.T, rule=heatloss_bin2)
 
 
 # solve the model
-solver = SolverFactory("mindtpy");
-results = solver.solve(model, mip_solver="gurobi", nlp_solver="ipopt", tee=True)
+# solver = SolverFactory("mindtpy");
+# results = solver.solve(model, mip_solver="gurobi", nlp_solver="ipopt", tee=True)
 
-# solver = SolverFactory("octeract");
-# results = solver.solve(model,tee=True)
+solver = SolverFactory("octeract");
+results = solver.solve(model,tee=True)
 
 print(f"Objective value: {model.obj():.2f}")
 
