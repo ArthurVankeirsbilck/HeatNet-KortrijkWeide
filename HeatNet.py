@@ -19,7 +19,7 @@ def CHP_feasible_area(yA):
 
     return xA, xB, yB, xC, yC, xD, yD
 
-hours=1
+hours=500
 node1_demands = []
 node2_demands = []
 node3_demands = []
