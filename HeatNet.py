@@ -2,6 +2,11 @@ from pyomo.environ import *
 import math
 import random
 import csv
+random.seed(10)
+#Data
+k_SDR11 = 0.414*0.1
+do_SDR11 = 0.125
+di_SDR11 = 0.1022
 
 def CHP_feasible_area(yA):
     xA = 0
@@ -14,36 +19,39 @@ def CHP_feasible_area(yA):
 
     return xA, xB, yB, xC, yC, xD, yD
 
-random.seed(10)
 hours=1
-randomlist = []
-randomlist2 = []
-randomlist3 = []
-#Aanpassen nummers, numerical instability due to big
-for i in range(0,hours):
-    n = random.randint(200,500)
-    randomlist.append(n)
-
-for i in range(0,hours):
-    n = random.randint(200,500)
-    randomlist2.append(n)
-
-for i in range(0,hours):
-    n = random.randint(100,300)
-    randomlist3.append(n)
-
-
-node1_demands = randomlist
-node2_demands = randomlist2
-node3_demands = randomlist3
+node1_demands = []
+node2_demands = []
+node3_demands = []
+node4_demands = []
 node1_costs = [1.8]*hours
 node2_costs = [1.4]*hours
 node3_costs = [1.0]*hours
+node4_costs = [1.0]*hours
 Plants = ['Plant1', 'Plant2', 'Plant3']
+nodes = [1, 2, 3, 4]
+
+#Aanpassen nummers, numerical instability due to big
+for i in range(0,hours):
+    n = random.randint(200,210)
+    node1_demands.append(n)
+
+for i in range(0,hours):
+    n = random.randint(200,210)
+    node2_demands.append(n)
+
+for i in range(0,hours):
+    n = random.randint(100,210)
+    node3_demands.append(n)
+
+for i in range(0,hours):
+    n = random.randint(100,200)
+    node4_demands.append(n)
+
 def demands():
     demands_dict = {}
     #nodes
-    for i in range(1, 4):
+    for i in range(1, len(nodes)+1):
         #time periods
         for t in range(0, len(node1_demands)+1):
             # add demand to dictionary with node and time period as keys
@@ -53,7 +61,7 @@ def demands():
 def gencosts():
     dict = {}
     # loop over nodes
-    for i in range(1, 4):
+    for i in range(1, len(nodes)+1):
         # loop over plants
         for t in range(0, len(node1_demands)+1):
             for p in Plants:
@@ -61,33 +69,39 @@ def gencosts():
                 # add demand to dictionary with node, plant, and time period as keys
                 dict[(i, p, t)] = eval(f"node{i}_costs[t-1]")
     return dict
-print(gencosts())
+
 T = len(node1_demands)+1
 times = list(range(T))
+
 # create model object
 model = ConcreteModel()
+
 # sets
 model.T = Set(initialize=times)
-model.I = Set(initialize=[1, 2, 3])  # set of nodes
-model.J = Set(initialize=[1, 2, 3])  # set of nodes
+model.I = Set(initialize=nodes)  # set of nodes
+model.J = Set(initialize=nodes)  # set of nodes
 model.Plants = Set(initialize=Plants)
 
 # parameters
 model.c = Param(model.I, model.J, initialize={
     (1, 2): 50, (1, 3): 50, (2, 1): 50, (2, 3): 50, (3, 1): 50, (3, 2): 50,
-    (1, 1): 0, (2, 2): 0, (3, 3): 0  # initialize diagonal elements to zero
+    (1, 1): 0, (2, 2): 0, (3, 3): 0, (1,4):50, (2,4):50, (3,4):50, (4,4):0, (4,1):50, (4,2):50, (4,3):50  # initialize diagonal elements to zero
 })  # transmission cost from i to j
 model.p_max_plant = Param(model.I, model.Plants, initialize={
-    (1, 'Plant1'): 1000, (1, 'Plant2'):200, (1, 'Plant3'):200,
-    (2, 'Plant1'): 200,  (2, 'Plant2'):200, (2, 'Plant3'):200,
-    (3, 'Plant1'): 1000, (3, 'Plant2'):200,(3, 'Plant3'):0,
+    (1, 'Plant1'): 751, (1, 'Plant2'):0, (1, 'Plant3'):0,
+    (2, 'Plant1'): 0,  (2, 'Plant2'):0, (2, 'Plant3'):0,
+    (3, 'Plant1'): 0, (3, 'Plant2'):0,(3, 'Plant3'):0,
+    (4, 'Plant1'): 350, (4, 'Plant2'): 0, (4, 'Plant3'): 0
 })
 CHP_plants ={
-    (1, 'Plant1'),(1, 'Plant2'), (1, 'Plant3'),
-    (2, 'Plant1'), (2, 'Plant2'), (2, 'Plant3')
+    (1, 'Plant1'),(4, 'Plant1')
+    
 }
 HOB_plants ={
-    (3, 'Plant1'), (3, 'Plant2'), (3, 'Plant3')
+    (1, 'Plant2'), (1, 'Plant3'),
+    (2, 'Plant1'), (2, 'Plant2'), (2, 'Plant3'),
+    (3, 'Plant1'), (3, 'Plant2'), (3, 'Plant3'),
+    (4, 'Plant2'), (4, 'Plant3')
 }
 model.CHP_Plants = Set(within=model.I * model.Plants, initialize=CHP_plants)
 
@@ -95,18 +109,19 @@ model.HOB_Plants = Set(within=model.I * model.Plants, initialize=HOB_plants)
 
 M=8000
 Cp=4.18
-P_elec = 0.4 #Wordt aangeleverd door Jurgen
-# massflow = 2.4
+P_elec = 0.4
 
-model.u = Param(model.I, model.J, initialize={(1, 2): M, (1, 3): M, (2, 1): M, (2, 3): M, (3, 1): M, (3, 2): M, (1, 1): 0, (2, 2): 0, (3, 3): 0})  # transmission capacity limit from i to j
+
+model.u = Param(model.I, model.J, initialize={(1, 2): M, (1, 3): 0, (2, 1): M, (2, 3): M, (3, 1): 0, (3, 2): M, (1, 1): 0, (2, 2): 0, (3, 3): 0, (1,4):0, (2,4):0, (3,4):M, (4,4):0, (4,1):0, (4,2):0, (4,3):M})  # transmission capacity limit from i to j
 model.d = Param(model.I, model.T, initialize=demands())  # net supply (supply - demand) in node i
 model.c_gen = Param(model.I, model.Plants, model.T, initialize=gencosts())
 
-model.k = Param(model.I, model.J, initialize={(1, 2): 0.3, (1, 3): 0.2, (2, 1): 0.3, (2, 3): 0.3, (3, 1): 0.2, (3, 2): 0.3,(1, 1): 0, (2, 2): 0, (3, 3): 0})
-model.L = Param(model.I, model.J, initialize={(1, 2): 30, (1, 3): 20, (2, 1): 30, (2, 3): 30, (3, 1): 20, (3, 2): 30,(1, 1): 0, (2, 2): 0, (3, 3): 0})
-model.Do = Param(model.I, model.J, initialize={(1, 2): 0.4, (1, 3): 0.3, (2, 1): 0.4, (2, 3): 0.4, (3, 1): 0.3, (3, 2): 0.4,(1, 1): 0.4, (2, 2): 0.4, (3, 3): 0.4})
-model.Di = Param(model.I, model.J, initialize={(1, 2): 0.3, (1, 3): 0.2, (2, 1): 0.3, (2, 3): 0.3, (3, 1): 0.2, (3, 2): 0.3,(1, 1): 0.1, (2, 2): 0.1, (3, 3): 0.1})
+model.k = Param(model.I, model.J, initialize={(1, 2): k_SDR11, (1, 3): k_SDR11, (2, 1): k_SDR11, (2, 3): k_SDR11, (3, 1): k_SDR11, (3, 2): k_SDR11,(1, 1): 0, (2, 2): 0, (3, 3): 0, (1,4):k_SDR11, (2,4):k_SDR11, (3,4):k_SDR11, (4,4):0, (4,1):k_SDR11, (4,2):k_SDR11, (4,3):k_SDR11})
+model.L = Param(model.I, model.J, initialize={(1, 2): 300, (1, 3): 300, (2, 1): 300, (2, 3): 300, (3, 1): 300, (3, 2): 300,(1, 1): 0, (2, 2): 0, (3, 3): 0, (1,4):0, (2,4):0, (3,4):300, (4,4):0, (4,1):0, (4,2):0, (4,3):300})
+model.Do = Param(model.I, model.J, initialize={(1, 2): do_SDR11, (1, 3): do_SDR11, (2, 1): do_SDR11, (2, 3): do_SDR11, (3, 1): do_SDR11, (3, 2): do_SDR11,(1, 1): do_SDR11, (2, 2): do_SDR11, (3, 3): do_SDR11, (1,4):do_SDR11, (2,4):do_SDR11, (3,4):do_SDR11, (4,4):do_SDR11, (4,1):do_SDR11, (4,2):do_SDR11, (4,3):do_SDR11})
+model.Di = Param(model.I, model.J, initialize={(1, 2): di_SDR11, (1, 3): di_SDR11, (2, 1): di_SDR11, (2, 3): di_SDR11, (3, 1): di_SDR11, (3, 2):di_SDR11,(1, 1): di_SDR11, (2, 2): di_SDR11, (3, 3): di_SDR11, (1,4):di_SDR11, (2,4):di_SDR11, (3,4):di_SDR11, (4,4):di_SDR11, (4,1):di_SDR11, (4,2):di_SDR11, (4,3):di_SDR11})
 model.cons = ConstraintList()
+
 # variables
 model.x = Var(model.I, model.J, model.T, bounds=(0, None))  # power transmission from i to j
 model.p = Var(model.Plants, model.I, model.T, bounds=(0, None))  # production at node i
@@ -193,6 +208,9 @@ model.heatloss_bin2 = Constraint(model.I, model.J, model.T, rule=heatloss_bin2)
 #Add Fairness constraint 
 solver = SolverFactory("octeract");
 results = solver.solve(model,tee=True)
+
+# solver = SolverFactory("mindtpy")
+# results = solver.solve(model,mip_solver="gurobi",nlp_solver="ipopt",tee=True)
 
 print(f"Objective value: {model.obj():.2f}")
 
