@@ -37,11 +37,11 @@ for i in range(0,hours):
     node1_demands.append(n)
 
 for i in range(0,hours):
-    n = random.randint(200,210)
+    n = random.randint(140,150)
     node2_demands.append(n)
 
 for i in range(0,hours):
-    n = random.randint(100,210)
+    n = random.randint(100,110)
     node3_demands.append(n)
 
 for i in range(0,hours):
