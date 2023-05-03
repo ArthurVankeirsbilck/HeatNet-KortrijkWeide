@@ -7,10 +7,14 @@ random.seed(10)
 k_SDR11 = 0.414
 do_SDR11 = 0.125
 di_SDR11 = 0.1022
-
+k_PTI = 0.5454
 k_DN125 = 0.5454
 do_DN125 = 0.125
 di_DN125 = 0.1022
+
+k_DHnetwerk = 0.414
+
+k_combinatie = 0.4797
 print("start")
 def CHP_feasible_area(yA):
     xA = 0
@@ -23,17 +27,23 @@ def CHP_feasible_area(yA):
 
     return xA, xB, yB, xC, yC, xD, yD
 
-hours=1000
+hours=5
 node1_demands = []
 node2_demands = []
 node3_demands = []
 node4_demands = []
+node5_demands = []
+node6_demands = []
+node7_demands = []
 node1_costs = [1.8]*hours
 node2_costs = [1.4]*hours
 node3_costs = [1.0]*hours
 node4_costs = [1.0]*hours
+node5_costs = [1.0]*hours
+node6_costs = [1.0]*hours
+node7_costs = [1.0]*hours
 Plants = ['Plant1', 'Plant2', 'Plant3']
-nodes = [1, 2, 3, 4]
+nodes = [1, 2, 3, 4,5,6,7]
 
 #Aanpassen nummers, numerical instability due to big
 for i in range(0,hours):
@@ -49,8 +59,20 @@ for i in range(0,hours):
     node3_demands.append(n)
 
 for i in range(0,hours):
-    n = random.randint(100,101)
+    n = random.randint(500,550)
     node4_demands.append(n)
+
+for i in range(0,hours):
+    n = random.randint(500,550)
+    node5_demands.append(n)
+
+for i in range(0,hours):
+    n = random.randint(500,550)
+    node6_demands.append(n)
+
+for i in range(0,hours):
+    n = random.randint(500,550)
+    node7_demands.append(n)
 
 def demands():
     demands_dict = {}
@@ -87,15 +109,23 @@ model.J = Set(initialize=nodes)  # set of nodes
 model.Plants = Set(initialize=Plants)
 
 # parameters
-model.c = Param(model.I, model.J, initialize={
-    (1, 2): 50, (1, 3): 50, (2, 1): 50, (2, 3): 50, (3, 1): 50, (3, 2): 50,
-    (1, 1): 0, (2, 2): 0, (3, 3): 0, (1,4):50, (2,4):50, (3,4):50, (4,4):0, (4,1):50, (4,2):50, (4,3):50  # initialize diagonal elements to zero
-})  # transmission cost from i to j
+model.c = Param(model.I, model.J, initialize=
+{(1, 1): 0, (1, 2): 50, (1, 3): 50, (1, 4): 50, (1, 5): 50, (1, 6): 50, (1, 7): 50, 
+(2, 1): 50, (2, 2): 0, (2, 3): 50, (2, 4): 50, (2, 5): 50, (2, 6): 50, (2, 7): 50, 
+(3, 1): 50, (3, 2): 50, (3, 3): 0, (3, 4): 50, (3, 5): 50, (3, 6): 50, (3, 7): 50, 
+(4, 1): 50, (4, 2): 50, (4, 3): 50, (4, 4): 0, (4, 5): 50, (4, 6): 50, (4, 7): 50, 
+(5, 1): 50, (5, 2): 50, (5, 3): 50, (5, 4): 50, (5, 5): 0, (5, 6): 50, (5, 7): 50, 
+(6, 1): 50, (6, 2): 50, (6, 3): 50, (6, 4): 50, (6, 5): 50, (6, 6): 0, (6, 7): 50, 
+(7, 1): 50, (7, 2): 50, (7, 3): 50, (7, 4): 50, (7, 5): 50, (7, 6): 50, (7, 7): 0}
+)  # transmission cost from i to j
 model.p_max_plant = Param(model.I, model.Plants, initialize={
     (1, 'Plant1'): 751, (1, 'Plant2'):751, (1, 'Plant3'):751,
     (2, 'Plant1'): 751,  (2, 'Plant2'):751, (2, 'Plant3'):751,
     (3, 'Plant1'): 751, (3, 'Plant2'):751,(3, 'Plant3'):751,
-    (4, 'Plant1'): 350, (4, 'Plant2'): 751, (4, 'Plant3'): 751
+    (4, 'Plant1'): 350, (4, 'Plant2'): 751, (4, 'Plant3'): 751,
+    (5, 'Plant1'): 350, (5, 'Plant2'): 751, (5, 'Plant3'): 751,
+    (6, 'Plant1'): 350, (6, 'Plant2'): 751, (6, 'Plant3'): 751,
+    (7, 'Plant1'): 350, (7, 'Plant2'): 751, (7, 'Plant3'): 751
 })
 CHP_plants ={
     (1, 'Plant1'),(4, 'Plant1')
@@ -105,7 +135,10 @@ HOB_plants ={
     (1, 'Plant2'), (1, 'Plant3'),
     (2, 'Plant1'), (2, 'Plant2'), (2, 'Plant3'),
     (3, 'Plant1'), (3, 'Plant2'), (3, 'Plant3'),
-    (4, 'Plant2'), (4, 'Plant3')
+    (4, 'Plant2'), (4, 'Plant3'),
+    (5, 'Plant1'), (5, 'Plant2'), (5, 'Plant3'),
+    (6, 'Plant1'), (6, 'Plant2'), (6, 'Plant3'),
+    (7, 'Plant1'), (7, 'Plant2'), (7, 'Plant3')
 }
 model.CHP_Plants = Set(within=model.I * model.Plants, initialize=CHP_plants)
 
@@ -116,14 +149,57 @@ Cp=4.18
 P_elec = 0.4
 
 
-model.u = Param(model.I, model.J, initialize={(1, 2): M, (1, 3): 0, (2, 1): M, (2, 3): M, (3, 1): 0, (3, 2): M, (1, 1): 0, (2, 2): 0, (3, 3): 0, (1,4):0, (2,4):0, (3,4):M, (4,4):0, (4,1):0, (4,2):0, (4,3):M})  # transmission capacity limit from i to j
+model.u =Param(model.I, model.J, initialize=
+{(1, 1): 0, (1, 2): M, (1, 3): M, (1, 4): M, (1, 5): M, (1, 6): M, (1, 7): M,
+(2, 1): M, (2, 2): 0, (2, 3): M, (2, 4): M, (2, 5): M, (2, 6): M, (2, 7): M, 
+(3, 1): M, (3, 2): M, (3, 3): 0, (3, 4): M, (3, 5): M, (3, 6): M, (3, 7): M, 
+(4, 1): M, (4, 2): M, (4, 3): M, (4, 4): 0, (4, 5): M, (4, 6): M, (4, 7): M, 
+(5, 1): M, (5, 2): M, (5, 3): M, (5, 4): M, (5, 5): 0, (5, 6): M, (5, 7): M, 
+(6, 1): M, (6, 2): M, (6, 3): M, (6, 4): M, (6, 5): M, (6, 6): 0, (6, 7): M, 
+(7, 1): M, (7, 2): M, (7, 3): M, (7, 4): M, (7, 5): M, (7, 6): M, (7, 7): 0}
+) #transmission capacity
+
 model.d = Param(model.I, model.T, initialize=demands())  # net supply (supply - demand) in node i
 model.c_gen = Param(model.I, model.Plants, model.T, initialize=gencosts())
 
-model.k = Param(model.I, model.J, initialize={(1, 2): k_SDR11, (1, 3): k_SDR11, (2, 1): k_SDR11, (2, 3): k_SDR11, (3, 1): k_SDR11, (3, 2): k_SDR11,(1, 1): 0, (2, 2): 0, (3, 3): 0, (1,4):k_SDR11, (2,4):k_SDR11, (3,4):k_SDR11, (4,4):0, (4,1):k_SDR11, (4,2):k_SDR11, (4,3):k_SDR11})
-model.L = Param(model.I, model.J, initialize={(1, 2): 300, (1, 3): 300, (2, 1): 300, (2, 3): 300, (3, 1): 300, (3, 2): 300,(1, 1): 0, (2, 2): 0, (3, 3): 0, (1,4):0, (2,4):0, (3,4):300, (4,4):0, (4,1):0, (4,2):0, (4,3):300})
-model.Do = Param(model.I, model.J, initialize={(1, 2): do_SDR11, (1, 3): do_SDR11, (2, 1): do_SDR11, (2, 3): do_SDR11, (3, 1): do_SDR11, (3, 2): do_SDR11,(1, 1): do_SDR11, (2, 2): do_SDR11, (3, 3): do_SDR11, (1,4):do_SDR11, (2,4):do_SDR11, (3,4):do_SDR11, (4,4):do_SDR11, (4,1):do_SDR11, (4,2):do_SDR11, (4,3):do_SDR11})
-model.Di = Param(model.I, model.J, initialize={(1, 2): di_SDR11, (1, 3): di_SDR11, (2, 1): di_SDR11, (2, 3): di_SDR11, (3, 1): di_SDR11, (3, 2):di_SDR11,(1, 1): di_SDR11, (2, 2): di_SDR11, (3, 3): di_SDR11, (1,4):di_SDR11, (2,4):di_SDR11, (3,4):di_SDR11, (4,4):di_SDR11, (4,1):di_SDR11, (4,2):di_SDR11, (4,3):di_SDR11})
+model.k = Param(model.I, model.J, initialize=
+{(1, 1): 0, (1, 2): k_SDR11, (1, 3): k_DHnetwerk, (1, 4): k_combinatie, (1, 5): k_DHnetwerk, (1, 6): k_DHnetwerk, (1, 7): k_DHnetwerk,
+(2, 1): k_SDR11, (2, 2): 0, (2, 3): k_PTI, (2, 4): k_combinatie, (2, 5): k_DHnetwerk, (2, 6): k_DHnetwerk, (2, 7): k_DHnetwerk, 
+(3, 1): k_DHnetwerk, (3, 2): k_PTI, (3, 3): 0, (3, 4): k_DHnetwerk, (3, 5): k_DHnetwerk, (3, 6): k_DHnetwerk, (3, 7): k_DHnetwerk, 
+(4, 1): k_combinatie, (4, 2): k_combinatie, (4, 3): k_DHnetwerk, (4, 4): 0, (4, 5): k_DHnetwerk, (4, 6): k_DHnetwerk, (4, 7): k_DHnetwerk, 
+(5, 1): k_DHnetwerk, (5, 2): k_DHnetwerk, (5, 3): k_DHnetwerk, (5, 4): k_DHnetwerk, (5, 5): 0, (5, 6): k_DHnetwerk, (5, 7): k_DHnetwerk, 
+(6, 1): k_DHnetwerk, (6, 2): k_DHnetwerk, (6, 3): k_DHnetwerk, (6, 4): k_DHnetwerk, (6, 5): k_DHnetwerk, (6, 6): 0, (6, 7): k_DHnetwerk, 
+(7, 1): k_DHnetwerk, (7, 2): k_DHnetwerk, (7, 3): k_DHnetwerk, (7, 4): k_DHnetwerk, (7, 5): k_DHnetwerk, (7, 6): k_DHnetwerk, (7, 7): 0})
+
+model.L = Param(model.I, model.J, initialize=
+{(1, 1): 0, (1, 2): 50, (1, 3): 50, (1, 4): 50, (1, 5): 50, (1, 6): 50, (1, 7): 50, 
+(2, 1): 50, (2, 2): 0, (2, 3): 50, (2, 4): 50, (2, 5): 50, (2, 6): 50, (2, 7): 50, 
+(3, 1): 50, (3, 2): 50, (3, 3): 0, (3, 4): 50, (3, 5): 50, (3, 6): 50, (3, 7): 50, 
+(4, 1): 50, (4, 2): 50, (4, 3): 50, (4, 4): 0, (4, 5): 50, (4, 6): 50, (4, 7): 50, 
+(5, 1): 50, (5, 2): 50, (5, 3): 50, (5, 4): 50, (5, 5): 0, (5, 6): 50, (5, 7): 50, 
+(6, 1): 50, (6, 2): 50, (6, 3): 50, (6, 4): 50, (6, 5): 50, (6, 6): 0, (6, 7): 50, 
+(7, 1): 50, (7, 2): 50, (7, 3): 50, (7, 4): 50, (7, 5): 50, (7, 6): 50, (7, 7): 0})
+
+model.Do = Param(model.I, model.J, initialize=
+{(1, 1): do_DN125, (1, 2): do_DN125, (1, 3): do_DN125, (1, 4): do_DN125, (1, 5): do_DN125, (1, 6): do_DN125, (1, 7): do_DN125, 
+(2, 1): do_DN125, (2, 2): do_DN125, (2, 3): do_DN125, (2, 4): do_DN125, (2, 5): do_DN125, (2, 6): do_DN125, (2, 7): do_DN125, 
+(3, 1): do_DN125, (3, 2): do_DN125, (3, 3): do_DN125, (3, 4): do_DN125, (3, 5): do_DN125, (3, 6): do_DN125, (3, 7): do_DN125, 
+(4, 1): do_DN125, (4, 2): do_DN125, (4, 3): do_DN125, (4, 4): do_DN125, (4, 5): do_DN125, (4, 6): do_DN125, (4, 7): do_DN125, 
+(5, 1): do_DN125, (5, 2): do_DN125, (5, 3): do_DN125, (5, 4): do_DN125, (5, 5): do_DN125, (5, 6): do_DN125, (5, 7): do_DN125, 
+(6, 1): do_DN125, (6, 2): do_DN125, (6, 3): do_DN125, (6, 4): do_DN125, (6, 5): do_DN125, (6, 6): do_DN125, (6, 7): do_DN125, 
+(7, 1): do_DN125, (7, 2): do_DN125, (7, 3): do_DN125, (7, 4): do_DN125, (7, 5): do_DN125, (7, 6): do_DN125, (7, 7): do_DN125}
+)
+
+model.Di = Param(model.I, model.J, initialize=
+{(1, 1): di_DN125, (1, 2): di_DN125, (1, 3): di_DN125, (1, 4): di_DN125, (1, 5): di_DN125, (1, 6): di_DN125, (1, 7): di_DN125, 
+(2, 1): di_DN125, (2, 2): di_DN125, (2, 3): di_DN125, (2, 4): di_DN125, (2, 5): di_DN125, (2, 6): di_DN125, (2, 7): di_DN125, 
+(3, 1): di_DN125, (3, 2): di_DN125, (3, 3): di_DN125, (3, 4): di_DN125, (3, 5): di_DN125, (3, 6): di_DN125, (3, 7): di_DN125, 
+(4, 1): di_DN125, (4, 2): di_DN125, (4, 3): di_DN125, (4, 4): di_DN125, (4, 5): di_DN125, (4, 6): di_DN125, (4, 7): di_DN125, 
+(5, 1): di_DN125, (5, 2): di_DN125, (5, 3): di_DN125, (5, 4): di_DN125, (5, 5): di_DN125, (5, 6): di_DN125, (5, 7): di_DN125, 
+(6, 1): di_DN125, (6, 2): di_DN125, (6, 3): di_DN125, (6, 4): di_DN125, (6, 5): di_DN125, (6, 6): di_DN125, (6, 7): di_DN125, 
+(7, 1): di_DN125, (7, 2): di_DN125, (7, 3): di_DN125, (7, 4): di_DN125, (7, 5): di_DN125, (7, 6): di_DN125, (7, 7): di_DN125}
+)
+
 model.cons = ConstraintList()
 
 # variables
