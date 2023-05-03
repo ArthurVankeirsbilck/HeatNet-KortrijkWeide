@@ -11,7 +11,7 @@ di_SDR11 = 0.1022
 k_DN125 = 0.5454
 do_DN125 = 0.125
 di_DN125 = 0.1022
-
+print("start")
 def CHP_feasible_area(yA):
     xA = 0
     xB = round(yA*(180/247))
@@ -23,7 +23,7 @@ def CHP_feasible_area(yA):
 
     return xA, xB, yB, xC, yC, xD, yD
 
-hours=500
+hours=10
 node1_demands = []
 node2_demands = []
 node3_demands = []
