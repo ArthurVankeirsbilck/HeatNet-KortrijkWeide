@@ -210,7 +210,7 @@ def heatloss_bin2(model, i,j,t):
     return model.x[i,j,t] <= M*model.z[i,j,t]
 model.heatloss_bin2 = Constraint(model.I, model.J, model.T, rule=heatloss_bin2)
 #Add Fairness constraint 
-solver = SolverFactory("octeract");
+solver = SolverFactory("knitro");
 results = solver.solve(model,tee=True)
 
 # solver = SolverFactory("mindtpy")
