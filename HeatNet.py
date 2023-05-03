@@ -63,7 +63,7 @@ for i in range(0,hours):
     node4_demands.append(n)
 
 for i in range(0,hours):
-    n = random.randint(500,550)
+    n = random.randint(200,201)
     node5_demands.append(n)
 
 for i in range(0,hours):
@@ -71,7 +71,7 @@ for i in range(0,hours):
     node6_demands.append(n)
 
 for i in range(0,hours):
-    n = random.randint(500,550)
+    n = random.randint(200,201)
     node7_demands.append(n)
 
 def demands():
