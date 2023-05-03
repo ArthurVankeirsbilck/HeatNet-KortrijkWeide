@@ -123,9 +123,9 @@ model.p_max_plant = Param(model.I, model.Plants, initialize={
     (2, 'Plant1'): 751,  (2, 'Plant2'):751, (2, 'Plant3'):751,
     (3, 'Plant1'): 751, (3, 'Plant2'):0,(3, 'Plant3'):751,
     (4, 'Plant1'): 350, (4, 'Plant2'):0, (4, 'Plant3'): 751,
-    (5, 'Plant1'): 0, (5, 'Plant2'): 751, (5, 'Plant3'): 0,
-    (6, 'Plant1'): 0, (6, 'Plant2'): 0, (6, 'Plant3'): 0,
-    (7, 'Plant1'): 0, (7, 'Plant2'): 751, (7, 'Plant3'): 0
+    (5, 'Plant1'): 350, (5, 'Plant2'): 751, (5, 'Plant3'): 0,
+    (6, 'Plant1'): 0, (6, 'Plant2'): 350, (6, 'Plant3'): 0,
+    (7, 'Plant1'): 0, (7, 'Plant2'): 751, (7, 'Plant3'): 350
 })
 CHP_plants ={
     (1, 'Plant1'),(4, 'Plant1')
