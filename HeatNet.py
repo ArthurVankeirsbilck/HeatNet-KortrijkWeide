@@ -92,9 +92,9 @@ model.c = Param(model.I, model.J, initialize={
     (1, 1): 0, (2, 2): 0, (3, 3): 0, (1,4):50, (2,4):50, (3,4):50, (4,4):0, (4,1):50, (4,2):50, (4,3):50  # initialize diagonal elements to zero
 })  # transmission cost from i to j
 model.p_max_plant = Param(model.I, model.Plants, initialize={
-    (1, 'Plant1'): 751, (1, 'Plant2'):0, (1, 'Plant3'):0,
-    (2, 'Plant1'): 0,  (2, 'Plant2'):0, (2, 'Plant3'):0,
-    (3, 'Plant1'): 0, (3, 'Plant2'):0,(3, 'Plant3'):0,
+    (1, 'Plant1'): 751, (1, 'Plant2'):751, (1, 'Plant3'):751,
+    (2, 'Plant1'): 0,  (2, 'Plant2'):751, (2, 'Plant3'):0,
+    (3, 'Plant1'): 0, (3, 'Plant2'):751,(3, 'Plant3'):0,
     (4, 'Plant1'): 350, (4, 'Plant2'): 0, (4, 'Plant3'): 0
 })
 CHP_plants ={
