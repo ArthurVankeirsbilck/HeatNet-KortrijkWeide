@@ -37,19 +37,19 @@ nodes = [1, 2, 3, 4]
 
 #Aanpassen nummers, numerical instability due to big
 for i in range(0,hours):
-    n = random.randint(200,210)
+    n = random.randint(200,201)
     node1_demands.append(n)
 
 for i in range(0,hours):
-    n = random.randint(140,150)
+    n = random.randint(140,141)
     node2_demands.append(n)
 
 for i in range(0,hours):
-    n = random.randint(100,110)
+    n = random.randint(100,101)
     node3_demands.append(n)
 
 for i in range(0,hours):
-    n = random.randint(100,200)
+    n = random.randint(100,101)
     node4_demands.append(n)
 
 def demands():
