@@ -4,9 +4,13 @@ import random
 import csv
 random.seed(10)
 #Data
-k_SDR11 = 0.414*0.1
+k_SDR11 = 0.414
 do_SDR11 = 0.125
 di_SDR11 = 0.1022
+
+k_DN125 = 0.5454
+do_DN125 = 0.125
+di_DN125 = 0.1022
 
 def CHP_feasible_area(yA):
     xA = 0
