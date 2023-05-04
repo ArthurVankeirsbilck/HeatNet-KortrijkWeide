@@ -36,6 +36,7 @@ df["Vegitec_dec_jan"] = df["Vegitec_dec_jan"] * 1000
 df["Collectief_dec_jan"] = df["Collectief_dec_jan"] * 1000
 hours=5
 node1_demands = df["KWEA_dec_jan"].iloc[0:hours].to_list()
+print(node1_demands)
 node2_demands = [0]*hours
 node3_demands = [300]*hours
 node4_demands = df["Penta_dec_jan"].iloc[0:hours].to_list()
@@ -273,7 +274,7 @@ def heatloss_bin2(model, i,j,t):
 model.heatloss_bin2 = Constraint(model.I, model.J, model.T, rule=heatloss_bin2)
 # #Add Fairness constraint 
 solver = SolverFactory("knitro");
-results = solver.solve(model, options={'outlev' : 6, 'numthreads': 8},tee=True)
+results = solver.solve(model, options={'outlev' : 4, 'numthreads': 8},tee=True)
 
 # solver = SolverFactory("mindtpy")
 # results = solver.solve(model,mip_solver="gurobi",nlp_solver="ipopt",tee=True)
