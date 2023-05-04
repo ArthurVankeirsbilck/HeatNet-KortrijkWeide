@@ -30,7 +30,7 @@ def CHP_feasible_area(yA):
 
 df = pd.read_csv("Consumptions.csv")
 
-hours=1488
+hours=100
 node1_demands = df["KWEA_dec_jan"].to_list()
 node2_demands = [0]*hours
 node3_demands = []
