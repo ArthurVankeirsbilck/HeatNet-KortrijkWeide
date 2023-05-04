@@ -34,11 +34,18 @@ df = pd.read_csv("Consumptions.csv")
 hours=1488
 node1_demands = df["KWEA_dec_jan"].to_list()
 node2_demands = [0]*hours
-node3_demands = []
+node3_demands = [0.3]*hours
 node4_demands = df["Penta_dec_jan"].to_list()
 node5_demands = df["Vegitec_dec_jan"].to_list()
 node6_demands = [0.5]*hours
 node7_demands = df["Collectief_dec_jan"].to_list()
+print(len(node1_demands))
+print(len(node2_demands))
+print(len(node3_demands))
+print(len(node4_demands))
+print(len(node5_demands))
+print(len(node6_demands))
+print(len(node7_demands))
 node1_costs = [1.8]*hours
 node2_costs = [1.4]*hours
 node3_costs = [1.0]*hours
@@ -52,7 +59,7 @@ nodes = [1, 2, 3, 4,5,6,7]
 def demands():
     demands_dict = {}
     #nodes
-    for i in range(1, len(nodes)):
+    for i in range(1, len(nodes)+1):
         #time periods
         for t in range(0, len(node1_demands)+1):
             # add demand to dictionary with node and time period as keys
