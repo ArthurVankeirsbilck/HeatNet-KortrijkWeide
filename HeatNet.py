@@ -1,6 +1,5 @@
 from pyomo.environ import *
 import math
-import pandas as pd
 import random
 import csv
 random.seed(10)
@@ -30,19 +29,15 @@ def CHP_feasible_area(yA):
     return xA, xB, yB, xC, yC, xD, yD
 
 df = pd.read_csv("Consumptions.csv")
-df["KWEA_dec_jan"] = df["KWEA_dec_jan"] * 1000
-df["Penta_dec_jan"] = df["Penta_dec_jan"] * 1000
-df["Vegitec_dec_jan"] = df["Vegitec_dec_jan"] * 1000
-df["Collectief_dec_jan"] = df["Collectief_dec_jan"] * 1000
-hours=1
-node1_demands = df["KWEA_dec_jan"].iloc[0:hours].to_list()
-print(node1_demands)
+
+hours=1488
+node1_demands = df["KWEA_dec_jan"].to_list()
 node2_demands = [0]*hours
-node3_demands = [300]*hours
-node4_demands = df["Penta_dec_jan"].iloc[0:hours].to_list()
-node5_demands = df["Vegitec_dec_jan"].iloc[0:hours].to_list()
-node6_demands = [200]*hours
-node7_demands = df["Collectief_dec_jan"].iloc[0:hours].to_list()
+node3_demands = []
+node4_demands = df["Penta_dec_jan"].to_list()
+node5_demands = df["Vegitec_dec_jan"].to_list()
+node6_demands = [500]*hours
+node7_demands = df["Collectief_dec_jan"].to_list()
 node1_costs = [1.8]*hours
 node2_costs = [1.4]*hours
 node3_costs = [1.0]*hours
@@ -97,15 +92,15 @@ model.c = Param(model.I, model.J, initialize=
 (6, 1): 50, (6, 2): 50, (6, 3): 50, (6, 4): 50, (6, 5): 50, (6, 6): 0, (6, 7): 50, 
 (7, 1): 50, (7, 2): 50, (7, 3): 50, (7, 4): 50, (7, 5): 50, (7, 6): 50, (7, 7): 0}
 )  # transmission cost from i to j
-hour = 60
+hour = 24
 model.p_max_plant = Param(model.I, model.Plants, initialize={
-    (1, 'Plant1'): 0.751*1000, (1, 'Plant2'):0, (1, 'Plant3'):0,
-    (2, 'Plant1'): 2.312*1000,  (2, 'Plant2'):0.045*1000, (2, 'Plant3'):0.34*1000,
-    (3, 'Plant1'): 0.350*1000, (3, 'Plant2'):0.350*1000,(3, 'Plant3'):0.350*1000,
-    (4, 'Plant1'): 0.350*1000, (4, 'Plant2'):0.350*1000, (4, 'Plant3'): 0,
-    (5, 'Plant1'): 0, (5, 'Plant2'): 0, (5, 'Plant3'): 0.350*1000,
-    (6, 'Plant1'): 0.160*1000, (6, 'Plant2'): 0, (6, 'Plant3'): 0,
-    (7, 'Plant1'): 0.350*1000, (7, 'Plant2'): 0, (7, 'Plant3'): 0.350*1000
+    (1, 'Plant1'): 0.751*hour, (1, 'Plant2'):0, (1, 'Plant3'):0,
+    (2, 'Plant1'): 751,  (2, 'Plant2'):751, (2, 'Plant3'):751,
+    (3, 'Plant1'): 751, (3, 'Plant2'):0,(3, 'Plant3'):751,
+    (4, 'Plant1'): 0.350*hour, (4, 'Plant2'):0, (4, 'Plant3'): 0,
+    (5, 'Plant1'): 350, (5, 'Plant2'): 751, (5, 'Plant3'): 0,
+    (6, 'Plant1'): 0.160*hour, (6, 'Plant2'): 350, (6, 'Plant3'): 0,
+    (7, 'Plant1'): 0, (7, 'Plant2'): 751, (7, 'Plant3'): 350
 })
 CHP_plants ={
     (1, 'Plant1'),(4, 'Plant1'),(6, 'Plant1')
@@ -265,9 +260,9 @@ model.heatloss_bin1 = Constraint(model.I, model.J, model.T, rule=heatloss_bin1)
 def heatloss_bin2(model, i,j,t):
     return model.x[i,j,t] <= M*model.z[i,j,t]
 model.heatloss_bin2 = Constraint(model.I, model.J, model.T, rule=heatloss_bin2)
-# #Add Fairness constraint 
+#Add Fairness constraint 
 solver = SolverFactory("knitro");
-results = solver.solve(model, options={'outlev' : 4, 'numthreads': 8},tee=True)
+results = solver.solve(model, options={'outlev' : 6, 'numthreads': 8},tee=True)
 
 # solver = SolverFactory("mindtpy")
 # results = solver.solve(model,mip_solver="gurobi",nlp_solver="ipopt",tee=True)
@@ -276,39 +271,31 @@ print(f"Objective value: {model.obj():.2f}")
 
 for t in model.T:
     for i in model.I:
-        for p in model.Plants:
-            print("P_el:{}".format(model.P_el[p,i,t].value))
-
-
-for t in model.T:
-    for i in model.I:
         for j in model.J:
-            # if model.x[i, j,t]() > 0:
+            if model.x[i, j,t]() > 0:
                 print(f"From node {j} to node {i} at {t}: {model.x[i,j,t]():.2f} MWh")
 
-print("Temps:")
-for t in model.T:
-    for i in model.I:
-        for j in model.J:
-            if i == j:
-                pass
-            else:
-                # if model.Tr[i,j,t].value > 0:
-                print("Supply-Return temp {} -> {}: {} <-> {}°C".format(j,i,model.Ts[i,j,t].value,model.Tr[i,j,t].value))
+# print("Temps:")
+# for t in model.T:
+#     for i in model.I:
+#         for j in model.J:
+#             if i == j:
+#                 pass
+#             else:
+#                 if model.Tr[i,j,t].value > 0:
+#                     print("Supply-Return temp {} -> {}: {} <-> {}°C".format(j,i,model.Ts[i,j,t].value,model.Tr[i,j,t].value))
 
-print("Heatloss cost:")
-for t in model.T:
-    for i in model.I:
-        for j in model.J:
-                print(f"Loss from node {j} to node {i}: {model.Ql[i,j,t].value*model.z[i,j,t].value:.2f}")
+# print("Heatloss cost:")
+# for t in model.T:
+#     for i in model.I:
+#         for j in model.J:
+#                 print(f"Loss from node {j} to node {i}: {model.Ql[i,j,t].value*model.z[i,j,t].value:.2f}")
 
-print("z:")
-for t in model.T:
-    for i in model.I:
-        for j in model.J:
-                print(model.z[i,j,t].value)
-
-print()
+# print("z:")
+# for t in model.T:
+#     for i in model.I:
+#         for j in model.J:
+#                 print(model.z[i,j,t].value)
 
 with open('temps.csv', 'w', newline='') as csvfile:
     writer = csv.writer(csvfile)
