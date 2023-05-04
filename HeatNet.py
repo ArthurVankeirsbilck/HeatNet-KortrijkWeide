@@ -20,24 +20,27 @@ k_combinatie = 0.4797
 print("start")
 def CHP_feasible_area(yA):
     xA = 0
-    xB = round(yA*(0.180/0.247))
-    yB = round(yA*(0.215/0.247))
-    xC = round(yA*(0.1048/0.247))
-    yC = round(yA*(0.81/0.247))
+    xB = round(yA*(180/247))
+    yB = round(yA*(215/247))
+    xC = round(yA*(104.8/247))
+    yC = round(yA*(81/247))
     xD = 0
-    yD = round(yA*(0.81/0.247));
+    yD = round(yA*(81/247));
 
     return xA, xB, yB, xC, yC, xD, yD
 
 df = pd.read_csv("Consumptions.csv")
-
-hours=100
+df["KWEA_dec_jan"] = df["KWEA_dec_jan"] * 1000
+df["Penta_dec_jan"] = df["Penta_dec_jan"] * 1000
+df["Vegitec_dec_jan"] = df["Vegitec_dec_jan"] * 1000
+df["Collectief_dec_jan"] = df["Collectief_dec_jan"] * 1000
+hours=1
 node1_demands = df["KWEA_dec_jan"].iloc[0:hours].to_list()
 node2_demands = [0]*hours
-node3_demands = [0.2]*hours
+node3_demands = [300]*hours
 node4_demands = df["Penta_dec_jan"].iloc[0:hours].to_list()
 node5_demands = df["Vegitec_dec_jan"].iloc[0:hours].to_list()
-node6_demands = [0.2]*hours
+node6_demands = [200]*hours
 node7_demands = df["Collectief_dec_jan"].iloc[0:hours].to_list()
 print(len(node1_demands))
 print(len(node2_demands))
@@ -102,13 +105,13 @@ model.c = Param(model.I, model.J, initialize=
 )  # transmission cost from i to j
 hour = 60
 model.p_max_plant = Param(model.I, model.Plants, initialize={
-    (1, 'Plant1'): 0.751*hour, (1, 'Plant2'):0, (1, 'Plant3'):0,
-    (2, 'Plant1'): 2.312*hour,  (2, 'Plant2'):0.045*hour, (2, 'Plant3'):0.34*hour,
+    (1, 'Plant1'): 0.751*1000*hour, (1, 'Plant2'):0, (1, 'Plant3'):0,
+    (2, 'Plant1'): 2.312*1000*hour,  (2, 'Plant2'):0.045*1000*hour, (2, 'Plant3'):0.34*1000*hour,
     (3, 'Plant1'): 0, (3, 'Plant2'):0,(3, 'Plant3'):0,
-    (4, 'Plant1'): 0.350*hour, (4, 'Plant2'):0, (4, 'Plant3'): 0,
-    (5, 'Plant1'): 0, (5, 'Plant2'): 0, (5, 'Plant3'): 0,
-    (6, 'Plant1'): 0.160*hour, (6, 'Plant2'): 0, (6, 'Plant3'): 0,
-    (7, 'Plant1'): 0, (7, 'Plant2'): 0, (7, 'Plant3'): 0
+    (4, 'Plant1'): 0.350*1000*hour, (4, 'Plant2'):0.350*1000*hour, (4, 'Plant3'): 0,
+    (5, 'Plant1'): 0, (5, 'Plant2'): 0, (5, 'Plant3'): 0.350*1000*hour,
+    (6, 'Plant1'): 0.160*1000*hour, (6, 'Plant2'): 0, (6, 'Plant3'): 0,
+    (7, 'Plant1'): 0, (7, 'Plant2'): 0, (7, 'Plant3'): 0.350*1000*hour
 })
 CHP_plants ={
     (1, 'Plant1'),(4, 'Plant1'),(6, 'Plant1')
@@ -269,11 +272,11 @@ def heatloss_bin2(model, i,j,t):
     return model.x[i,j,t] <= M*model.z[i,j,t]
 model.heatloss_bin2 = Constraint(model.I, model.J, model.T, rule=heatloss_bin2)
 # #Add Fairness constraint 
-solver = SolverFactory("knitro");
-results = solver.solve(model, options={'outlev' : 6, 'numthreads': 8,  'mip_multistart': 1},tee=True)
+# solver = SolverFactory("knitro");
+# results = solver.solve(model, options={'outlev' : 6, 'numthreads': 8},tee=True)
 
-# solver = SolverFactory("mindtpy")
-# results = solver.solve(model,mip_solver="gurobi",nlp_solver="ipopt",tee=True)
+solver = SolverFactory("mindtpy")
+results = solver.solve(model,mip_solver="gurobi",nlp_solver="ipopt",tee=True)
 
 print(f"Objective value: {model.obj():.2f}")
 
