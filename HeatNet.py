@@ -27,7 +27,7 @@ def CHP_feasible_area(yA):
 
     return xA, xB, yB, xC, yC, xD, yD
 
-hours=200
+hours=10
 node1_demands = []
 node2_demands = []
 node3_demands = []
@@ -286,7 +286,7 @@ def heatloss_bin2(model, i,j,t):
     return model.x[i,j,t] <= M*model.z[i,j,t]
 model.heatloss_bin2 = Constraint(model.I, model.J, model.T, rule=heatloss_bin2)
 #Add Fairness constraint 
-solver = SolverFactory("octeract");
+solver = SolverFactory("knitro");
 results = solver.solve(model, options={'outlev' : 6, 'numthreads': 8},tee=True)
 
 # solver = SolverFactory("mindtpy")
