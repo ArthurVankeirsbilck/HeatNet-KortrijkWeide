@@ -20,18 +20,18 @@ k_combinatie = 0.4797
 print("start")
 def CHP_feasible_area(yA):
     xA = 0
-    xB = round(yA*(180/247))
-    yB = round(yA*(215/247))
-    xC = round(yA*(104.8/247))
-    yC = round(yA*(81/247))
+    xB = round(yA*(0.180/0.247))
+    yB = round(yA*(0.215/0.247))
+    xC = round(yA*(0.1048/0.247))
+    yC = round(yA*(0.81/0.247))
     xD = 0
-    yD = round(yA*(81/247));
+    yD = round(yA*(0.81/0.247));
 
     return xA, xB, yB, xC, yC, xD, yD
 
 df = pd.read_csv("Consumptions.csv")
 
-hours=10
+hours=1
 node1_demands = df["KWEA_dec_jan"].iloc[0:hours].to_list()
 node2_demands = [0]*hours
 node3_demands = [0.2]*hours
@@ -269,11 +269,11 @@ def heatloss_bin2(model, i,j,t):
     return model.x[i,j,t] <= M*model.z[i,j,t]
 model.heatloss_bin2 = Constraint(model.I, model.J, model.T, rule=heatloss_bin2)
 # #Add Fairness constraint 
-# solver = SolverFactory("knitro");
-# results = solver.solve(model, options={'outlev' : 6, 'numthreads': 8},tee=True)
+solver = SolverFactory("knitro");
+results = solver.solve(model, options={'outlev' : 6, 'numthreads': 8},tee=True)
 
-solver = SolverFactory("mindtpy")
-results = solver.solve(model,mip_solver="gurobi",nlp_solver="ipopt",tee=True)
+# solver = SolverFactory("mindtpy")
+# results = solver.solve(model,mip_solver="gurobi",nlp_solver="ipopt",tee=True)
 
 print(f"Objective value: {model.obj():.2f}")
 
