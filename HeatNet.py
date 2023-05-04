@@ -3,6 +3,7 @@ import math
 import random
 import csv
 random.seed(10)
+
 #Data
 k_SDR11 = 0.414
 do_SDR11 = 0.125
@@ -27,14 +28,16 @@ def CHP_feasible_area(yA):
 
     return xA, xB, yB, xC, yC, xD, yD
 
-hours=10
-node1_demands = []
-node2_demands = []
+df = pd.read_csv("Consumptions.csv")
+
+hours=1488
+node1_demands = df["KWEA_dec_jan"].to_list()
+node2_demands = [0]*hours
 node3_demands = []
-node4_demands = []
-node5_demands = []
-node6_demands = []
-node7_demands = []
+node4_demands = df["Penta_dec_jan"].to_list()
+node5_demands = df["Vegitec_dec_jan"].to_list()
+node6_demands = [0.5]*hours
+node7_demands = df["Collectief_dec_jan"].to_list()
 node1_costs = [1.8]*hours
 node2_costs = [1.4]*hours
 node3_costs = [1.0]*hours
@@ -44,35 +47,6 @@ node6_costs = [1.0]*hours
 node7_costs = [1.0]*hours
 Plants = ['Plant1', 'Plant2', 'Plant3']
 nodes = [1, 2, 3, 4,5,6,7]
-
-#Aanpassen nummers, numerical instability due to big
-for i in range(0,hours):
-    n = random.randint(200,201)
-    node1_demands.append(n)
-
-for i in range(0,hours):
-    n = random.randint(140,141)
-    node2_demands.append(n)
-
-for i in range(0,hours):
-    n = random.randint(100,101)
-    node3_demands.append(n)
-
-for i in range(0,hours):
-    n = random.randint(500,550)
-    node4_demands.append(n)
-
-for i in range(0,hours):
-    n = random.randint(200,201)
-    node5_demands.append(n)
-
-for i in range(0,hours):
-    n = random.randint(500,550)
-    node6_demands.append(n)
-
-for i in range(0,hours):
-    n = random.randint(200,201)
-    node7_demands.append(n)
 
 def demands():
     demands_dict = {}
@@ -118,17 +92,18 @@ model.c = Param(model.I, model.J, initialize=
 (6, 1): 50, (6, 2): 50, (6, 3): 50, (6, 4): 50, (6, 5): 50, (6, 6): 0, (6, 7): 50, 
 (7, 1): 50, (7, 2): 50, (7, 3): 50, (7, 4): 50, (7, 5): 50, (7, 6): 50, (7, 7): 0}
 )  # transmission cost from i to j
+hour = 24
 model.p_max_plant = Param(model.I, model.Plants, initialize={
-    (1, 'Plant1'): 751, (1, 'Plant2'):751, (1, 'Plant3'):751,
-    (2, 'Plant1'): 751,  (2, 'Plant2'):751, (2, 'Plant3'):751,
+    (1, 'Plant1'): 0.751*hour, (1, 'Plant2'):0, (1, 'Plant3'):0,
+    (2, 'Plant1'): 2.312*hour,  (2, 'Plant2'):0.045*hour, (2, 'Plant3'):0.34*hour,
     (3, 'Plant1'): 751, (3, 'Plant2'):0,(3, 'Plant3'):751,
-    (4, 'Plant1'): 350, (4, 'Plant2'):0, (4, 'Plant3'): 751,
+    (4, 'Plant1'): 0.350*hour, (4, 'Plant2'):0, (4, 'Plant3'): 0,
     (5, 'Plant1'): 350, (5, 'Plant2'): 751, (5, 'Plant3'): 0,
-    (6, 'Plant1'): 0, (6, 'Plant2'): 350, (6, 'Plant3'): 0,
+    (6, 'Plant1'): 0.160*hour, (6, 'Plant2'): 350, (6, 'Plant3'): 0,
     (7, 'Plant1'): 0, (7, 'Plant2'): 751, (7, 'Plant3'): 350
 })
 CHP_plants ={
-    (1, 'Plant1'),(4, 'Plant1')
+    (1, 'Plant1'),(4, 'Plant1'),(6, 'Plant1')
     
 }
 HOB_plants ={
@@ -137,7 +112,7 @@ HOB_plants ={
     (3, 'Plant1'), (3, 'Plant2'), (3, 'Plant3'),
     (4, 'Plant2'), (4, 'Plant3'),
     (5, 'Plant1'), (5, 'Plant2'), (5, 'Plant3'),
-    (6, 'Plant1'), (6, 'Plant2'), (6, 'Plant3'),
+    (6, 'Plant2'), (6, 'Plant3'),
     (7, 'Plant1'), (7, 'Plant2'), (7, 'Plant3')
 }
 model.CHP_Plants = Set(within=model.I * model.Plants, initialize=CHP_plants)

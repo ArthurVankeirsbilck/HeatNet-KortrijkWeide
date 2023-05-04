@@ -43,9 +43,7 @@ Penta_dec_jan = pd.concat(cons_Penta)
 
 year_Vegitec = conversion(0, 9504, 120.243, df, 45)
 
-plt.plot(Collectief_dec_jan["Cons"], label="Collectief")
-plt.plot(KWEA_dec_jan["Cons"], label="KWE A")
-plt.plot(Penta_dec_jan["Cons"],label="Penta")
-plt.plot(year_Vegitec["Cons"].iloc[0:1488],label="Vegitec")
-plt.legend()
-plt.show()
+dict = {'Collectief_dec_jan': Collectief_dec_jan["Cons"].to_list(), 'KWEA_dec_jan': KWEA_dec_jan["Cons"].to_list(), 'Penta_dec_jan': Penta_dec_jan["Cons"].to_list(), 'Vegitec_dec_jan': year_Vegitec["Cons"].iloc[0:1488].to_list()}  
+df = pd.DataFrame(dict) 
+print(df)
+df.to_csv('Consumptions.csv') 
