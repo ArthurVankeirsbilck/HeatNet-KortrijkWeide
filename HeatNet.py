@@ -31,14 +31,14 @@ def CHP_feasible_area(yA):
 
 df = pd.read_csv("Consumptions.csv")
 
-hours=100
-node1_demands = df["KWEA_dec_jan"].iloc[0:100].to_list()
+hours=10
+node1_demands = df["KWEA_dec_jan"].iloc[0:hours].to_list()
 node2_demands = [0]*hours
-node3_demands = [0.3]*hours
-node4_demands = df["Penta_dec_jan"].iloc[0:100].to_list()
-node5_demands = df["Vegitec_dec_jan"].iloc[0:100].to_list()
-node6_demands = [0.5]*hours
-node7_demands = df["Collectief_dec_jan"].iloc[0:100].to_list()
+node3_demands = [0.2]*hours
+node4_demands = df["Penta_dec_jan"].iloc[0:hours].to_list()
+node5_demands = df["Vegitec_dec_jan"].iloc[0:hours].to_list()
+node6_demands = [0.2]*hours
+node7_demands = df["Collectief_dec_jan"].iloc[0:hours].to_list()
 print(len(node1_demands))
 print(len(node2_demands))
 print(len(node3_demands))
@@ -104,9 +104,9 @@ hour = 60
 model.p_max_plant = Param(model.I, model.Plants, initialize={
     (1, 'Plant1'): 0.751*hour, (1, 'Plant2'):0, (1, 'Plant3'):0,
     (2, 'Plant1'): 2.312*hour,  (2, 'Plant2'):0.045*hour, (2, 'Plant3'):0.34*hour,
-    (3, 'Plant1'): 0, (3, 'Plant2'):0,(3, 'Plant3'):0,
+    (3, 'Plant1'): 2.312*hour, (3, 'Plant2'):0,(3, 'Plant3'):0,
     (4, 'Plant1'): 0.350*hour, (4, 'Plant2'):0, (4, 'Plant3'): 0,
-    (5, 'Plant1'): 0, (5, 'Plant2'): 0, (5, 'Plant3'): 0,
+    (5, 'Plant1'): 2.312*hour, (5, 'Plant2'): 2.312*hour, (5, 'Plant3'): 0,
     (6, 'Plant1'): 0.160*hour, (6, 'Plant2'): 0, (6, 'Plant3'): 0,
     (7, 'Plant1'): 0, (7, 'Plant2'): 0, (7, 'Plant3'): 0
 })
@@ -268,12 +268,12 @@ model.heatloss_bin1 = Constraint(model.I, model.J, model.T, rule=heatloss_bin1)
 def heatloss_bin2(model, i,j,t):
     return model.x[i,j,t] <= M*model.z[i,j,t]
 model.heatloss_bin2 = Constraint(model.I, model.J, model.T, rule=heatloss_bin2)
-#Add Fairness constraint 
-solver = SolverFactory("knitro");
-results = solver.solve(model, options={'outlev' : 6, 'numthreads': 8},tee=True)
+# #Add Fairness constraint 
+# solver = SolverFactory("knitro");
+# results = solver.solve(model, options={'outlev' : 6, 'numthreads': 8},tee=True)
 
-# solver = SolverFactory("mindtpy")
-# results = solver.solve(model,mip_solver="gurobi",nlp_solver="ipopt",tee=True)
+solver = SolverFactory("mindtpy")
+results = solver.solve(model,mip_solver="gurobi",nlp_solver="ipopt",tee=True)
 
 print(f"Objective value: {model.obj():.2f}")
 
