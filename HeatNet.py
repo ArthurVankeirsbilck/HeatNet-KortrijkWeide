@@ -101,11 +101,11 @@ hour = 60
 model.p_max_plant = Param(model.I, model.Plants, initialize={
     (1, 'Plant1'): 0.751*1000, (1, 'Plant2'):0, (1, 'Plant3'):0,
     (2, 'Plant1'): 2.312*1000,  (2, 'Plant2'):0.045*1000, (2, 'Plant3'):0.34*1000,
-    (3, 'Plant1'): 0, (3, 'Plant2'):0,(3, 'Plant3'):0,
+    (3, 'Plant1'): 0.350*1000, (3, 'Plant2'):0.350*1000,(3, 'Plant3'):0.350*1000,
     (4, 'Plant1'): 0.350*1000, (4, 'Plant2'):0.350*1000, (4, 'Plant3'): 0,
     (5, 'Plant1'): 0, (5, 'Plant2'): 0, (5, 'Plant3'): 0.350*1000,
     (6, 'Plant1'): 0.160*1000, (6, 'Plant2'): 0, (6, 'Plant3'): 0,
-    (7, 'Plant1'): 0, (7, 'Plant2'): 0, (7, 'Plant3'): 0.350*1000
+    (7, 'Plant1'): 0.350*1000, (7, 'Plant2'): 0, (7, 'Plant3'): 0.350*1000
 })
 CHP_plants ={
     (1, 'Plant1'),(4, 'Plant1'),(6, 'Plant1')
