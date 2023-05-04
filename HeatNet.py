@@ -272,11 +272,11 @@ def heatloss_bin2(model, i,j,t):
     return model.x[i,j,t] <= M*model.z[i,j,t]
 model.heatloss_bin2 = Constraint(model.I, model.J, model.T, rule=heatloss_bin2)
 # #Add Fairness constraint 
-# solver = SolverFactory("knitro");
-# results = solver.solve(model, options={'outlev' : 6, 'numthreads': 8},tee=True)
+solver = SolverFactory("knitro");
+results = solver.solve(model, options={'outlev' : 6, 'numthreads': 8},tee=True)
 
-solver = SolverFactory("mindtpy")
-results = solver.solve(model,mip_solver="gurobi",nlp_solver="ipopt",tee=True)
+# solver = SolverFactory("mindtpy")
+# results = solver.solve(model,mip_solver="gurobi",nlp_solver="ipopt",tee=True)
 
 print(f"Objective value: {model.obj():.2f}")
 
