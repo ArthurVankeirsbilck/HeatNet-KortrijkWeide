@@ -34,7 +34,7 @@ df["KWEA_dec_jan"] = df["KWEA_dec_jan"] * 1000
 df["Penta_dec_jan"] = df["Penta_dec_jan"] * 1000
 df["Vegitec_dec_jan"] = df["Vegitec_dec_jan"] * 1000
 df["Collectief_dec_jan"] = df["Collectief_dec_jan"] * 1000
-hours=10
+hours=5
 node1_demands = df["KWEA_dec_jan"].iloc[0:hours].to_list()
 node2_demands = [0]*hours
 node3_demands = [300]*hours
@@ -286,27 +286,27 @@ for t in model.T:
             if model.x[i, j,t]() > 0:
                 print(f"From node {j} to node {i} at {t}: {model.x[i,j,t]():.2f} MWh")
 
-# print("Temps:")
-# for t in model.T:
-#     for i in model.I:
-#         for j in model.J:
-#             if i == j:
-#                 pass
-#             else:
-#                 if model.Tr[i,j,t].value > 0:
-#                     print("Supply-Return temp {} -> {}: {} <-> {}°C".format(j,i,model.Ts[i,j,t].value,model.Tr[i,j,t].value))
+print("Temps:")
+for t in model.T:
+    for i in model.I:
+        for j in model.J:
+            if i == j:
+                pass
+            else:
+                if model.Tr[i,j,t].value > 0:
+                    print("Supply-Return temp {} -> {}: {} <-> {}°C".format(j,i,model.Ts[i,j,t].value,model.Tr[i,j,t].value))
 
-# print("Heatloss cost:")
-# for t in model.T:
-#     for i in model.I:
-#         for j in model.J:
-#                 print(f"Loss from node {j} to node {i}: {model.Ql[i,j,t].value*model.z[i,j,t].value:.2f}")
+print("Heatloss cost:")
+for t in model.T:
+    for i in model.I:
+        for j in model.J:
+                print(f"Loss from node {j} to node {i}: {model.Ql[i,j,t].value*model.z[i,j,t].value:.2f}")
 
-# print("z:")
-# for t in model.T:
-#     for i in model.I:
-#         for j in model.J:
-#                 print(model.z[i,j,t].value)
+print("z:")
+for t in model.T:
+    for i in model.I:
+        for j in model.J:
+                print(model.z[i,j,t].value)
 
 with open('temps.csv', 'w', newline='') as csvfile:
     writer = csv.writer(csvfile)
