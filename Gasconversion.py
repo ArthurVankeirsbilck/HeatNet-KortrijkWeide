@@ -17,7 +17,7 @@ def conversion(start, stop, consumption, data, HV):
     for i, row in data.iterrows():
         cubic = (row["HDD"]/sum(list))*consumption
         cubic2 = (cubic*3600)/HV
-        cons = (cubic2*0.85)/HV
+        cons = ((cubic2*0.85)/HV)*1000
         conslist.append(cons)
     
     data["Cons"] = conslist

@@ -2,6 +2,9 @@ from pyomo.environ import *
 import math
 import random
 import csv
+import pandas as pd
+df = pd.read_csv("Consumptions.csv")
+df.apply(pd.to_numeric)
 random.seed(10)
 #Data
 k_SDR11 = 0.414
@@ -15,7 +18,7 @@ di_DN125 = 0.1022
 k_DHnetwerk = 0.414
 
 k_combinatie = 0.4797
-print("start")
+
 def CHP_feasible_area(yA):
     xA = 0
     xB = round(yA*(180/247))
@@ -27,14 +30,14 @@ def CHP_feasible_area(yA):
 
     return xA, xB, yB, xC, yC, xD, yD
 
-hours=200
-node1_demands = []
-node2_demands = []
-node3_demands = []
-node4_demands = []
-node5_demands = []
-node6_demands = []
-node7_demands = []
+hours=1
+node1_demands = df["KWEA_dec_jan"].iloc[0:hours].to_list()
+node2_demands = [0]*hours
+node3_demands = [300]*hours
+node4_demands = df["Penta_dec_jan"].iloc[0:hours].to_list()
+node5_demands = df["Vegitec_dec_jan"].iloc[0:hours].to_list()
+node6_demands = [300]*hours
+node7_demands = df["Collectief_dec_jan"].iloc[0:hours].to_list()
 node1_costs = [1.8]*hours
 node2_costs = [1.4]*hours
 node3_costs = [1.0]*hours
@@ -44,35 +47,6 @@ node6_costs = [1.0]*hours
 node7_costs = [1.0]*hours
 Plants = ['Plant1', 'Plant2', 'Plant3']
 nodes = [1, 2, 3, 4,5,6,7]
-
-#Aanpassen nummers, numerical instability due to big
-for i in range(0,hours):
-    n = random.randint(200,201)
-    node1_demands.append(n)
-
-for i in range(0,hours):
-    n = random.randint(140,141)
-    node2_demands.append(n)
-
-for i in range(0,hours):
-    n = random.randint(100,101)
-    node3_demands.append(n)
-
-for i in range(0,hours):
-    n = random.randint(500,550)
-    node4_demands.append(n)
-
-for i in range(0,hours):
-    n = random.randint(500,550)
-    node5_demands.append(n)
-
-for i in range(0,hours):
-    n = random.randint(500,550)
-    node6_demands.append(n)
-
-for i in range(0,hours):
-    n = random.randint(500,550)
-    node7_demands.append(n)
 
 def demands():
     demands_dict = {}
