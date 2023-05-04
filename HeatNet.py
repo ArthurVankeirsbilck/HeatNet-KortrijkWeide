@@ -121,11 +121,11 @@ model.c = Param(model.I, model.J, initialize=
 model.p_max_plant = Param(model.I, model.Plants, initialize={
     (1, 'Plant1'): 751, (1, 'Plant2'):751, (1, 'Plant3'):751,
     (2, 'Plant1'): 751,  (2, 'Plant2'):751, (2, 'Plant3'):751,
-    (3, 'Plant1'): 751, (3, 'Plant2'):0,(3, 'Plant3'):751,
-    (4, 'Plant1'): 350, (4, 'Plant2'):0, (4, 'Plant3'): 751,
-    (5, 'Plant1'): 350, (5, 'Plant2'): 751, (5, 'Plant3'): 0,
-    (6, 'Plant1'): 0, (6, 'Plant2'): 350, (6, 'Plant3'): 0,
-    (7, 'Plant1'): 0, (7, 'Plant2'): 751, (7, 'Plant3'): 0
+    (3, 'Plant1'): 751, (3, 'Plant2'):751,(3, 'Plant3'):751,
+    (4, 'Plant1'): 350, (4, 'Plant2'): 751, (4, 'Plant3'): 751,
+    (5, 'Plant1'): 350, (5, 'Plant2'): 751, (5, 'Plant3'): 751,
+    (6, 'Plant1'): 350, (6, 'Plant2'): 751, (6, 'Plant3'): 751,
+    (7, 'Plant1'): 350, (7, 'Plant2'): 751, (7, 'Plant3'): 751
 })
 CHP_plants ={
     (1, 'Plant1'),(4, 'Plant1')
@@ -287,18 +287,18 @@ def heatloss_bin2(model, i,j,t):
 model.heatloss_bin2 = Constraint(model.I, model.J, model.T, rule=heatloss_bin2)
 #Add Fairness constraint 
 solver = SolverFactory("knitro");
-results = solver.solve(model, options={'outlev' : 6, 'numthreads': 8},tee=True)
+results = solver.solve(model, options={'outlev' : 4, 'numthreads': 8},tee=True)
 
 # solver = SolverFactory("mindtpy")
 # results = solver.solve(model,mip_solver="gurobi",nlp_solver="ipopt",tee=True)
 
 print(f"Objective value: {model.obj():.2f}")
 
-for t in model.T:
-    for i in model.I:
-        for j in model.J:
-            if model.x[i, j,t]() > 0:
-                print(f"From node {j} to node {i} at {t}: {model.x[i,j,t]():.2f} MWh")
+# for t in model.T:
+#     for i in model.I:
+#         for j in model.J:
+#             if model.x[i, j,t]() > 0:
+#                 print(f"From node {j} to node {i} at {t}: {model.x[i,j,t]():.2f} MWh")
 
 # print("Temps:")
 # for t in model.T:
