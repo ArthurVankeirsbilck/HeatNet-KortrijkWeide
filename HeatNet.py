@@ -31,14 +31,14 @@ def CHP_feasible_area(yA):
 
 df = pd.read_csv("Consumptions.csv")
 
-hours=1488
-node1_demands = df["KWEA_dec_jan"].to_list()
+hours=100
+node1_demands = df["KWEA_dec_jan"].iloc[0:100].to_list()
 node2_demands = [0]*hours
 node3_demands = [0.3]*hours
-node4_demands = df["Penta_dec_jan"].to_list()
-node5_demands = df["Vegitec_dec_jan"].to_list()
+node4_demands = df["Penta_dec_jan"].iloc[0:100].to_list()
+node5_demands = df["Vegitec_dec_jan"].iloc[0:100].to_list()
 node6_demands = [0.5]*hours
-node7_demands = df["Collectief_dec_jan"].to_list()
+node7_demands = df["Collectief_dec_jan"].iloc[0:100].to_list()
 print(len(node1_demands))
 print(len(node2_demands))
 print(len(node3_demands))
@@ -100,15 +100,15 @@ model.c = Param(model.I, model.J, initialize=
 (6, 1): 50, (6, 2): 50, (6, 3): 50, (6, 4): 50, (6, 5): 50, (6, 6): 0, (6, 7): 50, 
 (7, 1): 50, (7, 2): 50, (7, 3): 50, (7, 4): 50, (7, 5): 50, (7, 6): 50, (7, 7): 0}
 )  # transmission cost from i to j
-hour = 24
+hour = 60
 model.p_max_plant = Param(model.I, model.Plants, initialize={
     (1, 'Plant1'): 0.751*hour, (1, 'Plant2'):0, (1, 'Plant3'):0,
     (2, 'Plant1'): 2.312*hour,  (2, 'Plant2'):0.045*hour, (2, 'Plant3'):0.34*hour,
-    (3, 'Plant1'): 751, (3, 'Plant2'):0,(3, 'Plant3'):751,
+    (3, 'Plant1'): 0, (3, 'Plant2'):0,(3, 'Plant3'):0,
     (4, 'Plant1'): 0.350*hour, (4, 'Plant2'):0, (4, 'Plant3'): 0,
-    (5, 'Plant1'): 350, (5, 'Plant2'): 751, (5, 'Plant3'): 0,
-    (6, 'Plant1'): 0.160*hour, (6, 'Plant2'): 350, (6, 'Plant3'): 0,
-    (7, 'Plant1'): 0, (7, 'Plant2'): 751, (7, 'Plant3'): 350
+    (5, 'Plant1'): 0, (5, 'Plant2'): 0, (5, 'Plant3'): 0,
+    (6, 'Plant1'): 0.160*hour, (6, 'Plant2'): 0, (6, 'Plant3'): 0,
+    (7, 'Plant1'): 0, (7, 'Plant2'): 0, (7, 'Plant3'): 0
 })
 CHP_plants ={
     (1, 'Plant1'),(4, 'Plant1'),(6, 'Plant1')
