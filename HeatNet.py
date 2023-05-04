@@ -43,13 +43,6 @@ node4_demands = df["Penta_dec_jan"].iloc[0:hours].to_list()
 node5_demands = df["Vegitec_dec_jan"].iloc[0:hours].to_list()
 node6_demands = [200]*hours
 node7_demands = df["Collectief_dec_jan"].iloc[0:hours].to_list()
-print(len(node1_demands))
-print(len(node2_demands))
-print(len(node3_demands))
-print(len(node4_demands))
-print(len(node5_demands))
-print(len(node6_demands))
-print(len(node7_demands))
 node1_costs = [1.8]*hours
 node2_costs = [1.4]*hours
 node3_costs = [1.0]*hours
@@ -283,8 +276,14 @@ print(f"Objective value: {model.obj():.2f}")
 
 for t in model.T:
     for i in model.I:
+        for p in model.Plants:
+            print("P_el:{}".format(model.P_el[p,i,t].value))
+
+
+for t in model.T:
+    for i in model.I:
         for j in model.J:
-            if model.x[i, j,t]() > 0:
+            # if model.x[i, j,t]() > 0:
                 print(f"From node {j} to node {i} at {t}: {model.x[i,j,t]():.2f} MWh")
 
 print("Temps:")
@@ -294,8 +293,8 @@ for t in model.T:
             if i == j:
                 pass
             else:
-                if model.Tr[i,j,t].value > 0:
-                    print("Supply-Return temp {} -> {}: {} <-> {}°C".format(j,i,model.Ts[i,j,t].value,model.Tr[i,j,t].value))
+                # if model.Tr[i,j,t].value > 0:
+                print("Supply-Return temp {} -> {}: {} <-> {}°C".format(j,i,model.Ts[i,j,t].value,model.Tr[i,j,t].value))
 
 print("Heatloss cost:")
 for t in model.T:
@@ -308,6 +307,8 @@ for t in model.T:
     for i in model.I:
         for j in model.J:
                 print(model.z[i,j,t].value)
+
+print()
 
 with open('temps.csv', 'w', newline='') as csvfile:
     writer = csv.writer(csvfile)
