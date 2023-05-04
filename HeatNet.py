@@ -340,7 +340,7 @@ with open('x.csv', 'w', newline='') as csvfile:
                     data_row.append(model.x[i, j,t].value)
         writer.writerow(data_row)
 
-with open('x.csv', 'w', newline='') as csvfile:
+with open('prod.csv', 'w', newline='') as csvfile:
     writer = csv.writer(csvfile)
 
     # Write header row
