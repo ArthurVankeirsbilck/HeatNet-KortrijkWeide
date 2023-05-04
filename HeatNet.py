@@ -52,7 +52,7 @@ nodes = [1, 2, 3, 4,5,6,7]
 def demands():
     demands_dict = {}
     #nodes
-    for i in range(1, len(nodes)+1):
+    for i in range(1, len(nodes)):
         #time periods
         for t in range(0, len(node1_demands)+1):
             # add demand to dictionary with node and time period as keys
