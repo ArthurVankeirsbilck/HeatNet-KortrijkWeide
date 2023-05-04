@@ -31,7 +31,7 @@ def CHP_feasible_area(yA):
 
 df = pd.read_csv("Consumptions.csv")
 
-hours=1
+hours=100
 node1_demands = df["KWEA_dec_jan"].iloc[0:hours].to_list()
 node2_demands = [0]*hours
 node3_demands = [0.2]*hours
@@ -270,7 +270,7 @@ def heatloss_bin2(model, i,j,t):
 model.heatloss_bin2 = Constraint(model.I, model.J, model.T, rule=heatloss_bin2)
 # #Add Fairness constraint 
 solver = SolverFactory("knitro");
-results = solver.solve(model, options={'outlev' : 6, 'numthreads': 8},tee=True)
+results = solver.solve(model, options={'outlev' : 6, 'numthreads': 8,  'mip_multistart': 1},tee=True)
 
 # solver = SolverFactory("mindtpy")
 # results = solver.solve(model,mip_solver="gurobi",nlp_solver="ipopt",tee=True)
