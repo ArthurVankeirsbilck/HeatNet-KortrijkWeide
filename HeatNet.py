@@ -339,3 +339,21 @@ with open('x.csv', 'w', newline='') as csvfile:
                 if i != j:
                     data_row.append(model.x[i, j,t].value)
         writer.writerow(data_row)
+
+with open('x.csv', 'w', newline='') as csvfile:
+    writer = csv.writer(csvfile)
+
+    # Write header row
+    header_row = ['']
+    for i in model.I:
+        for p in model.Plants:
+            header_row.append('{}_{}_x'.format(i,p))
+    writer.writerow(header_row)
+
+    # Write data rows   
+    for t in model.T:
+        data_row = [t]
+        for i in model.I:
+            for p in model.Plants:
+                data_row.append(model.p[p,i,t].value)
+        writer.writerow(data_row)
