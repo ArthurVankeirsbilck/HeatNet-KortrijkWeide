@@ -92,19 +92,17 @@ model.c = Param(model.I, model.J, initialize=
 (6, 1): 50, (6, 2): 50, (6, 3): 50, (6, 4): 50, (6, 5): 50, (6, 6): 0, (6, 7): 50, 
 (7, 1): 50, (7, 2): 50, (7, 3): 50, (7, 4): 50, (7, 5): 50, (7, 6): 50, (7, 7): 0}
 )  # transmission cost from i to j
-hour_conv = 60
 model.p_max_plant = Param(model.I, model.Plants, initialize={
-    (1, 'Plant1'): 751*hour_conv, (1, 'Plant2'):0, (1, 'Plant3'):0,
-    (2, 'Plant1'): 2312*hour_conv,  (2, 'Plant2'):45*hour_conv, (2, 'Plant3'):340*hour_conv,
+    (1, 'Plant1'): 751, (1, 'Plant2'):0, (1, 'Plant3'):0,
+    (2, 'Plant1'): 2312,  (2, 'Plant2'):45, (2, 'Plant3'):340,
     (3, 'Plant1'): 0, (3, 'Plant2'):0,(3, 'Plant3'):0,
-    (4, 'Plant1'): 350*hour_conv, (4, 'Plant2'): 0, (4, 'Plant3'): 0,
+    (4, 'Plant1'): 350, (4, 'Plant2'): 0, (4, 'Plant3'): 0,
     (5, 'Plant1'): 0, (5, 'Plant2'): 0, (5, 'Plant3'): 0,
-    (6, 'Plant1'): 160*hour_conv, (6, 'Plant2'): 0, (6, 'Plant3'): 0,
+    (6, 'Plant1'): 160, (6, 'Plant2'): 0, (6, 'Plant3'): 0,
     (7, 'Plant1'): 0, (7, 'Plant2'): 0, (7, 'Plant3'): 0
 })
 CHP_plants ={
-    (1, 'Plant1'),(4, 'Plant1')
-    
+    (1, 'Plant1'),(4, 'Plant1')  
 }
 HOB_plants ={
     (1, 'Plant2'), (1, 'Plant3'),
@@ -119,7 +117,7 @@ model.CHP_Plants = Set(within=model.I * model.Plants, initialize=CHP_plants)
 
 model.HOB_Plants = Set(within=model.I * model.Plants, initialize=HOB_plants)
 
-M=8000*hour_conv
+M=8000
 Cp=4.18
 P_elec = 0.4
 
