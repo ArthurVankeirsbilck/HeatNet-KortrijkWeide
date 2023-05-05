@@ -119,7 +119,7 @@ model.CHP_Plants = Set(within=model.I * model.Plants, initialize=CHP_plants)
 
 model.HOB_Plants = Set(within=model.I * model.Plants, initialize=HOB_plants)
 
-M=8000
+M=8000*hour_conv
 Cp=4.18
 P_elec = 0.4
 
@@ -187,7 +187,7 @@ model.z = Var(model.I, model.J, model.T, domain=Binary)
 model.Ts = Var(model.I, model.J, model.T, bounds=(60, 120))
 model.Tr = Var(model.I, model.J, model.T, bounds=(30, 120))
 model.y = Var(model.I, model.T, domain=Binary)
-model.massflow = Var(model.I, model.J, model.T, bounds=(0, 20))
+model.massflow = Var(model.I, model.J, model.T, bounds=(0, 20*hour_conv))
 model.P_el = Var(model.Plants, model.I, model.T, bounds=(0, None))
 model.kappa = Var(model.I, model.Plants, model.T, domain=Binary)
 M = 10000000
