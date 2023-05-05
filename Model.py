@@ -128,6 +128,7 @@ model.cons = ConstraintList()
 
 # variables
 model.x = Var(model.I, model.J, model.T, bounds=(0, None))  # power transmission from i to j
+model.y = Var(model.I, model.J, model.T, bounds=(0, None))  # power transmission from i to j
 model.p = Var(model.Plants, model.I, model.T, bounds=(0, None))  # production at node i
 model.mean_c = Var()  # mean transmission cost
 model.CQl = Var(model.I, model.J, model.T, bounds=(0, None))
@@ -147,7 +148,7 @@ model.obj = Objective(
     expr=sum(model.c[i,j]*model.x[i,j,t] + model.Ql[i,j,t]*model.z[i,j,t]  for j in model.J for i in model.I for t in model.T) + sum(model.c_gen[i,p,t]*model.p[p,i,t] - P_elec*model.P_el[p,i,t] for p in model.Plants for i in model.I for t in model.T), sense=minimize)
 
 def balance_constraint_rule(model, i,j,t):
-    return sum(model.x[i, j, t] - model.x[j, i, t] for j in model.J) + sum(model.p[p,i,t] for p in model.Plants) == model.d[i,t]
+    return sum(model.x[i, j, t] - model.y[i, j, t] for j in model.J) + sum(model.p[p,i,t] for p in model.Plants) == model.d[i,t]
 
 model.balance_constraint = Constraint(model.I, model.J, model.T , rule=balance_constraint_rule)
 
