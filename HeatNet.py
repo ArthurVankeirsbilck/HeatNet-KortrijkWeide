@@ -209,7 +209,7 @@ model.heat_flow_constraint = Constraint(model.I, model.J, model.T, rule=heat_flo
 #     return model.x[i, j,t] <= model.u[i, j]
 
 def capacity_constraint_rule(model, i, j,b,t):
-    return sum(model.x[i, j, b, t]) <= 8000
+    return sum(model.x[i, j, b, t] for i in model.I) <= 8000
 
 model.capacity_constraint = Constraint(model.I, model.J, model.Pipes, model.T, rule=capacity_constraint_rule)
 
