@@ -34,7 +34,7 @@ node3_costs = [1.0]*hours
 node4_costs = [1.0]*hours
 Plants = ['Plant1', 'Plant2', 'Plant3']
 nodes = [1, 2, 3, 4]
-pipes = [1]
+
 #Aanpassen nummers, numerical instability due to big
 for i in range(0,hours):
     n = random.randint(200,201)
@@ -83,7 +83,7 @@ model = ConcreteModel()
 # sets
 model.T = Set(initialize=times)
 model.I = Set(initialize=nodes)  # set of nodes
-model.J = Set(initialize=pipes)  # set of nodes
+model.J = Set(initialize=nodes)  # set of nodes
 model.Plants = Set(initialize=Plants)
 
 # parameters
@@ -210,11 +210,11 @@ def heatloss_bin2(model, i,j,t):
     return model.x[i,j,t] <= M*model.z[i,j,t]
 model.heatloss_bin2 = Constraint(model.I, model.J, model.T, rule=heatloss_bin2)
 #Add Fairness constraint 
-# solver = SolverFactory("knitro");
-# results = solver.solve(model, options={'mip_outlevel' : 2, 'numthreads': 8},tee=True)
+solver = SolverFactory("knitro");
+results = solver.solve(model, options={'mip_outlevel' : 2, 'numthreads': 8},tee=True)
 
-solver = SolverFactory("mindtpy")
-results = solver.solve(model,mip_solver="gurobi",nlp_solver="ipopt",tee=True)
+# solver = SolverFactory("mindtpy")
+# results = solver.solve(model,mip_solver="gurobi",nlp_solver="ipopt",tee=True)
 
 print(f"Objective value: {model.obj():.2f}")
 
