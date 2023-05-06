@@ -82,12 +82,13 @@ model.I = Set(initialize=nodes)  # set of nodes
 model.J = Set(initialize=nodes)  # set of nodes
 model.Plants = Set(initialize=Plants)
 model.Pipes = Set(initialize=pipes)
-model.nodes_connected_to_pipe_set = Set(dimen=2, initialize=((b,i) for b in model.Pipes for i in model.I if (b,i) in model.nodes_connected_to_pipe))
-# Define the set as a Pyomo Param object
 model.nodes_connected_to_pipe = Param(model.Pipes, model.I, initialize=
 {(1, 1): 1, (1, 2): 1, (1, 3): 1, (1, 4): 1, (1, 5): 0, (1, 6): 0, (1, 7): 0, 
 (2, 1): 0, (2, 2): 0, (2, 3): 0, (2, 4): 1, (2, 5): 1, (2, 6): 1, (2, 7): 0}
 )
+model.nodes_connected_to_pipe_set = Set(dimen=2, initialize=((b,i) for b in model.Pipes for i in model.I if (b,i) in model.nodes_connected_to_pipe))
+# Define the set as a Pyomo Param object
+
 print(model.nodes_connected_to_pipe)
 # parameters
 model.c = Param(model.I, model.J, initialize=
