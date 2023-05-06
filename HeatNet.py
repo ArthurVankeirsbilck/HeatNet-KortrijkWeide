@@ -82,13 +82,13 @@ model.I = Set(initialize=nodes)  # set of nodes
 model.J = Set(initialize=nodes)  # set of nodes
 model.Plants = Set(initialize=Plants)
 model.Pipes = Set(initialize=pipes)
-
+model.nodes_connected_to_pipe_set = Set(dimen=2, initialize=((b,i) for b in model.Pipes for i in model.I if (b,i) in model.nodes_connected_to_pipe))
 # Define the set as a Pyomo Param object
 model.nodes_connected_to_pipe = Param(model.Pipes, model.I, initialize=
 {(1, 1): 1, (1, 2): 1, (1, 3): 1, (1, 4): 1, (1, 5): 0, (1, 6): 0, (1, 7): 0, 
-(2, 1): 0, (2, 2): 0, (2, 3): 0, (2, 4): 1, (2, 5): 1, (2, 6): 1, (2, 7): 1}
+(2, 1): 0, (2, 2): 0, (2, 3): 0, (2, 4): 1, (2, 5): 1, (2, 6): 1, (2, 7): 0}
 )
-nodes_connected_to_pipe = {1: {1,2,3,4}, 2: {4,5,6,7}}
+print(model.nodes_connected_to_pipe)
 # parameters
 model.c = Param(model.I, model.J, initialize=
 {(1, 1): 0, (1, 2): 50, (1, 3): 50, (1, 4): 50, (1, 5): 50, (1, 6): 50, (1, 7): 50, 
@@ -194,7 +194,7 @@ model.Tr = Var(model.I, model.J, model.T, bounds=(30, 120))
 model.y = Var(model.I, model.T, domain=Binary)
 model.massflow = Var(model.I, model.J, model.T, bounds=(0, 20))
 model.P_el = Var(model.Plants, model.I, model.T, bounds=(0, None))
-model.sigma = Var(model.I, model.J, model.Pipes, model.T, within=Binary)
+model.sigma = Var(model.I, model.J, model.Pipes, model.Time, within=Binary)
 model.kappa = Var(model.I, model.Plants, model.T, domain=Binary)
 M = 10000000
 epsilon = 0.0000001
@@ -203,11 +203,10 @@ epsilon = 0.0000001
 model.obj = Objective(
     expr=sum(model.c[i,j]*model.x[i, j, b, t] + model.Ql[i,j,t]*model.z[i,j,t]  for j in model.J for i in model.I for b in model.Pipes for t in model.T) + sum(model.c_gen[i,p,t]*model.p[p,i,t] - P_elec*model.P_el[p,i,t] for p in model.Plants for i in model.I for t in model.T), sense=minimize)
 
-def balance_constraint_rule(model, i, b,t):
-    # return sum(model.x[i, j, b, t] - model.x[j, i, b, t] for j in model.J) + sum(model.p[p,i,t] for p in model.Plants) == model.d[i,t]
-    return sum(model.x[i, j, b, t] - model.x[j, i, b, t] for j in nodes_connected_to_pipe[b]) + sum(model.p[p,i,t] for p in model.Plants) == model.d[i,t]
+def balance_constraint_rule(model, i,j, b,t):
+    return sum(model.x[i, j, b, t] - model.x[j, i, b, t] for j in model.J) + sum(model.p[p,i,t] for p in model.Plants) == model.d[i,t]
 
-model.balance_constraint = Constraint(model.I, model.Pipes, model.T, rule=balance_constraint_rule)
+model.balance_constraint = Constraint(model.I, model.nodes_connected_to_pipe_set, model.Pipes, model.T, rule=balance_constraint_rule)
 
 def heat_flow_constraint(model, i, j,t):
     return Cp*model.massflow[i,j,t]*(model.Ts[i,j,t]-model.Tr[i,j,t]) == model.d[i,t]
@@ -228,7 +227,7 @@ model.cap_bin1 = Constraint(model.I, model.J, model.Pipes,model.T, rule=cap_bin1
 
 def cap_bin2(model, i,j,b,t):
     return model.nodes_connected_to_pipe[b,i] <= M*model.sigma[i,j,b,t]
-model.cap_bin2 = Constraint(model.I, model.J,model.Pipes, model.T, rule=cap_bin2)
+model.cap_bin1 = Constraint(model.I, model.J,model.Pipes, model.T, rule=cap_bin1)
 
 def CHP_1(model, t, i, p):
     return model.P_el[p,i,t] - model.p_max_plant[i,p] - ((model.p_max_plant[i,p]-CHP_feasible_area(model.p_max_plant[i,p])[2])/(CHP_feasible_area(model.p_max_plant[i,p])[0]-CHP_feasible_area(model.p_max_plant[i,p])[1])) * (model.p[p,i,t] - CHP_feasible_area(model.p_max_plant[i,p])[0]) <= 0
