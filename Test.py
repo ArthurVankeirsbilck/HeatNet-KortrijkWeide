@@ -2,7 +2,7 @@
 d = {}
 
 # Iterate through each number from 1 to 9
-for i in range(1, 8):
+for i in range(1, 3):
     for j in range(1, 8):
         # Create a tuple for each possible combination
         pair = (i, j)

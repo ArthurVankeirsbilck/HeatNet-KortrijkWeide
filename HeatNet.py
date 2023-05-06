@@ -82,6 +82,13 @@ model.I = Set(initialize=nodes)  # set of nodes
 model.J = Set(initialize=nodes)  # set of nodes
 model.Plants = Set(initialize=Plants)
 model.Pipes = Set(initialize=pipes)
+
+# Define the set as a Pyomo Param object
+model.nodes_connected_to_pipe = Param(model.Pipes, model.I, initialize=
+{(1, 1): 1, (1, 2): 1, (1, 3): 1, (1, 4): 1, (1, 5): 0, (1, 6): 0, (1, 7): 0, 
+(2, 1): 0, (2, 2): 0, (2, 3): 0, (2, 4): 1, (2, 5): 1, (2, 6): 1, (2, 7): 0}
+)
+print(model.nodes_connected_to_pipe)
 # parameters
 model.c = Param(model.I, model.J, initialize=
 {(1, 1): 0, (1, 2): 50, (1, 3): 50, (1, 4): 50, (1, 5): 50, (1, 6): 50, (1, 7): 50, 
@@ -187,6 +194,7 @@ model.Tr = Var(model.I, model.J, model.T, bounds=(30, 120))
 model.y = Var(model.I, model.T, domain=Binary)
 model.massflow = Var(model.I, model.J, model.T, bounds=(0, 20))
 model.P_el = Var(model.Plants, model.I, model.T, bounds=(0, None))
+model.sigma = Var(model.I, model.J, model.Pipes, model.Time, within=Binary)
 model.kappa = Var(model.I, model.Plants, model.T, domain=Binary)
 M = 10000000
 epsilon = 0.0000001
@@ -209,9 +217,17 @@ model.heat_flow_constraint = Constraint(model.I, model.J, model.T, rule=heat_flo
 #     return model.x[i, j,t] <= model.u[i, j]
 
 def capacity_constraint_rule(model, i, j,b,t):
-    return sum(model.x[i, j, b, t] for i in model.I) <= model.Pipes_max[b]
+    return sum(model.x[i, j, b, t] for i in model.I) <= model.Pipes_max[b]*model.sigma[i,j,b,t]
 
 model.capacity_constraint = Constraint(model.I, model.J, model.Pipes, model.T, rule=capacity_constraint_rule)
+
+def cap_bin1(model, i,j, b,t): #Big M Formulations to enforce z=1 when there is heat exchange otherwise 0.
+    return model.nodes_connected_to_pipe[b,i] >= 1- M*(1-model.sigma[i,j,b,t]) 
+model.cap_bin1 = Constraint(model.I, model.J, model.Pipes,model.T, rule=cap_bin1)
+
+def cap_bin2(model, i,j,b,t):
+    return model.nodes_connected_to_pipe[b,i] <= M*model.sigma[i,j,b,t]
+model.cap_bin2 = Constraint(model.I, model.J,model.Pipes, model.T, rule=cap_bin2)
 
 def CHP_1(model, t, i, p):
     return model.P_el[p,i,t] - model.p_max_plant[i,p] - ((model.p_max_plant[i,p]-CHP_feasible_area(model.p_max_plant[i,p])[2])/(CHP_feasible_area(model.p_max_plant[i,p])[0]-CHP_feasible_area(model.p_max_plant[i,p])[1])) * (model.p[p,i,t] - CHP_feasible_area(model.p_max_plant[i,p])[0]) <= 0
@@ -254,8 +270,8 @@ def heatloss_constraint(model, i, j,t):
     return model.Ql[i,j,t] == ((((2.0*3.14*model.k[i,j]*model.L[i,j]*(model.Ts[i,j,t]-model.Tr[i,j,t]))/math.log(model.Do[i,j]/model.Di[i,j]))/1000))
 model.heatloss_constraint = Constraint(model.I, model.J, model.T, rule=heatloss_constraint)
 
-def heatloss_bin1(model, i,j, b,t):
-    return model.x[i, j, b, t] >= 1- M*(1-model.z[i,j,t])
+def heatloss_bin1(model, i,j, b,t): #Big M Formulations to enforce z=1 when there is heat exchange otherwise 0.
+    return model.x[i, j, b, t] >= 1- M*(1-model.z[i,j,t]) 
 model.heatloss_bin1 = Constraint(model.I, model.J, model.Pipes,model.T, rule=heatloss_bin1)
 
 def heatloss_bin2(model, i,j,b,t):
