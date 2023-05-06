@@ -100,12 +100,12 @@ model.c = Param(model.I, model.J, initialize=
 (7, 1): 50, (7, 2): 50, (7, 3): 50, (7, 4): 50, (7, 5): 50, (7, 6): 50, (7, 7): 0}
 )  # transmission cost from i to j
 model.p_max_plant = Param(model.I, model.Plants, initialize={
-    (1, 'Plant1'): 751*5, (1, 'Plant2'):0, (1, 'Plant3'):0,
-    (2, 'Plant1'): 2312*5,  (2, 'Plant2'):45*5, (2, 'Plant3'):340,
+    (1, 'Plant1'): 751, (1, 'Plant2'):0, (1, 'Plant3'):0,
+    (2, 'Plant1'): 2312,  (2, 'Plant2'):45, (2, 'Plant3'):340,
     (3, 'Plant1'): 0, (3, 'Plant2'):0,(3, 'Plant3'):0,
-    (4, 'Plant1'): 350*5, (4, 'Plant2'): 0, (4, 'Plant3'): 0,
+    (4, 'Plant1'): 350, (4, 'Plant2'): 0, (4, 'Plant3'): 0,
     (5, 'Plant1'): 0, (5, 'Plant2'): 0, (5, 'Plant3'): 0,
-    (6, 'Plant1'): 160*5, (6, 'Plant2'): 0, (6, 'Plant3'): 0,
+    (6, 'Plant1'): 160, (6, 'Plant2'): 0, (6, 'Plant3'): 0,
     (7, 'Plant1'): 0, (7, 'Plant2'): 0, (7, 'Plant3'): 0
 })
 CHP_plants ={
@@ -203,11 +203,11 @@ epsilon = 0.0000001
 model.obj = Objective(
     expr=sum(model.c[i,j]*model.x[i, j, b, t] + model.Ql[i,j,t]*model.z[i,j,t]  for j in model.J for i in model.I for b in model.Pipes for t in model.T) + sum(model.c_gen[i,p,t]*model.p[p,i,t] - P_elec*model.P_el[p,i,t] for p in model.Plants for i in model.I for t in model.T), sense=minimize)
 
-def balance_constraint_rule(model, i,j, b,t):
+def balance_constraint_rule(model, i, b,t):
     # return sum(model.x[i, j, b, t] - model.x[j, i, b, t] for j in model.J) + sum(model.p[p,i,t] for p in model.Plants) == model.d[i,t]
     return sum(model.x[i, j, b, t] - model.x[j, i, b, t] for j in nodes_connected_to_pipe[b]) + sum(model.p[p,i,t] for p in model.Plants) == model.d[i,t]
 
-model.balance_constraint = Constraint(model.I, model.J, model.Pipes, model.T, rule=balance_constraint_rule)
+model.balance_constraint = Constraint(model.I, model.Pipes, model.T, rule=balance_constraint_rule)
 
 def heat_flow_constraint(model, i, j,t):
     return Cp*model.massflow[i,j,t]*(model.Ts[i,j,t]-model.Tr[i,j,t]) == model.d[i,t]
