@@ -194,7 +194,7 @@ model.Tr = Var(model.I, model.J, model.T, bounds=(30, 120))
 model.y = Var(model.I, model.T, domain=Binary)
 model.massflow = Var(model.I, model.J, model.T, bounds=(0, 20))
 model.P_el = Var(model.Plants, model.I, model.T, bounds=(0, None))
-model.sigma = Var(model.I, model.J, model.Pipes, model.Time, within=Binary)
+model.sigma = Var(model.I, model.J, model.Pipes, model.T, within=Binary)
 model.kappa = Var(model.I, model.Plants, model.T, domain=Binary)
 M = 10000000
 epsilon = 0.0000001
