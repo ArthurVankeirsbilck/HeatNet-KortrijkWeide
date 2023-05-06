@@ -89,8 +89,6 @@ model.nodes_connected_to_pipe = Param(model.Pipes, model.I, initialize=
 (2, 1): 0, (2, 2): 0, (2, 3): 0, (2, 4): 1, (2, 5): 1, (2, 6): 1, (2, 7): 1}
 )
 nodes_connected_to_pipe = {1: {1,2,3,4}, 2: {4,5,6,7}}
-print(nodes_connected_to_pipe)
-print(model.nodes_connected_to_pipe)
 # parameters
 model.c = Param(model.I, model.J, initialize=
 {(1, 1): 0, (1, 2): 50, (1, 3): 50, (1, 4): 50, (1, 5): 50, (1, 6): 50, (1, 7): 50, 
@@ -207,7 +205,7 @@ model.obj = Objective(
 
 def balance_constraint_rule(model, i,j, b,t):
     # return sum(model.x[i, j, b, t] - model.x[j, i, b, t] for j in model.J) + sum(model.p[p,i,t] for p in model.Plants) == model.d[i,t]
-    return sum(model.x[i, j, b, t] - model.x[j, i, b, t] for j in model.nodes_connected_to_pipe[b]) + sum(model.p[p,i,t] for p in model.Plants) == model.d[i,t]
+    return sum(model.x[i, j, b, t] - model.x[j, i, b, t] for j in nodes_connected_to_pipe[b]) + sum(model.p[p,i,t] for p in model.Plants) == model.d[i,t]
 
 model.balance_constraint = Constraint(model.I, model.J, model.Pipes, model.T, rule=balance_constraint_rule)
 
