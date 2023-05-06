@@ -47,7 +47,7 @@ node6_costs = [212.62/1000]*hours
 node7_costs = [212.62/1000]*hours
 Plants = ['Plant1', 'Plant2', 'Plant3']
 nodes = [1, 2, 3, 4,5,6,7]
-
+pipes = [1,2]
 def demands():
     demands_dict = {}
     #nodes
@@ -81,7 +81,7 @@ model.T = Set(initialize=times)
 model.I = Set(initialize=nodes)  # set of nodes
 model.J = Set(initialize=nodes)  # set of nodes
 model.Plants = Set(initialize=Plants)
-
+model.Pipes = Set(initialize=pipes)
 # parameters
 model.c = Param(model.I, model.J, initialize=
 {(1, 1): 0, (1, 2): 50, (1, 3): 50, (1, 4): 50, (1, 5): 50, (1, 6): 50, (1, 7): 50, 
@@ -162,7 +162,10 @@ model.Do = Param(model.I, model.J, initialize=
 (6, 1): do_DN125, (6, 2): do_DN125, (6, 3): do_DN125, (6, 4): do_DN125, (6, 5): do_DN125, (6, 6): do_DN125, (6, 7): do_DN125, 
 (7, 1): do_DN125, (7, 2): do_DN125, (7, 3): do_DN125, (7, 4): do_DN125, (7, 5): do_DN125, (7, 6): do_DN125, (7, 7): do_DN125}
 )
-
+model.Pipes_max = Param(model.Pipes, initialize=
+{
+    1:8000,2:8000
+})
 model.Di = Param(model.I, model.J, initialize=
 {(1, 1): di_DN125, (1, 2): di_DN125, (1, 3): di_DN125, (1, 4): di_DN125, (1, 5): di_DN125, (1, 6): di_DN125, (1, 7): di_DN125, 
 (2, 1): di_DN125, (2, 2): di_DN125, (2, 3): di_DN125, (2, 4): di_DN125, (2, 5): di_DN125, (2, 6): di_DN125, (2, 7): di_DN125, 
@@ -176,7 +179,7 @@ model.Di = Param(model.I, model.J, initialize=
 model.cons = ConstraintList()
 
 # variables
-model.x = Var(model.I, model.J, model.T, bounds=(0, None))  # power transmission from i to j
+model.x = Var(model.I, model.J, model.Pipes, model.T, bounds=(0, None))  # power transmission from i to j
 model.p = Var(model.Plants, model.I, model.T, bounds=(0, None))  # production at node i
 model.mean_c = Var()  # mean transmission cost
 model.CQl = Var(model.I, model.J, model.T, bounds=(0, None))
@@ -195,20 +198,23 @@ epsilon = 0.0000001
 model.obj = Objective(
     expr=sum(model.c[i,j]*model.x[i,j,t] + model.Ql[i,j,t]*model.z[i,j,t]  for j in model.J for i in model.I for t in model.T) + sum(model.c_gen[i,p,t]*model.p[p,i,t] - P_elec*model.P_el[p,i,t] for p in model.Plants for i in model.I for t in model.T), sense=minimize)
 
-def balance_constraint_rule(model, i,j,t):
-    return sum(model.x[i, j, t] - model.x[j, i, t] for j in model.J) + sum(model.p[p,i,t] for p in model.Plants) == model.d[i,t]
+def balance_constraint_rule(model, i,j, b,t):
+    return sum(model.x[i, j, b, t] - model.x[j, i, b, t] for j in model.J) + sum(model.p[p,i,t] for p in model.Plants) == model.d[i,t]
 
-model.balance_constraint = Constraint(model.I, model.J, model.T , rule=balance_constraint_rule)
+model.balance_constraint = Constraint(model.I, model.J, model.Pipes, model.T, rule=balance_constraint_rule)
 
 def heat_flow_constraint(model, i, j,t):
     return Cp*model.massflow[i,j,t]*(model.Ts[i,j,t]-model.Tr[i,j,t]) == model.d[i,t]
 
 model.heat_flow_constraint = Constraint(model.I, model.J, model.T, rule=heat_flow_constraint)
 
-def capacity_constraint_rule(model, i, j,t):
-    return model.x[i, j,t] <= model.u[i, j]
+# def capacity_constraint_rule(model, i, j,t):
+#     return model.x[i, j,t] <= model.u[i, j]
 
-model.capacity_constraint = Constraint(model.I, model.J, model.T, rule=capacity_constraint_rule)
+def capacity_constraint_rule(model, i, j,b,t):
+    return sum(model.x[i, j, b, t]) <= model.Pipes_max[b]
+
+model.capacity_constraint = Constraint(model.I, model.J, model.Pipes, model.T, rule=capacity_constraint_rule)
 
 def CHP_1(model, t, i, p):
     return model.P_el[p,i,t] - model.p_max_plant[i,p] - ((model.p_max_plant[i,p]-CHP_feasible_area(model.p_max_plant[i,p])[2])/(CHP_feasible_area(model.p_max_plant[i,p])[0]-CHP_feasible_area(model.p_max_plant[i,p])[1])) * (model.p[p,i,t] - CHP_feasible_area(model.p_max_plant[i,p])[0]) <= 0
@@ -251,13 +257,13 @@ def heatloss_constraint(model, i, j,t):
     return model.Ql[i,j,t] == ((((2.0*3.14*model.k[i,j]*model.L[i,j]*(model.Ts[i,j,t]-model.Tr[i,j,t]))/math.log(model.Do[i,j]/model.Di[i,j]))/1000))
 model.heatloss_constraint = Constraint(model.I, model.J, model.T, rule=heatloss_constraint)
 
-def heatloss_bin1(model, i,j,t):
-    return model.x[i,j,t] >= 1- M*(1-model.z[i,j,t])
-model.heatloss_bin1 = Constraint(model.I, model.J, model.T, rule=heatloss_bin1)
+def heatloss_bin1(model, i,j, b,t):
+    return model.x[i, j, b, t] >= 1- M*(1-model.z[i,j,t])
+model.heatloss_bin1 = Constraint(model.I, model.J, model.Pipes,model.T, rule=heatloss_bin1)
 
-def heatloss_bin2(model, i,j,t):
-    return model.x[i,j,t] <= M*model.z[i,j,t]
-model.heatloss_bin2 = Constraint(model.I, model.J, model.T, rule=heatloss_bin2)
+def heatloss_bin2(model, i,j,b,t):
+    return model.x[i, j, b, t] <= M*model.z[i,j,t]
+model.heatloss_bin2 = Constraint(model.I, model.J,model.Pipes, model.T, rule=heatloss_bin2)
 
 
 #Add Fairness constraint 
