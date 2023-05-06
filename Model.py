@@ -34,7 +34,7 @@ node3_costs = [1.0]*hours
 node4_costs = [1.0]*hours
 Plants = ['Plant1', 'Plant2', 'Plant3']
 nodes = [1, 2, 3, 4]
-
+pipes = [1]
 #Aanpassen nummers, numerical instability due to big
 for i in range(0,hours):
     n = random.randint(200,201)
@@ -83,7 +83,7 @@ model = ConcreteModel()
 # sets
 model.T = Set(initialize=times)
 model.I = Set(initialize=nodes)  # set of nodes
-model.J = Set(initialize=nodes)  # set of nodes
+model.J = Set(initialize=pipes)  # set of nodes
 model.Plants = Set(initialize=Plants)
 
 # parameters
@@ -128,7 +128,6 @@ model.cons = ConstraintList()
 
 # variables
 model.x = Var(model.I, model.J, model.T, bounds=(0, None))  # power transmission from i to j
-model.y = Var(model.I, model.J, model.T, bounds=(0, None))  # power transmission from i to j
 model.p = Var(model.Plants, model.I, model.T, bounds=(0, None))  # production at node i
 model.mean_c = Var()  # mean transmission cost
 model.CQl = Var(model.I, model.J, model.T, bounds=(0, None))
@@ -148,7 +147,7 @@ model.obj = Objective(
     expr=sum(model.c[i,j]*model.x[i,j,t] + model.Ql[i,j,t]*model.z[i,j,t]  for j in model.J for i in model.I for t in model.T) + sum(model.c_gen[i,p,t]*model.p[p,i,t] - P_elec*model.P_el[p,i,t] for p in model.Plants for i in model.I for t in model.T), sense=minimize)
 
 def balance_constraint_rule(model, i,j,t):
-    return sum(model.x[i, j, t] - model.y[i, j, t] for j in model.J) + sum(model.p[p,i,t] for p in model.Plants) == model.d[i,t]
+    return sum(model.x[i, j, t] - model.x[j, i, t] for j in model.J) + sum(model.p[p,i,t] for p in model.Plants) == model.d[i,t]
 
 model.balance_constraint = Constraint(model.I, model.J, model.T , rule=balance_constraint_rule)
 
@@ -211,11 +210,11 @@ def heatloss_bin2(model, i,j,t):
     return model.x[i,j,t] <= M*model.z[i,j,t]
 model.heatloss_bin2 = Constraint(model.I, model.J, model.T, rule=heatloss_bin2)
 #Add Fairness constraint 
-solver = SolverFactory("knitro");
-results = solver.solve(model, options={'mip_outlevel' : 2, 'numthreads': 8},tee=True)
+# solver = SolverFactory("knitro");
+# results = solver.solve(model, options={'mip_outlevel' : 2, 'numthreads': 8},tee=True)
 
-# solver = SolverFactory("mindtpy")
-# results = solver.solve(model,mip_solver="gurobi",nlp_solver="ipopt",tee=True)
+solver = SolverFactory("mindtpy")
+results = solver.solve(model,mip_solver="gurobi",nlp_solver="ipopt",tee=True)
 
 print(f"Objective value: {model.obj():.2f}")
 
