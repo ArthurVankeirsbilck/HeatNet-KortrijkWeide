@@ -86,8 +86,10 @@ model.Pipes = Set(initialize=pipes)
 # Define the set as a Pyomo Param object
 model.nodes_connected_to_pipe = Param(model.Pipes, model.I, initialize=
 {(1, 1): 1, (1, 2): 1, (1, 3): 1, (1, 4): 1, (1, 5): 0, (1, 6): 0, (1, 7): 0, 
-(2, 1): 0, (2, 2): 0, (2, 3): 0, (2, 4): 1, (2, 5): 1, (2, 6): 1, (2, 7): 0}
+(2, 1): 0, (2, 2): 0, (2, 3): 0, (2, 4): 1, (2, 5): 1, (2, 6): 1, (2, 7): 1}
 )
+nodes_connected_to_pipe = {1: {1,2,3,4}, 2: {4,5,6,7}}
+print(nodes_connected_to_pipe)
 print(model.nodes_connected_to_pipe)
 # parameters
 model.c = Param(model.I, model.J, initialize=
@@ -204,7 +206,8 @@ model.obj = Objective(
     expr=sum(model.c[i,j]*model.x[i, j, b, t] + model.Ql[i,j,t]*model.z[i,j,t]  for j in model.J for i in model.I for b in model.Pipes for t in model.T) + sum(model.c_gen[i,p,t]*model.p[p,i,t] - P_elec*model.P_el[p,i,t] for p in model.Plants for i in model.I for t in model.T), sense=minimize)
 
 def balance_constraint_rule(model, i,j, b,t):
-    return sum(model.x[i, j, b, t]*model.sigma[i,j,b,t] - model.x[j, i, b, t]*model.sigma[i,j,b,t] for j in model.J) + sum(model.p[p,i,t] for p in model.Plants) == model.d[i,t]
+    # return sum(model.x[i, j, b, t] - model.x[j, i, b, t] for j in model.J) + sum(model.p[p,i,t] for p in model.Plants) == model.d[i,t]
+    return sum(model.x[i, j, b, t] - model.x[j, i, b, t] for j in model.nodes_connected_to_pipe[b]) + sum(model.p[p,i,t] for p in model.Plants) == model.d[i,t]
 
 model.balance_constraint = Constraint(model.I, model.J, model.Pipes, model.T, rule=balance_constraint_rule)
 
