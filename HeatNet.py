@@ -340,7 +340,7 @@ with open('x.csv', 'w', newline='') as csvfile:
         data_row = [t]
         for j in model.J:
             for i in model.I:
-                for b in model.Plants:
+                for b in model.Pipes:
                     if i != j:
                         data_row.append(model.x[i, j, b, t].value)
         writer.writerow(data_row)
