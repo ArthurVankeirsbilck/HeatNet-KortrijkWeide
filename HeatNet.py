@@ -162,7 +162,7 @@ model.Do = Param(model.I, model.J, initialize=
 (6, 1): do_DN125, (6, 2): do_DN125, (6, 3): do_DN125, (6, 4): do_DN125, (6, 5): do_DN125, (6, 6): do_DN125, (6, 7): do_DN125, 
 (7, 1): do_DN125, (7, 2): do_DN125, (7, 3): do_DN125, (7, 4): do_DN125, (7, 5): do_DN125, (7, 6): do_DN125, (7, 7): do_DN125}
 )
-model.Pipes_max = Param(initialize=8000)
+model.Pipes_max = Param(model.Pipes, initialize={(1): 8000, (2): 8000})
 model.Di = Param(model.I, model.J, initialize=
 {(1, 1): di_DN125, (1, 2): di_DN125, (1, 3): di_DN125, (1, 4): di_DN125, (1, 5): di_DN125, (1, 6): di_DN125, (1, 7): di_DN125, 
 (2, 1): di_DN125, (2, 2): di_DN125, (2, 3): di_DN125, (2, 4): di_DN125, (2, 5): di_DN125, (2, 6): di_DN125, (2, 7): di_DN125, 
@@ -209,7 +209,7 @@ model.heat_flow_constraint = Constraint(model.I, model.J, model.T, rule=heat_flo
 #     return model.x[i, j,t] <= model.u[i, j]
 
 def capacity_constraint_rule(model, i, j,b,t):
-    return sum(model.x[i, j, b, t] for i in model.I) <= 8000
+    return sum(model.x[i, j, b, t] for i in model.I) <= model.Pipes_max[b]
 
 model.capacity_constraint = Constraint(model.I, model.J, model.Pipes, model.T, rule=capacity_constraint_rule)
 
