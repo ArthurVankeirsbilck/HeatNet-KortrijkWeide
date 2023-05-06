@@ -207,7 +207,7 @@ model.obj = Objective(
 def balance_constraint_rule(model, i,j, b,t):
     return sum(model.x[i, j, b, t] - model.x[j, i, b, t] for j in model.nodes_connected_to_pipe_set) + sum(model.p[p,i,t] for p in model.Plants) == model.d[i,t]
 
-model.balance_constraint = Constraint(model.I, model.nodes_connected_to_pipe_set, model.Pipes, model.T, rule=balance_constraint_rule)
+model.balance_constraint = Constraint(model.I, model.nodes_connected_to_pipe_set, model.T, rule=balance_constraint_rule)
 
 def heat_flow_constraint(model, i, j,t):
     return Cp*model.massflow[i,j,t]*(model.Ts[i,j,t]-model.Tr[i,j,t]) == model.d[i,t]
