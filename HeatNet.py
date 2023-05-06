@@ -204,7 +204,7 @@ model.obj = Objective(
     expr=sum(model.c[i,j]*model.x[i, j, b, t] + model.Ql[i,j,t]*model.z[i,j,t]  for j in model.J for i in model.I for b in model.Pipes for t in model.T) + sum(model.c_gen[i,p,t]*model.p[p,i,t] - P_elec*model.P_el[p,i,t] for p in model.Plants for i in model.I for t in model.T), sense=minimize)
 
 def balance_constraint_rule(model, i,j, b,t):
-    return sum(model.x[i, j, b, t] - model.x[j, i, b, t] for j in model.J) + sum(model.p[p,i,t] for p in model.Plants) == model.d[i,t]
+    return sum(model.x[i, j, b, t]*model.sigma[i,j,b,t] - model.x[j, i, b, t]*model.sigma[i,j,b,t] for j in model.J) + sum(model.p[p,i,t] for p in model.Plants) == model.d[i,t]
 
 model.balance_constraint = Constraint(model.I, model.J, model.Pipes, model.T, rule=balance_constraint_rule)
 
