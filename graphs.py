@@ -2,21 +2,20 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 spot = pd.read_csv("x.csv")
-print(spot["1_2_x"].to_list())
 
 plt.rcParams.update({'font.size': 11})
 plt.rcParams["figure.figsize"] = (11.69/2,8.27/2)
 
-plt.plot(spot["1_3_x"].to_list(), label=r"$x_{1,3}$")
-plt.plot(spot["1_4_x"].to_list(), label=r"$x_{1,4}$")
-plt.plot(spot["1_5_x"].to_list(), label=r"$x_{1,5}$")
-plt.plot(spot["1_6_x"].to_list(), label=r"$x_{1,6}$")
+plt.plot(spot["1_3"].to_list(), label=r"$x_{1,3}$")
+plt.plot(spot["1_4"].to_list(), label=r"$x_{1,4}$")
+plt.plot(spot["1_5"].to_list(), label=r"$x_{1,5}$")
+plt.plot(spot["1_6"].to_list(), label=r"$x_{1,6}$")
 
-plt.plot(spot["2_3_x"].to_list(), label=r"$x_{1,3}$")
-plt.plot(spot["2_4_x"].to_list(), label=r"$x_{1,4}$")
-plt.plot(spot["2_5_x"].to_list(), label=r"$x_{1,5}$")
-plt.plot(spot["2_6_x"].to_list(), label=r"$x_{1,6}$")
-plt.plot(spot["2_7_x"].to_list(), label=r"$x_{1,7}$")
+plt.plot(spot["2_3"].to_list(), label=r"$x_{1,3}$")
+plt.plot(spot["2_4"].to_list(), label=r"$x_{1,4}$")
+plt.plot(spot["2_5"].to_list(), label=r"$x_{1,5}$")
+plt.plot(spot["2_6"].to_list(), label=r"$x_{1,6}$")
+plt.plot(spot["2_7"].to_list(), label=r"$x_{1,7}$")
 
 
 # plt.plot(P_CHPWastelist, label=r"$q_{CHP - Waste}$",color="brown")
