@@ -40,7 +40,7 @@ def CHP_feasible_area(yA):
 
     return xA, xB, yB, xC, yC, xD, yD
 
-hours=168
+hours=100
 node1_demands = df["KWEA_dec_jan"].iloc[0:hours].to_list()
 node2_demands = [0]*hours
 node3_demands = [300]*hours
@@ -127,7 +127,7 @@ model.CHP_Plants = Set(within=model.I * model.Plants, initialize=CHP_plants)
 
 model.HOB_Plants = Set(within=model.I * model.Plants, initialize=HOB_plants)
 
-M=10000
+M=8000
 Cp=4.18
 
 model.u =Param(model.I, model.J, initialize=
