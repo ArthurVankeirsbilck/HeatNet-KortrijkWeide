@@ -272,7 +272,7 @@ def ramping_1(model, i,p,t):
     if t == model.T.first(): 
         return Constraint.Skip 
     else:
-        return 1*model.p_max_plant[i,p] <= model.p[p,i,t] - model.p[p,i,t-1]
+        return 0.04*model.p_max_plant[i,p] <= model.p[p,i,t] - model.p[p,i,t-1]
 
 model.ramping_1 = Constraint(model.I, model.Plants, model.T, rule=ramping_1)
 
@@ -280,42 +280,42 @@ def ramping_2(model, i,p,t):
     if t == model.T.first(): 
         return Constraint.Skip 
     else:
-        return model.p[p,i,t] - model.p[p,i,t-1] <= 1*model.p_max_plant[i,p]
+        return model.p[p,i,t] - model.p[p,i,t-1] <= 0.04*model.p_max_plant[i,p]
 
 model.ramping_2 = Constraint(model.I, model.Plants, model.T, rule=ramping_2)
 
-def ramping_3(model, i,p,t):
-    if t == model.T.first(): 
-        return model.Cramp[p,i,t] == 0
-    else:
-        return 0 <= model.Cramp[p,i,t] - ((model.p[p,i,t] - model.p[p,i,t-1])*Cramping)
+# def ramping_3(model, i,p,t):
+#     if t == model.T.first(): 
+#         return model.Cramp[p,i,t] == 0
+#     else:
+#         return 0 <= model.Cramp[p,i,t] - ((model.p[p,i,t] - model.p[p,i,t-1])*Cramping)
 
-model.ramping_3 = Constraint(model.I, model.Plants, model.T, rule=ramping_3)
+# model.ramping_3 = Constraint(model.I, model.Plants, model.T, rule=ramping_3)
 
-def ramping_4(model, i,p,t):
-    if t == model.T.first(): 
-        return model.Cramp[p,i,t] == 0
-    else:
-        return model.Cramp[p,i,t] - ((model.p[p,i,t] - model.p[p,i,t-1])*Cramping) <= 2*1*model.kappa[i,p,t]
+# def ramping_4(model, i,p,t):
+#     if t == model.T.first(): 
+#         return model.Cramp[p,i,t] == 0
+#     else:
+#         return model.Cramp[p,i,t] - ((model.p[p,i,t] - model.p[p,i,t-1])*Cramping) <= 2*1*model.kappa[i,p,t]
 
-model.ramping_4 = Constraint(model.I, model.Plants, model.T, rule=ramping_4)
+# model.ramping_4 = Constraint(model.I, model.Plants, model.T, rule=ramping_4)
 
 
-def ramping_5(model, i,p,t):
-    if t == model.T.first(): 
-        return model.Cramp[p,i,t] == 0
-    else:
-        return 0 <= model.Cramp[p,i,t] + ((model.p[p,i,t] - model.p[p,i,t-1])*Cramping)
+# def ramping_5(model, i,p,t):
+#     if t == model.T.first(): 
+#         return model.Cramp[p,i,t] == 0
+#     else:
+#         return 0 <= model.Cramp[p,i,t] + ((model.p[p,i,t] - model.p[p,i,t-1])*Cramping)
 
-model.ramping_5 = Constraint(model.I, model.Plants, model.T, rule=ramping_5)
+# model.ramping_5 = Constraint(model.I, model.Plants, model.T, rule=ramping_5)
 
-def ramping_6(model, i,p,t):
-    if t == model.T.first(): 
-        return model.Cramp[p,i,t] == 0
-    else:
-        return model.Cramp[p,i,t] + ((model.p[p,i,t] - model.p[p,i,t-1])*Cramping) <= 2*1*(1-model.kappa[i,p,t])
+# def ramping_6(model, i,p,t):
+#     if t == model.T.first(): 
+#         return model.Cramp[p,i,t] == 0
+#     else:
+#         return model.Cramp[p,i,t] + ((model.p[p,i,t] - model.p[p,i,t-1])*Cramping) <= 2*1*(1-model.kappa[i,p,t])
 
-model.ramping_6 = Constraint(model.I, model.Plants, model.T, rule=ramping_6)
+# model.ramping_6 = Constraint(model.I, model.Plants, model.T, rule=ramping_6)
 
 
 #Add Fairness constraint 
