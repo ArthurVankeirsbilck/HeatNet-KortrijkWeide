@@ -50,9 +50,9 @@ node6_demands = [300]*hours
 node7_demands = df["Collectief_dec_jan"].iloc[0:hours].to_list()
 node1_costs = [86.10/1000]*hours
 node2_costs = [86.10/1000]*hours
-node3_costs = [0.3]*hours
+node3_costs = [1.0]*hours
 node4_costs = [86.10/1000]*hours
-node5_costs = [0.3]*hours
+node5_costs = [1.0]*hours
 node6_costs = [212.62/1000]*hours
 node7_costs = [212.62/1000]*hours
 Plants = ['Plant1', 'Plant2', 'Plant3']
@@ -102,8 +102,6 @@ model.c = Param(model.I, model.J, initialize=
 (6, 1): 0.50, (6, 2): 0.50, (6, 3): 0.50, (6, 4): 0.50, (6, 5): 0.50, (6, 6): 0, (6, 7): 0.50, 
 (7, 1): 0.50, (7, 2): 0.50, (7, 3): 0.50, (7, 4): 0.50, (7, 5): 0.50, (7, 6): 0.50, (7, 7): 0}
 )  # transmission cost from i to j
-CHPramp = 600
-HOBramp = 120
 model.p_max_plant = Param(model.I, model.Plants, initialize={
     (1, 'Plant1'): 751, (1, 'Plant2'):0, (1, 'Plant3'):0,
     (2, 'Plant1'): 2312,  (2, 'Plant2'):45, (2, 'Plant3'):340,
@@ -113,17 +111,6 @@ model.p_max_plant = Param(model.I, model.Plants, initialize={
     (6, 'Plant1'): 160, (6, 'Plant2'): 0, (6, 'Plant3'): 0,
     (7, 'Plant1'): 0, (7, 'Plant2'): 0, (7, 'Plant3'): 0
 })
-
-model.ramp_rate = Param(model.I, model.Plants, initialize={
-    (1, 'Plant1'): CHPramp/751, (1, 'Plant2'):0, (1, 'Plant3'):0,
-    (2, 'Plant1'): HOBramp/2312,  (2, 'Plant2'):45, (2, 'Plant3'):HOBramp/340,
-    (3, 'Plant1'): 0, (3, 'Plant2'):0,(3, 'Plant3'):0,
-    (4, 'Plant1'): 350, (4, 'Plant2'): 0, (4, 'Plant3'): 0,
-    (5, 'Plant1'): 0, (5, 'Plant2'): 0, (5, 'Plant3'): 0,
-    (6, 'Plant1'): HOBramp/160, (6, 'Plant2'): 0, (6, 'Plant3'): 0,
-    (7, 'Plant1'): 0, (7, 'Plant2'): 0, (7, 'Plant3'): 0
-})
-
 CHP_plants ={
     (1, 'Plant1'),(4, 'Plant1')  
 }
@@ -209,10 +196,9 @@ model.y = Var(model.I, model.T, domain=Binary)
 model.massflow = Var(model.I, model.J, model.T, bounds=(0, 20))
 model.P_el = Var(model.Plants, model.I, model.T, bounds=(0, None))
 model.kappa = Var(model.I, model.Plants, model.T, domain=Binary)
-model.Cramp= Var(model.Plants, model.I, model.T, bounds=(0, None))
 M = 10000000
 epsilon = 0.0000001
-Cramping = 0.1
+
 # objective
 model.obj = Objective(
     expr=sum(model.c[i,j]*model.x[i,j,t] + model.Ql[i,j,t]*model.z[i,j,t]  for j in model.J for i in model.I for t in model.T) + sum(model.c_gen[i,p,t]*model.p[p,i,t] - model.P_elec[t]*model.P_el[p,i,t] for p in model.Plants for i in model.I for t in model.T), sense=minimize)
@@ -270,7 +256,7 @@ def HOB_2(model, t, i, p):
 model.HOB_2_constraint = Constraint(model.T, model.HOB_Plants, rule=HOB_2)
 
 def heatloss_constraint(model, i, j,t):
-    return model.Ql[i,j,t] == ((((2.0*3.14*model.k[i,j]*model.L[i,j]*(model.Ts[i,j,t]-model.Tr[i,j,t]))/math.log(model.Do[i,j]/model.Di[i,j]))/1000))*0.2
+    return model.Ql[i,j,t] == ((((2.0*3.14*model.k[i,j]*model.L[i,j]*(model.Ts[i,j,t]-model.Tr[i,j,t]))/math.log(model.Do[i,j]/model.Di[i,j]))/1000))
 model.heatloss_constraint = Constraint(model.I, model.J, model.T, rule=heatloss_constraint)
 
 def heatloss_bin1(model, i,j,t):
@@ -280,55 +266,6 @@ model.heatloss_bin1 = Constraint(model.I, model.J, model.T, rule=heatloss_bin1)
 def heatloss_bin2(model, i,j,t):
     return model.x[i,j,t] <= M*model.z[i,j,t]
 model.heatloss_bin2 = Constraint(model.I, model.J, model.T, rule=heatloss_bin2)
-
-def ramping_1(model, i,p,t):
-    if t == 0:
-        return Constraint.Skip
-    else:
-        return model.ramp_rate[i,p]*model.p_max_plant[i,p] >= model.p[p,i,t] - model.p[p,i,t-1]
-
-model.ramping_1 = Constraint(model.I, model.Plants, model.T, rule=ramping_1)
-
-def ramping_2(model, i,p,t):
-    if t == 0: 
-        return Constraint.Skip 
-    else:
-        return model.p[p,i,t] - model.p[p,i,t-1] >= model.ramp_rate[i,p]*model.p_max_plant[i,p]
-
-# model.ramping_2 = Constraint(model.I, model.Plants, model.T, rule=ramping_2)
-
-# def ramping_3(model, i,p,t):
-#     if t == model.T.first(): 
-#         return model.Cramp[p,i,t] == 0
-#     else:
-#         return 0 <= model.Cramp[p,i,t] - ((model.p[p,i,t] - model.p[p,i,t-1])*Cramping)
-
-# model.ramping_3 = Constraint(model.I, model.Plants, model.T, rule=ramping_3)
-
-# def ramping_4(model, i,p,t):
-#     if t == model.T.first(): 
-#         return model.Cramp[p,i,t] == 0
-#     else:
-#         return model.Cramp[p,i,t] - ((model.p[p,i,t] - model.p[p,i,t-1])*Cramping) <= 2*1*model.kappa[i,p,t]
-
-# model.ramping_4 = Constraint(model.I, model.Plants, model.T, rule=ramping_4)
-
-
-# def ramping_5(model, i,p,t):
-#     if t == model.T.first(): 
-#         return model.Cramp[p,i,t] == 0
-#     else:
-#         return 0 <= model.Cramp[p,i,t] + ((model.p[p,i,t] - model.p[p,i,t-1])*Cramping)
-
-# model.ramping_5 = Constraint(model.I, model.Plants, model.T, rule=ramping_5)
-
-# def ramping_6(model, i,p,t):
-#     if t == model.T.first(): 
-#         return model.Cramp[p,i,t] == 0
-#     else:
-#         return model.Cramp[p,i,t] + ((model.p[p,i,t] - model.p[p,i,t-1])*Cramping) <= 2*1*(1-model.kappa[i,p,t])
-
-# model.ramping_6 = Constraint(model.I, model.Plants, model.T, rule=ramping_6)
 
 
 #Add Fairness constraint 
@@ -399,7 +336,7 @@ with open('x.csv', 'w', newline='') as csvfile:
     for j in model.J:
         for i in model.I:
             if i != j:
-                header_row.append('{}_{}'.format(j,i))
+                header_row.append('{}_{}_x'.format(j,i))
     writer.writerow(header_row)
 
     # Write data rows   
@@ -463,25 +400,4 @@ with open('prodelec.csv', 'w', newline='') as csvfile:
         for i in model.I:
             for p in model.Plants:
                 data_row.append(model.P_el[p,i,t].value)
-        writer.writerow(data_row)
-
-
-with open('massflows.csv', 'w', newline='') as csvfile:
-    writer = csv.writer(csvfile)
-
-    # Write header row
-    header_row = ['']
-    for j in model.J:
-        for i in model.I:
-            if i != j:
-                header_row.append('{}_{}'.format(j,i))
-    writer.writerow(header_row)
-
-    # Write data rows   
-    for t in model.T:
-        data_row = [t]
-        for j in model.J:
-            for i in model.I:
-                if i != j:
-                    data_row.append(model.massflow[i,j,t].value)
         writer.writerow(data_row)
