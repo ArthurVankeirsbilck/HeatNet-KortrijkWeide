@@ -399,7 +399,7 @@ with open('x.csv', 'w', newline='') as csvfile:
     for j in model.J:
         for i in model.I:
             if i != j:
-                header_row.append('{}_{}_x'.format(j,i))
+                header_row.append('{}_{}'.format(j,i))
     writer.writerow(header_row)
 
     # Write data rows   
@@ -463,4 +463,25 @@ with open('prodelec.csv', 'w', newline='') as csvfile:
         for i in model.I:
             for p in model.Plants:
                 data_row.append(model.P_el[p,i,t].value)
+        writer.writerow(data_row)
+
+
+with open('massflows.csv', 'w', newline='') as csvfile:
+    writer = csv.writer(csvfile)
+
+    # Write header row
+    header_row = ['']
+    for j in model.J:
+        for i in model.I:
+            if i != j:
+                header_row.append('{}_{}'.format(j,i))
+    writer.writerow(header_row)
+
+    # Write data rows   
+    for t in model.T:
+        data_row = [t]
+        for j in model.J:
+            for i in model.I:
+                if i != j:
+                    data_row.append(model.massflow[i,j,t].value)
         writer.writerow(data_row)
