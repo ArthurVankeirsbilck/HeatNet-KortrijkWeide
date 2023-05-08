@@ -269,9 +269,9 @@ def HOB_2(model, t, i, p):
     return model.p[p,i,t] <= model.p_max_plant[i,p]*model.kappa[i,p,t]
 model.HOB_2_constraint = Constraint(model.T, model.HOB_Plants, rule=HOB_2)
 
-def heatloss_constraint(model, i, j,t):
+def heatloss_constraint(model, i, j,t, p):
     return model.Ql[i,j,t] == ((((2.0*3.14*model.k[i,j]*model.L[i,j]*(model.Ts[i,j,t]-model.Tr[i,j,t]))/math.log(model.Do[i,j]/model.Di[i,j]))/1000))*model.c_gen[i,p,t]
-model.heatloss_constraint = Constraint(model.I, model.J, model.T, rule=heatloss_constraint)
+model.heatloss_constraint = Constraint(model.I, model.J, model.T, model.Plants, rule=heatloss_constraint)
 
 def heatloss_bin1(model, i,j,t):
     return model.x[i,j,t] >= 1- M*(1-model.z[i,j,t])
