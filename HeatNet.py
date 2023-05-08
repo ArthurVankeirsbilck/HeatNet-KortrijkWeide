@@ -40,7 +40,7 @@ def CHP_feasible_area(yA):
 
     return xA, xB, yB, xC, yC, xD, yD
 
-hours=100
+hours=5
 node1_demands = df["KWEA_dec_jan"].iloc[0:hours].to_list()
 node2_demands = [0]*hours
 node3_demands = [300]*hours
@@ -382,4 +382,22 @@ with open('prod.csv', 'w', newline='') as csvfile:
         for i in model.I:
             for p in model.Plants:
                 data_row.append(model.p[p,i,t].value)
+        writer.writerow(data_row)
+
+with open('prodelec.csv', 'w', newline='') as csvfile:
+    writer = csv.writer(csvfile)
+
+    # Write header row
+    header_row = ['']
+    for i in model.I:
+        for p in model.Plants:
+            header_row.append('{}_{}'.format(i,p))
+    writer.writerow(header_row)
+
+    # Write data rows   
+    for t in model.T:
+        data_row = [t]
+        for i in model.I:
+            for p in model.Plants:
+                data_row.append(model.P_el[p,i,t].value)
         writer.writerow(data_row)
