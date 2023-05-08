@@ -3,6 +3,15 @@ import math
 import random
 import csv
 import pandas as pd
+
+spot = pd.read_csv("Data/Costs/spot.csv")
+spot = spot[::-1]
+spot = spot.reset_index(drop=True)
+spot["Euro"]=spot["Euro"].str.replace(',','.')
+spot["Euro"] = pd.to_numeric(spot["Euro"])
+print(spot)
+
+
 df = pd.read_csv("Consumptions.csv")
 df.apply(pd.to_numeric)
 random.seed(10)
@@ -30,7 +39,7 @@ def CHP_feasible_area(yA):
 
     return xA, xB, yB, xC, yC, xD, yD
 
-hours=336
+hours=5
 node1_demands = df["KWEA_dec_jan"].iloc[0:hours].to_list()
 node2_demands = [0]*hours
 node3_demands = [300]*hours
@@ -81,7 +90,7 @@ model.T = Set(initialize=times)
 model.I = Set(initialize=nodes)  # set of nodes
 model.J = Set(initialize=nodes)  # set of nodes
 model.Plants = Set(initialize=Plants)
-
+model.P_elec = Param(model.T, initialize=spot["Euro"].iloc[0:hours+1].to_list())
 # parameters
 model.c = Param(model.I, model.J, initialize=
 {(1, 1): 0, (1, 2): 50, (1, 3): 50, (1, 4): 50, (1, 5): 50, (1, 6): 50, (1, 7): 50, 
@@ -119,8 +128,6 @@ model.HOB_Plants = Set(within=model.I * model.Plants, initialize=HOB_plants)
 
 M=8000
 Cp=4.18
-P_elec = 0.4
-
 
 model.u =Param(model.I, model.J, initialize=
 {(1, 1): 0, (1, 2): M, (1, 3): M, (1, 4): M, (1, 5): M, (1, 6): M, (1, 7): M,
@@ -193,7 +200,7 @@ epsilon = 0.0000001
 
 # objective
 model.obj = Objective(
-    expr=sum(model.c[i,j]*model.x[i,j,t] + model.Ql[i,j,t]*model.z[i,j,t]  for j in model.J for i in model.I for t in model.T) + sum(model.c_gen[i,p,t]*model.p[p,i,t] - P_elec*model.P_el[p,i,t] for p in model.Plants for i in model.I for t in model.T), sense=minimize)
+    expr=sum(model.c[i,j]*model.x[i,j,t] + model.Ql[i,j,t]*model.z[i,j,t]  for j in model.J for i in model.I for t in model.T) + sum(model.c_gen[i,p,t]*model.p[p,i,t] - model.P_elec[t]*model.P_el[p,i,t] for p in model.Plants for i in model.I for t in model.T), sense=minimize)
 
 def balance_constraint_rule(model, i,j,t):
     return sum(model.x[i, j, t] - model.x[j, i, t] for j in model.J) + sum(model.p[p,i,t] for p in model.Plants) == model.d[i,t]
@@ -338,6 +345,24 @@ with open('x.csv', 'w', newline='') as csvfile:
             for i in model.I:
                 if i != j:
                     data_row.append(model.x[i, j,t].value)
+        writer.writerow(data_row)
+
+with open('prod.csv', 'w', newline='') as csvfile:
+    writer = csv.writer(csvfile)
+
+    # Write header row
+    header_row = ['']
+    for i in model.I:
+        for p in model.Plants:
+            header_row.append('{}_{}_x'.format(i,p))
+    writer.writerow(header_row)
+
+    # Write data rows   
+    for t in model.T:
+        data_row = [t]
+        for i in model.I:
+            for p in model.Plants:
+                data_row.append(model.p[p,i,t].value)
         writer.writerow(data_row)
 
 with open('prod.csv', 'w', newline='') as csvfile:
