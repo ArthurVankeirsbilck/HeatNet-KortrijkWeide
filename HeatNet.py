@@ -45,13 +45,13 @@ node1_demands = df["KWEA_dec_jan"].iloc[0:hours].to_list()
 node2_demands = [0]*hours
 node3_demands = []
 for i in range(0,hours):
-    n = random.randint(310,350)
+    n = random.randint(310,320)
     node3_demands.append(n)
 node4_demands = df["Penta_dec_jan"].iloc[0:hours].to_list()
 node5_demands = df["Vegitec_dec_jan"].iloc[0:hours].to_list()
 node6_demands = []
 for i in range(0,hours):
-    n = random.randint(350,370)
+    n = random.randint(100,110)
     node6_demands.append(n)
 node7_demands = df["Collectief_dec_jan"].iloc[0:hours].to_list()
 node1_costs = [86.10/1000]*hours
