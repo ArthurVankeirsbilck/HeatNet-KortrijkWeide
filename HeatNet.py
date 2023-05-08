@@ -7,6 +7,7 @@ import pandas as pd
 spot = pd.read_csv("Data/Costs/spot.csv")
 spot = spot[::-1]
 spot = spot.reset_index(drop=True)
+spot["Euro"] = spot["Euro"]/1000
 spot["Euro"]=spot["Euro"].str.replace(',','.')
 spot["Euro"] = pd.to_numeric(spot["Euro"])
 print(spot)
@@ -39,7 +40,7 @@ def CHP_feasible_area(yA):
 
     return xA, xB, yB, xC, yC, xD, yD
 
-hours=5
+hours=100
 node1_demands = df["KWEA_dec_jan"].iloc[0:hours].to_list()
 node2_demands = [0]*hours
 node3_demands = [300]*hours
