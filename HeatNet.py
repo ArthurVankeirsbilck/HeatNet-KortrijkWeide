@@ -7,9 +7,9 @@ import pandas as pd
 spot = pd.read_csv("Data/Costs/spot.csv")
 spot = spot[::-1]
 spot = spot.reset_index(drop=True)
-spot["Euro"] = spot["Euro"]/1000
 spot["Euro"]=spot["Euro"].str.replace(',','.')
 spot["Euro"] = pd.to_numeric(spot["Euro"])
+spot["Euro"] = spot["Euro"]/1000
 print(spot)
 
 
