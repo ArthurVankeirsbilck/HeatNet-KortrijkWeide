@@ -268,21 +268,21 @@ def heatloss_bin2(model, i,j,t):
     return model.x[i,j,t] <= M*model.z[i,j,t]
 model.heatloss_bin2 = Constraint(model.I, model.J, model.T, rule=heatloss_bin2)
 
-def ramping_1(model, i,p,t):
-    if t == model.T.first(): 
-        return Constraint.Skip 
-    else:
-        return 1*model.p_max_plant[i,p] <= model.p[p,i,t] - model.p[p,i,t-1]
+# def ramping_1(model, i,p,t):
+#     if t == model.T.first(): 
+#         return Constraint.Skip 
+#     else:
+#         return 1*model.p_max_plant[i,p] <= model.p[p,i,t] - model.p[p,i,t-1]
 
-model.ramping_1 = Constraint(model.I, model.Plants, model.T, rule=ramping_1)
+# model.ramping_1 = Constraint(model.I, model.Plants, model.T, rule=ramping_1)
 
-def ramping_2(model, i,p,t):
-    if t == model.T.first(): 
-        return Constraint.Skip 
-    else:
-        return model.p[p,i,t] - model.p[p,i,t-1] <= 1*model.p_max_plant[i,p]
+# def ramping_2(model, i,p,t):
+#     if t == model.T.first(): 
+#         return Constraint.Skip 
+#     else:
+#         return model.p[p,i,t] - model.p[p,i,t-1] <= 1*model.p_max_plant[i,p]
 
-model.ramping_2 = Constraint(model.I, model.Plants, model.T, rule=ramping_2)
+# model.ramping_2 = Constraint(model.I, model.Plants, model.T, rule=ramping_2)
 
 # def ramping_3(model, i,p,t):
 #     if t == model.T.first(): 
