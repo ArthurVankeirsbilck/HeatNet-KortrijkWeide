@@ -40,7 +40,7 @@ def CHP_feasible_area(yA):
 
     return xA, xB, yB, xC, yC, xD, yD
 
-hours=138
+hours=5
 node1_demands = df["KWEA_dec_jan"].iloc[0:hours].to_list()
 node2_demands = [0]*hours
 node3_demands = [300]*hours
@@ -196,9 +196,10 @@ model.y = Var(model.I, model.T, domain=Binary)
 model.massflow = Var(model.I, model.J, model.T, bounds=(0, 20))
 model.P_el = Var(model.Plants, model.I, model.T, bounds=(0, None))
 model.kappa = Var(model.I, model.Plants, model.T, domain=Binary)
+model.Cramp= Var(model.Plants, model.I, model.T, bounds=(0, None))
 M = 10000000
 epsilon = 0.0000001
-
+Cramping = 0.1
 # objective
 model.obj = Objective(
     expr=sum(model.c[i,j]*model.x[i,j,t] + model.Ql[i,j,t]*model.z[i,j,t]  for j in model.J for i in model.I for t in model.T) + sum(model.c_gen[i,p,t]*model.p[p,i,t] - model.P_elec[t]*model.P_el[p,i,t] for p in model.Plants for i in model.I for t in model.T), sense=minimize)
@@ -267,14 +268,63 @@ def heatloss_bin2(model, i,j,t):
     return model.x[i,j,t] <= M*model.z[i,j,t]
 model.heatloss_bin2 = Constraint(model.I, model.J, model.T, rule=heatloss_bin2)
 
+def ramping_1(model, i,p,t):
+    if t == model.T.first(): 
+        return Constraint.Skip 
+    else:
+        return 0.04*model.p_max_plant[i,p] <= model.p[p,i,t] - model.p[p,i,t-1]
+
+model.ramping_1 = Constraint(model.I, model.Plants, model.T, rule=ramping_1)
+
+def ramping_2(model, i,p,t):
+    if t == model.T.first(): 
+        return Constraint.Skip 
+    else:
+        return model.p[p,i,t] - model.p[p,i,t-1] <= 0.04*model.p_max_plant[i,p]
+
+model.ramping_2 = Constraint(model.I, model.Plants, model.T, rule=ramping_2)
+
+def ramping_3(model, i,p,t):
+    if t == model.T.first(): 
+        return model.Cramp[p,i,t] == 0
+    else:
+        return 0 <= model.Cramp[p,i,t] - ((model.p[p,i,t] - model.p[p,i,t-1])*Cramping)
+
+model.ramping_3 = Constraint(model.I, model.Plants, model.T, rule=ramping_3)
+
+def ramping_4(model, i,p,t):
+    if t == model.T.first(): 
+        return model.Cramp[p,i,t] == 0
+    else:
+        return model.Cramp[p,i,t] - ((model.p[p,i,t] - model.p[p,i,t-1])*Cramping) <= 2*0.04*model.kappa[i,p,t]
+
+model.ramping_4 = Constraint(model.I, model.Plants, model.T, rule=ramping_4)
+
+
+def ramping_5(model, i,p,t):
+    if t == model.T.first(): 
+        return model.Cramp[p,i,t] == 0
+    else:
+        return 0 <= model.Cramp[p,i,t] + ((model.p[p,i,t] - model.p[p,i,t-1])*Cramping)
+
+model.ramping_5 = Constraint(model.I, model.Plants, model.T, rule=ramping_5)
+
+def ramping_6(model, i,p,t):
+    if t == model.T.first(): 
+        return model.Cramp[p,i,t] == 0
+    else:
+        return model.Cramp[p,i,t] + ((model.p[p,i,t] - model.p[p,i,t-1])*Cramping) <= 2*0.04*(1-model.kappa[i,p,t])
+
+model.ramping_6 = Constraint(model.I, model.Plants, model.T, rule=ramping_6)
+
 
 #Add Fairness constraint 
 # solver = SolverFactory("knitro");
 # results = solver.solve(model, options={'outlev' : 4, 'numthreads': 8},tee=True)
-solver = SolverFactory("octeract");
-results = solver.solve(model,tee=True)
-# solver = SolverFactory("mindtpy")
-# results = solver.solve(model,mip_solver="gurobi",nlp_solver="ipopt",tee=True)
+# solver = SolverFactory("octeract");
+# results = solver.solve(model,tee=True)
+solver = SolverFactory("mindtpy")
+results = solver.solve(model,mip_solver="gurobi",nlp_solver="ipopt",tee=True)
 
 print(f"Objective value: {model.obj():.2f}")
 
