@@ -40,7 +40,7 @@ def CHP_feasible_area(yA):
 
     return xA, xB, yB, xC, yC, xD, yD
 
-hours=50
+hours=100
 node1_demands = df["KWEA_dec_jan"].iloc[0:hours].to_list()
 node2_demands = [0]*hours
 node3_demands = [300]*hours
@@ -102,6 +102,8 @@ model.c = Param(model.I, model.J, initialize=
 (6, 1): 50, (6, 2): 50, (6, 3): 50, (6, 4): 50, (6, 5): 50, (6, 6): 0, (6, 7): 50, 
 (7, 1): 50, (7, 2): 50, (7, 3): 50, (7, 4): 50, (7, 5): 50, (7, 6): 50, (7, 7): 0}
 )  # transmission cost from i to j
+CHPramp = 600
+HOBramp = 120
 model.p_max_plant = Param(model.I, model.Plants, initialize={
     (1, 'Plant1'): 751, (1, 'Plant2'):0, (1, 'Plant3'):0,
     (2, 'Plant1'): 2312,  (2, 'Plant2'):45, (2, 'Plant3'):340,
@@ -111,6 +113,17 @@ model.p_max_plant = Param(model.I, model.Plants, initialize={
     (6, 'Plant1'): 160, (6, 'Plant2'): 0, (6, 'Plant3'): 0,
     (7, 'Plant1'): 0, (7, 'Plant2'): 0, (7, 'Plant3'): 0
 })
+
+model.ramp_rate = Param(model.I, model.Plants, initialize={
+    (1, 'Plant1'): CHPramp/751, (1, 'Plant2'):0, (1, 'Plant3'):0,
+    (2, 'Plant1'): HOBramp/2312,  (2, 'Plant2'):45, (2, 'Plant3'):HOBramp/340,
+    (3, 'Plant1'): 0, (3, 'Plant2'):0,(3, 'Plant3'):0,
+    (4, 'Plant1'): 350, (4, 'Plant2'): 0, (4, 'Plant3'): 0,
+    (5, 'Plant1'): 0, (5, 'Plant2'): 0, (5, 'Plant3'): 0,
+    (6, 'Plant1'): HOBramp/160, (6, 'Plant2'): 0, (6, 'Plant3'): 0,
+    (7, 'Plant1'): 0, (7, 'Plant2'): 0, (7, 'Plant3'): 0
+})
+
 CHP_plants ={
     (1, 'Plant1'),(4, 'Plant1')  
 }
@@ -272,7 +285,7 @@ def ramping_1(model, i,p,t):
     if t == 0:
         return Constraint.Skip
     else:
-        return 0.5*model.p_max_plant[i,p] >= model.p[p,i,t] - model.p[p,i,t-1]
+        return model.ramp_rate[i,p]*model.p_max_plant[i,p] >= model.p[p,i,t] - model.p[p,i,t-1]
 
 model.ramping_1 = Constraint(model.I, model.Plants, model.T, rule=ramping_1)
 
@@ -280,7 +293,7 @@ def ramping_2(model, i,p,t):
     if t == 0: 
         return Constraint.Skip 
     else:
-        return model.p[p,i,t] - model.p[p,i,t-1] >= 0.04*model.p_max_plant[i,p]
+        return model.p[p,i,t] - model.p[p,i,t-1] >= model.ramp_rate[i,p]*model.p_max_plant[i,p]
 
 # model.ramping_2 = Constraint(model.I, model.Plants, model.T, rule=ramping_2)
 
