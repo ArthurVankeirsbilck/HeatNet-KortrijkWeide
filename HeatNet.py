@@ -50,7 +50,7 @@ for i in range(0,hours):
 node4_demands = df["Penta_dec_jan"].iloc[0:hours].to_list()
 node5_demands = df["Vegitec_dec_jan"].iloc[0:hours].to_list()
 node6_demands = []
-for i in range(0,5):
+for i in range(0,hours):
     n = random.randint(280,370)
     node6_demands.append(n)
 node7_demands = df["Collectief_dec_jan"].iloc[0:hours].to_list()
