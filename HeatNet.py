@@ -3,11 +3,6 @@ import math
 import random
 import csv
 import pandas as pd
-
-spot = pd.read_csv("Data/Costs/spot.csv", decimal=',')
-spot = spot[::-1]
-spot = spot.reset_index(drop=True)
-
 df = pd.read_csv("Consumptions.csv")
 df.apply(pd.to_numeric)
 random.seed(10)
@@ -124,8 +119,7 @@ model.HOB_Plants = Set(within=model.I * model.Plants, initialize=HOB_plants)
 
 M=8000
 Cp=4.18
-
-model.P_elec = Set(initialize=spot["Column2"].iloc[0:hours].to_list())
+P_elec = 0.4
 
 
 model.u =Param(model.I, model.J, initialize=
@@ -199,7 +193,7 @@ epsilon = 0.0000001
 
 # objective
 model.obj = Objective(
-    expr=sum(model.c[i,j]*model.x[i,j,t] + model.Ql[i,j,t]*model.z[i,j,t]  for j in model.J for i in model.I for t in model.T) + sum(model.c_gen[i,p,t]*model.p[p,i,t] - P_elec[t]*model.P_el[p,i,t] for p in model.Plants for i in model.I for t in model.T), sense=minimize)
+    expr=sum(model.c[i,j]*model.x[i,j,t] + model.Ql[i,j,t]*model.z[i,j,t]  for j in model.J for i in model.I for t in model.T) + sum(model.c_gen[i,p,t]*model.p[p,i,t] - P_elec*model.P_el[p,i,t] for p in model.Plants for i in model.I for t in model.T), sense=minimize)
 
 def balance_constraint_rule(model, i,j,t):
     return sum(model.x[i, j, t] - model.x[j, i, t] for j in model.J) + sum(model.p[p,i,t] for p in model.Plants) == model.d[i,t]
@@ -363,21 +357,4 @@ with open('prod.csv', 'w', newline='') as csvfile:
             for p in model.Plants:
                 data_row.append(model.p[p,i,t].value)
         writer.writerow(data_row)
-
-with open('prod.csv', 'w', newline='') as csvfile:
-    writer = csv.writer(csvfile)
-
-    # Write header row
-    header_row = ['']
-    for i in model.I:
-        for p in model.Plants:
-            header_row.append('{}_{}_x'.format(i,p))
-    writer.writerow(header_row)
-
-    # Write data rows   
-    for t in model.T:
-        data_row = [t]
-        for i in model.I:
-            for p in model.Plants:
-                data_row.append(model.p[p,i,t].value)
-        writer.writerow(data_row)
+        
