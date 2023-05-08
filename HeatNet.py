@@ -40,7 +40,7 @@ def CHP_feasible_area(yA):
 
     return xA, xB, yB, xC, yC, xD, yD
 
-hours=138
+hours=168
 node1_demands = df["KWEA_dec_jan"].iloc[0:hours].to_list()
 node2_demands = [0]*hours
 node3_demands = [300]*hours
@@ -94,13 +94,13 @@ model.Plants = Set(initialize=Plants)
 model.P_elec = Param(model.T, initialize=spot["Euro"].iloc[0:hours+1].to_list())
 # parameters
 model.c = Param(model.I, model.J, initialize=
-{(1, 1): 0, (1, 2): 50, (1, 3): 50, (1, 4): 50, (1, 5): 50, (1, 6): 50, (1, 7): 50, 
-(2, 1): 50, (2, 2): 0, (2, 3): 50, (2, 4): 50, (2, 5): 50, (2, 6): 50, (2, 7): 50, 
-(3, 1): 50, (3, 2): 50, (3, 3): 0, (3, 4): 50, (3, 5): 50, (3, 6): 50, (3, 7): 50, 
-(4, 1): 50, (4, 2): 50, (4, 3): 50, (4, 4): 0, (4, 5): 50, (4, 6): 50, (4, 7): 50, 
-(5, 1): 50, (5, 2): 50, (5, 3): 50, (5, 4): 50, (5, 5): 0, (5, 6): 50, (5, 7): 50, 
-(6, 1): 50, (6, 2): 50, (6, 3): 50, (6, 4): 50, (6, 5): 50, (6, 6): 0, (6, 7): 50, 
-(7, 1): 50, (7, 2): 50, (7, 3): 50, (7, 4): 50, (7, 5): 50, (7, 6): 50, (7, 7): 0}
+{(1, 1): 0, (1, 2): 0.50, (1, 3): 0.50, (1, 4): 0.50, (1, 5): 0.50, (1, 6): 0.50, (1, 7): 0.50, 
+(2, 1): 0.50, (2, 2): 0, (2, 3): 0.50, (2, 4): 0.50, (2, 5): 0.50, (2, 6): 0.50, (2, 7): 0.50, 
+(3, 1): 0.50, (3, 2): 0.50, (3, 3): 0, (3, 4): 0.50, (3, 5): 0.50, (3, 6): 0.50, (3, 7): 0.50, 
+(4, 1): 0.50, (4, 2): 0.50, (4, 3): 0.50, (4, 4): 0, (4, 5): 0.50, (4, 6): 0.50, (4, 7): 0.50, 
+(5, 1): 0.50, (5, 2): 0.50, (5, 3): 0.50, (5, 4): 0.50, (5, 5): 0, (5, 6): 0.50, (5, 7): 0.50, 
+(6, 1): 0.50, (6, 2): 0.50, (6, 3): 0.50, (6, 4): 0.50, (6, 5): 0.50, (6, 6): 0, (6, 7): 0.50, 
+(7, 1): 0.50, (7, 2): 0.50, (7, 3): 0.50, (7, 4): 0.50, (7, 5): 0.50, (7, 6): 0.50, (7, 7): 0}
 )  # transmission cost from i to j
 CHPramp = 600
 HOBramp = 120
@@ -270,7 +270,7 @@ def HOB_2(model, t, i, p):
 model.HOB_2_constraint = Constraint(model.T, model.HOB_Plants, rule=HOB_2)
 
 def heatloss_constraint(model, i, j,t):
-    return model.Ql[i,j,t] == ((((2.0*3.14*model.k[i,j]*model.L[i,j]*(model.Ts[i,j,t]-model.Tr[i,j,t]))/math.log(model.Do[i,j]/model.Di[i,j]))/1000))
+    return model.Ql[i,j,t] == ((((2.0*3.14*model.k[i,j]*model.L[i,j]*(model.Ts[i,j,t]-model.Tr[i,j,t]))/math.log(model.Do[i,j]/model.Di[i,j]))/1000))*0.2
 model.heatloss_constraint = Constraint(model.I, model.J, model.T, rule=heatloss_constraint)
 
 def heatloss_bin1(model, i,j,t):
