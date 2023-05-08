@@ -93,6 +93,7 @@ model.J = Set(initialize=nodes)  # set of nodes
 model.Plants = Set(initialize=Plants)
 model.P_elec = Param(model.T, initialize=spot["Euro"].iloc[0:hours+1].to_list())
 # parameters
+trans cost = 5
 model.c = Param(model.I, model.J, initialize=
 {(1, 1): 0, (1, 2): 0.50, (1, 3): 0.50, (1, 4): 0.50, (1, 5): 0.50, (1, 6): 0.50, (1, 7): 0.50, 
 (2, 1): 0.50, (2, 2): 0, (2, 3): 0.50, (2, 4): 0.50, (2, 5): 0.50, (2, 6): 0.50, (2, 7): 0.50, 
@@ -281,19 +282,19 @@ def heatloss_bin2(model, i,j,t):
     return model.x[i,j,t] <= M*model.z[i,j,t]
 model.heatloss_bin2 = Constraint(model.I, model.J, model.T, rule=heatloss_bin2)
 
-# def ramping_1(model, i,p,t):
-#     if t == 0:
-#         return Constraint.Skip
-#     else:
-#         return model.ramp_rate[i,p]*model.p_max_plant[i,p] >= model.p[p,i,t] - model.p[p,i,t-1]
+def ramping_1(model, i,p,t):
+    if t == 0:
+        return Constraint.Skip
+    else:
+        return model.ramp_rate[i,p]*model.p_max_plant[i,p] >= model.p[p,i,t] - model.p[p,i,t-1]
 
-# model.ramping_1 = Constraint(model.I, model.Plants, model.T, rule=ramping_1)
+model.ramping_1 = Constraint(model.I, model.Plants, model.T, rule=ramping_1)
 
-# def ramping_2(model, i,p,t):
-#     if t == 0: 
-#         return Constraint.Skip 
-#     else:
-#         return model.p[p,i,t] - model.p[p,i,t-1] >= model.ramp_rate[i,p]*model.p_max_plant[i,p]
+def ramping_2(model, i,p,t):
+    if t == 0: 
+        return Constraint.Skip 
+    else:
+        return model.p[p,i,t] - model.p[p,i,t-1] >= model.ramp_rate[i,p]*model.p_max_plant[i,p]
 
 # model.ramping_2 = Constraint(model.I, model.Plants, model.T, rule=ramping_2)
 
