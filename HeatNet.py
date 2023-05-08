@@ -93,7 +93,6 @@ model.J = Set(initialize=nodes)  # set of nodes
 model.Plants = Set(initialize=Plants)
 model.P_elec = Param(model.T, initialize=spot["Euro"].iloc[0:hours+1].to_list())
 # parameters
-trans cost = 5
 model.c = Param(model.I, model.J, initialize=
 {(1, 1): 0, (1, 2): 0.50, (1, 3): 0.50, (1, 4): 0.50, (1, 5): 0.50, (1, 6): 0.50, (1, 7): 0.50, 
 (2, 1): 0.50, (2, 2): 0, (2, 3): 0.50, (2, 4): 0.50, (2, 5): 0.50, (2, 6): 0.50, (2, 7): 0.50, 
