@@ -272,7 +272,7 @@ def ramping_1(model, i,p,t):
     if t == 0:
         return Constraint.Skip 
     else:
-        return 0.04*model.p_max_plant[i,p] <= model.p[p,i,t] - model.p[p,i,t-1]
+        return 0.5*model.p_max_plant[i,p] <= model.p[p,i,t] - model.p[p,i,t-1]
 
 model.ramping_1 = Constraint(model.I, model.Plants, model.T, rule=ramping_1)
 
