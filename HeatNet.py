@@ -270,7 +270,7 @@ model.heatloss_bin2 = Constraint(model.I, model.J, model.T, rule=heatloss_bin2)
 
 def ramping_1(model, i,p,t):
     if t == 0:
-        return M <= model.p[p,i,t] - model.p[p,i,t-1]
+        return Constraint.Skip
     else:
         return 0.5*model.p_max_plant[i,p] <= model.p[p,i,t] - model.p[p,i,t-1]
 
