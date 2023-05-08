@@ -43,16 +43,22 @@ def CHP_feasible_area(yA):
 hours=138
 node1_demands = df["KWEA_dec_jan"].iloc[0:hours].to_list()
 node2_demands = [0]*hours
-node3_demands = [300]*hours
+node3_demands = []
+for i in range(0,hours):
+    n = random.randint(300,350)
+    node3_demands.append(n)
 node4_demands = df["Penta_dec_jan"].iloc[0:hours].to_list()
 node5_demands = df["Vegitec_dec_jan"].iloc[0:hours].to_list()
-node6_demands = [300]*hours
+node6_demands = []
+for i in range(0,5):
+    n = random.randint(280,370)
+    node6_demands.append(n)
 node7_demands = df["Collectief_dec_jan"].iloc[0:hours].to_list()
 node1_costs = [86.10/1000]*hours
 node2_costs = [86.10/1000]*hours
-node3_costs = [1.0]*hours
+node3_costs = [0.2]*hours
 node4_costs = [86.10/1000]*hours
-node5_costs = [1.0]*hours
+node5_costs = [0.2]*hours
 node6_costs = [212.62/1000]*hours
 node7_costs = [212.62/1000]*hours
 Plants = ['Plant1', 'Plant2', 'Plant3']
