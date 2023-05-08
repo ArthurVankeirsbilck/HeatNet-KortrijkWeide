@@ -103,12 +103,12 @@ model.c = Param(model.I, model.J, initialize=
 (7, 1): 50, (7, 2): 50, (7, 3): 50, (7, 4): 50, (7, 5): 50, (7, 6): 50, (7, 7): 0}
 )  # transmission cost from i to j
 model.p_max_plant = Param(model.I, model.Plants, initialize={
-    (1, 'Plant1'): 751, (1, 'Plant2'):0, (1, 'Plant3'):0,
-    (2, 'Plant1'): 2312,  (2, 'Plant2'):45, (2, 'Plant3'):340,
+    (1, 'Plant1'): 751*24, (1, 'Plant2'):0, (1, 'Plant3'):0,
+    (2, 'Plant1'): 2312*24,  (2, 'Plant2'):45*24, (2, 'Plant3'):340*24,
     (3, 'Plant1'): 0, (3, 'Plant2'):0,(3, 'Plant3'):0,
-    (4, 'Plant1'): 350, (4, 'Plant2'): 0, (4, 'Plant3'): 0,
+    (4, 'Plant1'): 350*24, (4, 'Plant2'): 0, (4, 'Plant3'): 0,
     (5, 'Plant1'): 0, (5, 'Plant2'): 0, (5, 'Plant3'): 0,
-    (6, 'Plant1'): 160, (6, 'Plant2'): 0, (6, 'Plant3'): 0,
+    (6, 'Plant1'): 160*24, (6, 'Plant2'): 0, (6, 'Plant3'): 0,
     (7, 'Plant1'): 0, (7, 'Plant2'): 0, (7, 'Plant3'): 0
 })
 CHP_plants ={
@@ -127,7 +127,7 @@ model.CHP_Plants = Set(within=model.I * model.Plants, initialize=CHP_plants)
 
 model.HOB_Plants = Set(within=model.I * model.Plants, initialize=HOB_plants)
 
-M=8000
+M=10000
 Cp=4.18
 
 model.u =Param(model.I, model.J, initialize=
