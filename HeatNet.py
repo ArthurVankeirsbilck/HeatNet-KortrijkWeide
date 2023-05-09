@@ -302,7 +302,7 @@ model.ramping_2 = Constraint(model.I, model.Plants, model.T, rule=ramping_2)
 
 
 def flow_speed(model, i,j,t):
-    return model.v[i,j,t] == model.massflow[i,j,t]/(971.79*(3.14*(model.Di[i,j]/2)**2))
+    return model.v[i,j,t] == model.massflow[i,j,t]/(971.79*(3.14*((model.Di[i,j]/2)*(model.Di[i,j]/2))))
 
 def reynolds(model,i,j,t):
     return model.Re[i,j,t] == (971.79*model.v[i,j,t]*model.Di[i,j])/0.000355
