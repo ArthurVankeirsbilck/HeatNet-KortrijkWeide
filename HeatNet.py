@@ -213,6 +213,7 @@ model.Re = Var(model.I, model.J, model.T, bounds=(0, None))
 model.Dp = Var(model.I, model.J, model.T, bounds=(0, None))
 model.NWloss = Var(model.I, model.J, model.T, bounds=(0, None))
 model.Ppump= Var(model.I, model.J, model.T, bounds=(0, None))
+model.f[i,j,t]= Var(model.I, model.J, model.T, bounds=(0, None))
 M = 10000
 epsilon = 0.00001
 Cramping = 0.1
@@ -310,6 +311,9 @@ def reynolds(model,i,j,t):
     return model.Re[i,j,t] == (971.79*model.v[i,j,t]*model.Di[i,j])/0.000355
 
 model.reynolds = Constraint(model.I, model.J, model.T, rule=reynolds)
+
+def friction(model,i,j,t):
+    return model.f[i,j,t] == 0.0055(1+((2*10^4)*(0.01/model.Di[i,j])+((10^6)/model.Re[i,j,t])^(1/3)))
 
 def pressure_drop(model,i,j,t):
     return model.Dp[i,j,t] == (model.L[i,j]/model.Di[i,j])*model.f[i,j,t]*971.79*((model.v[i,j,t]^2)/2)
