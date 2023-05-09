@@ -208,12 +208,17 @@ model.massflow = Var(model.I, model.J, model.T, bounds=(0, 20))
 model.P_el = Var(model.Plants, model.I, model.T, bounds=(0, None))
 model.kappa = Var(model.I, model.Plants, model.T, domain=Binary)
 model.Cramp= Var(model.Plants, model.I, model.T, bounds=(0, None))
+model.v = Var(model.I, model.J, model.T, bounds=(0, None))
+model.Re = Var(model.I, model.J, model.T, bounds=(0, None))
+model.Dp = Var(model.I, model.J, model.T, bounds=(0, None))
+model.NWloss = Var(model.I, model.J, model.T, bounds=(0, None))
+model.Ppump= Var(model.I, model.J, model.T, bounds=(0, None))
 M = 10000
 epsilon = 0.00001
 Cramping = 0.1
 # objective
 model.obj = Objective(
-    expr=sum(model.c[i,j]*model.x[i,j,t]   for j in model.J for i in model.I for t in model.T) + sum(model.c_gen[i,p,t]*model.p[p,i,t] - model.P_elec[t]*model.P_el[p,i,t] for p in model.Plants for i in model.I for t in model.T), sense=minimize)
+    expr=sum(model.c[i,j]*model.x[i,j,t] + model.Ppump[i,j,t] for j in model.J for i in model.I for t in model.T) + sum(model.c_gen[i,p,t]*model.p[p,i,t] - model.P_elec[t]*model.P_el[p,i,t] for p in model.Plants for i in model.I for t in model.T), sense=minimize)
 
 def balance_constraint_rule(model, i,j,t):
     return sum(model.x[i, j, t] - model.x[j, i, t] for j in model.J) + sum(model.p[p,i,t] for p in model.Plants) == model.d[i,t]+ model.Ql[i,j,t]*model.z[i,j,t]
@@ -296,20 +301,20 @@ def ramping_2(model, i,p,t):
 model.ramping_2 = Constraint(model.I, model.Plants, model.T, rule=ramping_2)
 
 
-# def flow_speed(model, i,j,t):
-#     return model.v[i,j,t] == model.massflow[i,j,t]/(971.79*(3.14*(model.Di[i,j]/2)^2))
+def flow_speed(model, i,j,t):
+    return model.v[i,j,t] == model.massflow[i,j,t]/(971.79*(3.14*(model.Di[i,j]/2)^2))
 
-# def reynolds(model,i,j,t):
-#     return model.Re[i,j,t] == (971.79*model.v[i,j,t]*model.Di[i,j])/0.000355
+def reynolds(model,i,j,t):
+    return model.Re[i,j,t] == (971.79*model.v[i,j,t]*model.Di[i,j])/0.000355
 
-# def pressure_drop(model,i,j,t):
-#     return model.Dp[i,j,t] == (model.L[i,j]/model.Di[i,j])*model.f[i,j,t]*971.79*((model.v[i,j,t]^2)/2)
+def pressure_drop(model,i,j,t):
+    return model.Dp[i,j,t] == (model.L[i,j]/model.Di[i,j])*model.f[i,j,t]*971.79*((model.v[i,j,t]^2)/2)
 
-# def networkloss(model,i,j,t):
-#     return NWloss[i,j,t] == 2*(model.Dp[i,j,t]+60000)
+def networkloss(model,i,j,t):
+    return NWloss[i,j,t] == 2*(model.Dp[i,j,t]+60000)
 
-# def Pumppower(model, i,j,t):
-#     return Ppump == ((model.Dp[i,j,t]/model.massflow[i,j,t])*NWloss[i,j,t])/0.7
+def Pumppower(model, i,j,t):
+    return Ppump[i,j,t] == ((model.Dp[i,j,t]/model.massflow[i,j,t])*NWloss[i,j,t])/0.7
 
 
 
