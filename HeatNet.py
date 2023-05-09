@@ -213,7 +213,7 @@ model.Re = Var(model.I, model.J, model.T, bounds=(0, None))
 model.Dp = Var(model.I, model.J, model.T, bounds=(0, None))
 model.NWloss = Var(model.I, model.J, model.T, bounds=(0, None))
 model.Ppump= Var(model.I, model.J, model.T, bounds=(0, None))
-model.f= Var(model.I, model.J, model.T, bounds=(0, None))
+# model.f= Var(model.I, model.J, model.T, bounds=(0, None))
 M = 10000
 epsilon = 0.00001
 Cramping = 0.1
@@ -312,25 +312,25 @@ def reynolds(model,i,j,t):
 
 model.reynolds = Constraint(model.I, model.J, model.T, rule=reynolds)
 
-def friction(model,i,j,t):
-    return model.f[i,j,t] == 0.0055*(1+((2*10^4)*(0.01/model.Di[i,j])+((10**6)/model.Re[i,j,t])**(1/3)))
-model.friction = Constraint(model.I, model.J, model.T, rule=friction)
+# def friction(model,i,j,t):
+#     return model.f[i,j,t] == 0.0055*(1+((2*10^4)*(0.01/model.Di[i,j])+((10**6)/model.Re[i,j,t])**(1/3)))
+# model.friction = Constraint(model.I, model.J, model.T, rule=friction)
 
 
-# def pressure_drop(model,i,j,t):
-#     return model.Dp[i,j,t] == (model.L[i,j]/model.Di[i,j])*model.f[i,j,t]*971.79*((model.v[i,j,t]**2)/2)
+def pressure_drop(model,i,j,t):
+    return model.Dp[i,j,t] == (model.L[i,j]/model.Di[i,j])*0.06986*971.79*((model.v[i,j,t]**2)/2)
 
-# model.pressure_drop = Constraint(model.I, model.J, model.T, rule=pressure_drop)
+model.pressure_drop = Constraint(model.I, model.J, model.T, rule=pressure_drop)
 
-# def networkloss(model,i,j,t):
-#     return model.NWloss[i,j,t] == 2*(model.Dp[i,j,t]+60000)
+def networkloss(model,i,j,t):
+    return model.NWloss[i,j,t] == 2*(model.Dp[i,j,t]+60000)
 
-# model.networkloss = Constraint(model.I, model.J, model.T, rule=networkloss)
+model.networkloss = Constraint(model.I, model.J, model.T, rule=networkloss)
 
-# def Pumppower(model, i,j,t):
-#     return model.Ppump[i,j,t] == ((model.Dp[i,j,t]/model.massflow[i,j,t])*model.NWloss[i,j,t])/0.7
+def Pumppower(model, i,j,t):
+    return model.Ppump[i,j,t] == ((model.Dp[i,j,t]/model.massflow[i,j,t])*model.NWloss[i,j,t])/0.7
 
-# model.Pumppower = Constraint(model.I, model.J, model.T, rule=Pumppower)
+model.Pumppower = Constraint(model.I, model.J, model.T, rule=Pumppower)
 
 
 # def ramping_3(model, i,p,t):
