@@ -323,7 +323,7 @@ def pressure_drop(model,i,j,t):
 model.pressure_drop = Constraint(model.I, model.J, model.T, rule=pressure_drop)
 
 def networkloss(model,i,j,t):
-    return NWloss[i,j,t] == 2*(model.Dp[i,j,t]+60000)
+    return model.NWloss[i,j,t] == 2*(model.Dp[i,j,t]+60000)
 
 model.networkloss = Constraint(model.I, model.J, model.T, rule=networkloss)
 
