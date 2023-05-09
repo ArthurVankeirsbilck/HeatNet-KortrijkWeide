@@ -210,8 +210,8 @@ model.massflow = Var(model.I, model.J, model.T, bounds=(0, 20))
 model.P_el = Var(model.Plants, model.I, model.T, bounds=(0, None))
 model.kappa = Var(model.I, model.Plants, model.T, domain=Binary)
 model.Cramp= Var(model.Plants, model.I, model.T, bounds=(0, None))
-M = 10000000
-epsilon = 0.0000001
+M = 10000
+epsilon = 0.00001
 Cramping = 0.1
 # objective
 model.obj = Objective(
