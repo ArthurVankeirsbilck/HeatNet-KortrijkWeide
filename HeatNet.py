@@ -390,8 +390,8 @@ for t in model.T:
             if i == j:
                 pass
             else:
-                if model.v[i,j,t].value > 0:
-                    print("power {} -> {}: {}".format(j,i,model.v[i,j,t].value))
+                if model.Ppump[i,j,t].value > 0:
+                    print("power {} -> {}: {}".format(j,i,model.Ppump[i,j,t].value))
 
 # print("Heatloss cost:")
 # for t in model.T:
