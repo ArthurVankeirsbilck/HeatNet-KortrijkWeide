@@ -375,8 +375,8 @@ for t in model.T:
             if i == j:
                 pass
             else:
-                if model.massflow[i,j,t] > 0:
-                    print("power {} -> {}: {}".format(j,i, model.massflow[i,j,t]))
+                if model.massflow[i,j,t].value > 0:
+                    print("power {} -> {}: {}".format(j,i, model.massflow[i,j,t].value))
 
 # print("Heatloss cost:")
 # for t in model.T:
