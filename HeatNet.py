@@ -38,7 +38,7 @@ def CHP_feasible_area(yA):
 
     return xA, xB, yB, xC, yC, xD, yD
 
-hours=168
+hours=10
 node1_demands = df["KWEA_dec_jan"].iloc[0:hours].to_list()
 node2_demands = [0]*hours
 node3_demands = [300]*hours
@@ -293,7 +293,7 @@ def ramping_2(model, i,p,t):
     else:
         return model.p[p,i,t] - model.p[p,i,t-1] >= model.ramp_rate[i,p]*model.p_max_plant[i,p]
 
-model.ramping_2 = Constraint(model.I, model.Plants, model.T, rule=ramping_2)
+# model.ramping_2 = Constraint(model.I, model.Plants, model.T, rule=ramping_2)
 
 
 # def flow_speed(model, i,j,t):
