@@ -322,15 +322,15 @@ def pressure_drop(model,i,j,t):
 
 model.pressure_drop = Constraint(model.I, model.J, model.T, rule=pressure_drop)
 
-def networkloss(model,i,j,t):
-    return model.NWloss[i,j,t] == 2*(model.Dp[i,j,t]+60000)
+# def networkloss(model,i,j,t):
+#     return model.NWloss[i,j,t] == 2*(model.Dp[i,j,t]+60000)
 
-model.networkloss = Constraint(model.I, model.J, model.T, rule=networkloss)
+# model.networkloss = Constraint(model.I, model.J, model.T, rule=networkloss)
 
-def Pumppower(model, i,j,t):
-    return model.Ppump[i,j,t] == ((model.Dp[i,j,t]/model.massflow[i,j,t])*model.NWloss[i,j,t])/0.7
+# def Pumppower(model, i,j,t):
+#     return model.Ppump[i,j,t] == ((model.Dp[i,j,t]/model.massflow[i,j,t])*model.NWloss[i,j,t])/0.7
 
-model.Pumppower = Constraint(model.I, model.J, model.T, rule=Pumppower)
+# model.Pumppower = Constraint(model.I, model.J, model.T, rule=Pumppower)
 
 
 # def ramping_3(model, i,p,t):
