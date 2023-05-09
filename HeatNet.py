@@ -223,7 +223,7 @@ def balance_constraint_rule(model, i,j,t):
 model.balance_constraint = Constraint(model.I, model.J, model.T , rule=balance_constraint_rule)
 
 def heat_flow_constraint(model, i, j,t):
-    return Cp*model.massflow[i,j,t]*(model.Ts[i,j,t]-model.Tr[i,j,t]) == model.d[i,t]
+    return Cp*model.massflow[i,j,t]*(model.Ts[i,j,t]-model.Tr[i,j,t]) == model.d[i,t]+ model.Ql[i,j,t]*model.z[i,j,t]
 
 model.heat_flow_constraint = Constraint(model.I, model.J, model.T, rule=heat_flow_constraint)
 
