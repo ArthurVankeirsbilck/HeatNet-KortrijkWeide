@@ -291,9 +291,9 @@ def ramping_2(model, i,p,t):
     if t == 0: 
         return Constraint.Skip 
     else:
-        return model.p[p,i,t] - model.p[p,i,t-1] >= model.ramp_rate[i,p]*model.p_max_plant[i,p]
+        return model.p[p,i,t] - model.p[p,i,t-1] <= model.ramp_rate[i,p]*model.p_max_plant[i,p]
 
-# model.ramping_2 = Constraint(model.I, model.Plants, model.T, rule=ramping_2)
+model.ramping_2 = Constraint(model.I, model.Plants, model.T, rule=ramping_2)
 
 
 # def flow_speed(model, i,j,t):
