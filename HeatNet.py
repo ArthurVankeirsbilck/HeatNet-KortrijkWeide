@@ -213,7 +213,7 @@ model.Re = Var(model.I, model.J, model.T, bounds=(0, None))
 model.Dp = Var(model.I, model.J, model.T, bounds=(0, None))
 model.NWloss = Var(model.I, model.J, model.T, bounds=(0, None))
 model.Ppump= Var(model.I, model.J, model.T, bounds=(0, None))
-# model.f= Var(model.I, model.J, model.T, bounds=(0, None))
+model.f= Var(model.I, model.J, model.T, bounds=(0, None))
 M = 10000
 epsilon = 0.00001
 Cramping = 0.1
