@@ -328,7 +328,7 @@ def networkloss(model,i,j,t):
 model.networkloss = Constraint(model.I, model.J, model.T, rule=networkloss)
 
 def Pumppower(model, i,j,t):
-    return model.Ppump[i,j,t] == ((model.massflow[i,j,t]/971.79)*model.NWloss[i,j,t])/0.7
+    return model.Ppump[i,j,t] == (((model.massflow[i,j,t]/971.79)*model.NWloss[i,j,t])/0.7)/1000
 
 model.Pumppower = Constraint(model.I, model.J, model.T, rule=Pumppower)
 
