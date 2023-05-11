@@ -4,6 +4,9 @@ import random
 import csv
 import pandas as pd
 
+#Augmented epsilon constraint for second OF
+#Darcy friction factor approximation or list of possible friction factors and binary variable
+
 spot = pd.read_csv("Data/Costs/spot.csv")
 spot = spot[::-1]
 spot = spot.reset_index(drop=True)
@@ -51,8 +54,8 @@ node2_costs = [86.10/1000]*hours
 node3_costs = [0.3]*hours
 node4_costs = [86.10/1000]*hours
 node5_costs = [0.3]*hours
-node6_costs = [212.62/1000]*hours
-node7_costs = [212.62/1000]*hours
+node6_costs = [82.090/1000]*hours
+node7_costs = [82.090/1000]*hours
 Plants = ['Plant1', 'Plant2', 'Plant3']
 nodes = [1, 2, 3, 4,5,6,7]
 
