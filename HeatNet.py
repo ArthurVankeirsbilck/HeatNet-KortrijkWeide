@@ -220,6 +220,7 @@ model.f= Var(model.I, model.J, model.T, bounds=(0, None))
 model.rho = Var(model.I, model.J, model.T, bounds=(0, None))
 model.zeta1 = Var(model.I, model.J, model.T, domain=Binary)
 model.zeta2 = Var(model.I, model.J, model.T, domain=Binary)
+model.mu = Var(model.I, model.J, model.T, bounds=(0, None))
 M = 10000
 epsilon = 0.00001
 Cramping = 0.1
@@ -314,7 +315,7 @@ def flow_speed(model, i,j,t):
 model.flow_speed = Constraint(model.I, model.J, model.T, rule=flow_speed)
 
 def reynolds(model,i,j,t):
-    return model.Re[i,j,t] == (model.rho[i,j,t]*model.v[i,j,t]*model.Di[i,j])/0.000355
+    return model.Re[i,j,t] == (model.rho[i,j,t]*model.v[i,j,t]*model.Di[i,j])/model.mu[i,j,t]
 
 model.reynolds = Constraint(model.I, model.J, model.T, rule=reynolds)
 
@@ -367,6 +368,10 @@ model.Pumppower = Constraint(model.I, model.J, model.T, rule=Pumppower)
 def density(model, i,j,t):
     return model.rho[i,j,t]== -0.5787*model.Ts[i,j,t] + 1016.4
 model.density = Constraint(model.I, model.J, model.T, rule=density)
+
+def dynamicviscosity(model,i,j,t):
+    return model.mu[i,j,t] == -6*10^(-6)+0.0009
+model.dynamicviscosity = Constraint(model.I, model.J, model.T, rule=dynamicviscosity)
 
 
 
