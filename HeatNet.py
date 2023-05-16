@@ -319,13 +319,13 @@ def reynolds(model,i,j,t):
 
 model.reynolds = Constraint(model.I, model.J, model.T, rule=reynolds)
 
-def friction(model,i,j,t):
-    return model.f[i,j,t] == 0.0055*(1+((2*10^4)*(0.01/model.Di[i,j])+((10**6)/model.Re[i,j,t])**(1/3)))
+# def friction(model,i,j,t):
+    # return model.f[i,j,t] == 0.0055*(1+((2*10^4)*(0.01/model.Di[i,j])+((10**6)/model.Re[i,j,t])**(1/3)))
     # return model.f[i,j,t] == 0.094*((0.01/model.Di[i,j])**0.225) + 0.53*(0.01/model.Di[i,j]) + 88*((0.01/model.Di[i,j])**0.44)*model.Re[i,j,t]**(-(1.62*(0.01/model.Di[i,j])**0.134))
-model.friction = Constraint(model.I, model.J, model.T, rule=friction)
+# model.friction = Constraint(model.I, model.J, model.T, rule=friction)
 
 def pressure_drop(model,i,j,t):
-    return model.Dp[i,j,t] == (model.L[i,j]/model.Di[i,j])*model.f[i,j,t]*model.rho[i,j,t]*((model.v[i,j,t]**2)/2)
+    return model.Dp[i,j,t] == (model.L[i,j]/model.Di[i,j])*0.07*model.rho[i,j,t]*((model.v[i,j,t]**2)/2)
 
 model.pressure_drop = Constraint(model.I, model.J, model.T, rule=pressure_drop)
 
