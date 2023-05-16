@@ -341,28 +341,33 @@ def Pumppower(model, i,j,t):
 
 model.Pumppower = Constraint(model.I, model.J, model.T, rule=Pumppower)
 
-def density_bin_cons1(model, i,j,t):
-    return 30-M*(1-model.zeta1[i,j,t]) <= model.Ts[i,j,t]
-model.density_bin_cons1 = Constraint(model.I, model.J, model.T, rule=density_bin_cons1)
+# def density_bin_cons1(model, i,j,t):
+#     return 30-M*(1-model.zeta1[i,j,t]) <= model.Ts[i,j,t]
+# model.density_bin_cons1 = Constraint(model.I, model.J, model.T, rule=density_bin_cons1)
 
-def density_bin_cons1_1(model, i,j,t):
-    return model.Ts[i,j,t] <= 70+M*(1-model.zeta1[i,j,t])
-model.density_bin_cons1_1 = Constraint(model.I, model.J, model.T, rule=density_bin_cons1_1)
+# def density_bin_cons1_1(model, i,j,t):
+#     return model.Ts[i,j,t] <= 70+M*(1-model.zeta1[i,j,t])
+# model.density_bin_cons1_1 = Constraint(model.I, model.J, model.T, rule=density_bin_cons1_1)
 
-def density_bin_cons2(model, i,j,t):
-    return 71-M*(1-model.zeta2[i,j,t]) <= model.Ts[i,j,t]
-model.density_bin_cons2 = Constraint(model.I, model.J, model.T, rule=density_bin_cons2)
-def density_bin_cons2_1(model, i,j,t):
-    return model.Ts[i,j,t] <= 120+M*(1-model.zeta2[i,j,t])
-model.density_bin_cons2_1 = Constraint(model.I, model.J, model.T, rule=density_bin_cons2_1)
+# def density_bin_cons2(model, i,j,t):
+#     return 71-M*(1-model.zeta2[i,j,t]) <= model.Ts[i,j,t]
+# model.density_bin_cons2 = Constraint(model.I, model.J, model.T, rule=density_bin_cons2)
+# def density_bin_cons2_1(model, i,j,t):
+#     return model.Ts[i,j,t] <= 120+M*(1-model.zeta2[i,j,t])
+# model.density_bin_cons2_1 = Constraint(model.I, model.J, model.T, rule=density_bin_cons2_1)
 
-def density_binaries(model, i,j,t):
-    return model.zeta1[i,j,t] + model.zeta2[i,j,t] == 1
-model.density_binaries = Constraint(model.I, model.J, model.T, rule=density_binaries)
+# def density_binaries(model, i,j,t):
+#     return model.zeta1[i,j,t] + model.zeta2[i,j,t] == 1
+# model.density_binaries = Constraint(model.I, model.J, model.T, rule=density_binaries)
+
+# def density(model, i,j,t):
+#     return model.rho[i,j,t]== 987.48*model.zeta1[i,j,t] + 963.6233333*model.zeta2[i,j,t]
+# model.density = Constraint(model.I, model.J, model.T, rule=density)
 
 def density(model, i,j,t):
-    return model.rho[i,j,t]== 987.48*model.zeta1[i,j,t] + 963.6233333*model.zeta2[i,j,t]
+    return model.rho[i,j,t]== -0.5787*model.Ts[i,j,t] + 1016.4
 model.density = Constraint(model.I, model.J, model.T, rule=density)
+
 
 
 # def ramping_3(model, i,p,t):
