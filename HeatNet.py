@@ -360,7 +360,7 @@ model.density_binaries = Constraint(model.I, model.J, model.T, rule=density_bina
 
 def density(model, i,j,t):
     return model.rho[i,j,t]== 987.48*model.zeta1[i,j,t] + 963.6233333*model.zeta2[i,j,t]
-model.density_binaries = Constraint(model.I, model.J, model.T, rule=density_binaries)
+model.density = Constraint(model.I, model.J, model.T, rule=density)
 
 
 # def ramping_3(model, i,p,t):
