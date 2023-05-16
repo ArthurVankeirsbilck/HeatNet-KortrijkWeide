@@ -309,12 +309,12 @@ model.ramping_2 = Constraint(model.I, model.Plants, model.T, rule=ramping_2)
 
 
 def flow_speed(model, i,j,t):
-    return model.v[i,j,t] == model.massflow[i,j,t]/(971.79*(3.14*((model.Di[i,j]/2)*(model.Di[i,j]/2))))
+    return model.v[i,j,t] == model.massflow[i,j,t]/(model.rho[i,j,t]*(3.14*((model.Di[i,j]/2)*(model.Di[i,j]/2))))
 
 model.flow_speed = Constraint(model.I, model.J, model.T, rule=flow_speed)
 
 def reynolds(model,i,j,t):
-    return model.Re[i,j,t] == (971.79*model.v[i,j,t]*model.Di[i,j])/0.000355
+    return model.Re[i,j,t] == (model.rho[i,j,t]*model.v[i,j,t]*model.Di[i,j])/0.000355
 
 model.reynolds = Constraint(model.I, model.J, model.T, rule=reynolds)
 
@@ -327,7 +327,7 @@ model.reynolds = Constraint(model.I, model.J, model.T, rule=reynolds)
 # model.friction = Constraint(model.I, model.J, model.T, rule=friction)
 
 def pressure_drop(model,i,j,t):
-    return model.Dp[i,j,t] == (model.L[i,j]/model.Di[i,j])*0.07*971.79*((model.v[i,j,t]**2)/2)
+    return model.Dp[i,j,t] == (model.L[i,j]/model.Di[i,j])*0.07*model.rho[i,j,t]*((model.v[i,j,t]**2)/2)
 
 model.pressure_drop = Constraint(model.I, model.J, model.T, rule=pressure_drop)
 
@@ -337,7 +337,7 @@ def networkloss(model,i,j,t):
 model.networkloss = Constraint(model.I, model.J, model.T, rule=networkloss)
 
 def Pumppower(model, i,j,t):
-    return model.Ppump[i,j,t] == (((model.massflow[i,j,t]/971.79)*model.NWloss[i,j,t])/0.7)/1000
+    return model.Ppump[i,j,t] == (((model.massflow[i,j,t]/model.rho[i,j,t])*model.NWloss[i,j,t])/0.7)/1000
 
 model.Pumppower = Constraint(model.I, model.J, model.T, rule=Pumppower)
 
