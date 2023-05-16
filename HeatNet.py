@@ -338,7 +338,11 @@ def Pumppower(model, i,j,t):
 model.Pumppower = Constraint(model.I, model.J, model.T, rule=Pumppower)
 
 def density(model, i, j ,t):
-    return model.rho[i,j,t] == -0.5787*model.Ts[i,j,t]+1016.4
+    if model.Ts[i,j,t] < 40 and model.Ts[i,j,t] > 30:
+        return model.rho[i,j,t] == 995.65
+    else:
+        return model.rho[i,j,t] == 1000
+    # return model.rho[i,j,t] == -0.5787*model.Ts[i,j,t]+1016.4
 
 model.density = Constraint(model.I, model.J, model.T, rule=density)
 
