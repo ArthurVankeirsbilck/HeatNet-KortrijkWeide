@@ -316,7 +316,7 @@ def reynolds(model,i,j,t):
 model.reynolds = Constraint(model.I, model.J, model.T, rule=reynolds)
 
 def friction(model,i,j,t):
-    return 1/math.sqrt(model.f[i,j,t]) == -2*math.log(((0.01/model.Di[i,j])/3.7)+(2.5/(model.Re[i,j,t]*math.sqrt(model.f[i,j,t]))))
+    return model.f[i,j,t] == 0.0055*(1+((2*10^4)*(0.01/model.Di[i,j])+((10**6)/model.Re[i,j,t])**(1/3)))
 model.friction = Constraint(model.I, model.J, model.T, rule=friction)
 
 def pressure_drop(model,i,j,t):
