@@ -370,7 +370,7 @@ def density(model, i,j,t):
 model.density = Constraint(model.I, model.J, model.T, rule=density)
 
 def dynamicviscosity(model,i,j,t):
-    return model.mu[i,j,t] == -6*10^(-6)+0.0009
+    return model.mu[i,j,t] == -6*10**(-6)+0.0009
 model.dynamicviscosity = Constraint(model.I, model.J, model.T, rule=dynamicviscosity)
 
 
