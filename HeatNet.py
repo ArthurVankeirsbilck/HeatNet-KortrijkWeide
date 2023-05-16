@@ -323,12 +323,12 @@ model.reynolds = Constraint(model.I, model.J, model.T, rule=reynolds)
 #     return model.f[i,j,t] == 0.0055*(1+((2*10^4)*(0.01/model.Di[i,j])+((10**6)/model.Re[i,j,t])**(1/3)))
 # model.friction = Constraint(model.I, model.J, model.T, rule=friction)
 
-def friction(model,i,j,t):
-    return model.f[i,j,t] == 0.11*((68/model.Re[i,j,t])+(0.012/model.Di[i,j]))**0.25
-model.friction = Constraint(model.I, model.J, model.T, rule=friction)
+# def friction(model,i,j,t):
+#     return model.f[i,j,t] == 0.11*((68/model.Re[i,j,t])+(0.012/model.Di[i,j]))**0.25
+# model.friction = Constraint(model.I, model.J, model.T, rule=friction)
 
 def pressure_drop(model,i,j,t):
-    return model.Dp[i,j,t] == (model.L[i,j]/model.Di[i,j])*model.f[i,j,t]*model.rho[i,j,t]*((model.v[i,j,t]**2)/2)
+    return model.Dp[i,j,t] == (model.L[i,j]/model.Di[i,j])*0.007*model.rho[i,j,t]*((model.v[i,j,t]**2)/2)
 
 model.pressure_drop = Constraint(model.I, model.J, model.T, rule=pressure_drop)
 
@@ -370,7 +370,8 @@ def density(model, i,j,t):
 model.density = Constraint(model.I, model.J, model.T, rule=density)
 
 def dynamicviscosity(model,i,j,t):
-    return model.mu[i,j,t] == -6*10**(-6)+0.0009
+    return model.mu[i,j,t] == (-7**(-10))*model.Ts[i,j,t]**3 + 2*(10**(-7))*model.Ts[i,j,t]**2 - 3*(10**(-5))*model.Ts[i,j,t] + 0.0014
+    # return model.mu[i,j,t] == -6*10**(-6)+0.0009
 model.dynamicviscosity = Constraint(model.I, model.J, model.T, rule=dynamicviscosity)
 
 
