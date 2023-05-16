@@ -41,7 +41,7 @@ def CHP_feasible_area(yA):
 
     return xA, xB, yB, xC, yC, xD, yD
 
-hours=10
+hours=1
 node1_demands = df["KWEA_dec_jan"].iloc[0:hours].to_list()
 node2_demands = [0]*hours
 node3_demands = [300]*hours
@@ -210,8 +210,6 @@ model.y = Var(model.I, model.T, domain=Binary)
 model.massflow = Var(model.I, model.J, model.T, bounds=(0, 20))
 model.P_el = Var(model.Plants, model.I, model.T, bounds=(0, None))
 model.kappa = Var(model.I, model.Plants, model.T, domain=Binary)
-model.zeta1 = Var(model.I, model.J, model.T, domain=Binary)
-model.zeta2 = Var(model.I, model.J, model.T, domain=Binary)
 model.Cramp= Var(model.Plants, model.I, model.T, bounds=(0, None))
 model.v = Var(model.I, model.J, model.T, bounds=(0, None))
 model.Re = Var(model.I, model.J, model.T, bounds=(0, None))
@@ -219,11 +217,9 @@ model.Dp = Var(model.I, model.J, model.T, bounds=(0, None))
 model.NWloss = Var(model.I, model.J, model.T, bounds=(0, None))
 model.Ppump= Var(model.I, model.J, model.T, bounds=(0, None))
 model.f= Var(model.I, model.J, model.T, bounds=(0, None))
-model.rho = Var(model.I, model.J, model.T, bounds=(0,None))
 M = 10000
 epsilon = 0.00001
 Cramping = 0.1
-
 # objective
 model.obj = Objective(
     expr=sum(model.c[i,j]*model.x[i,j,t] + model.Ppump[i,j,t]*model.P_elec[t] for j in model.J for i in model.I for t in model.T) + sum(model.c_gen[i,p,t]*model.p[p,i,t] - model.P_elec[t]*model.P_el[p,i,t] for p in model.Plants for i in model.I for t in model.T), sense=minimize)
@@ -310,22 +306,25 @@ model.ramping_2 = Constraint(model.I, model.Plants, model.T, rule=ramping_2)
 
 
 def flow_speed(model, i,j,t):
-    return model.v[i,j,t] == model.massflow[i,j,t]/(model.rho[i,j,t]*(3.14*((model.Di[i,j]/2)*(model.Di[i,j]/2))))
+    return model.v[i,j,t] == model.massflow[i,j,t]/(971.79*(3.14*((model.Di[i,j]/2)*(model.Di[i,j]/2))))
 
 model.flow_speed = Constraint(model.I, model.J, model.T, rule=flow_speed)
 
 def reynolds(model,i,j,t):
-    return model.Re[i,j,t] == (model.rho[i,j,t]*model.v[i,j,t]*model.Di[i,j])/0.000355
+    return model.Re[i,j,t] == (971.79*model.v[i,j,t]*model.Di[i,j])/0.000355
 
 model.reynolds = Constraint(model.I, model.J, model.T, rule=reynolds)
 
 # def friction(model,i,j,t):
-    # return model.f[i,j,t] == 0.0055*(1+((2*10^4)*(0.01/model.Di[i,j])+((10**6)/model.Re[i,j,t])**(1/3)))
-    # return model.f[i,j,t] == 0.094*((0.01/model.Di[i,j])**0.225) + 0.53*(0.01/model.Di[i,j]) + 88*((0.01/model.Di[i,j])**0.44)*model.Re[i,j,t]**(-(1.62*(0.01/model.Di[i,j])**0.134))
+#     return model.f[i,j,t] == 0.0055*(1+((2*10^4)*(0.01/model.Di[i,j])+((10**6)/model.Re[i,j,t])**(1/3)))
+# model.friction = Constraint(model.I, model.J, model.T, rule=friction)
+
+# def friction(model,i,j,t):
+#     return model.f[i,j,t] == 0.11*((68/model.Re[i,j,t])+(0.012/model.Di[i,j]))**0.25
 # model.friction = Constraint(model.I, model.J, model.T, rule=friction)
 
 def pressure_drop(model,i,j,t):
-    return model.Dp[i,j,t] == (model.L[i,j]/model.Di[i,j])*0.07*model.rho[i,j,t]*((model.v[i,j,t]**2)/2)
+    return model.Dp[i,j,t] == (model.L[i,j]/model.Di[i,j])*0.07*971.79*((model.v[i,j,t]**2)/2)
 
 model.pressure_drop = Constraint(model.I, model.J, model.T, rule=pressure_drop)
 
@@ -335,32 +334,9 @@ def networkloss(model,i,j,t):
 model.networkloss = Constraint(model.I, model.J, model.T, rule=networkloss)
 
 def Pumppower(model, i,j,t):
-    return model.Ppump[i,j,t] == (((model.massflow[i,j,t]/model.rho[i,j,t])*model.NWloss[i,j,t])/0.7)/1000
+    return model.Ppump[i,j,t] == (((model.massflow[i,j,t]/971.79)*model.NWloss[i,j,t])/0.7)/1000
 
 model.Pumppower = Constraint(model.I, model.J, model.T, rule=Pumppower)
-
-def density_bin_cons1(model, i,j,t):
-    return 30-M*(1-model.zeta1[i,j,t]) <= model.Ts[i,j,t]
-model.density_bin_cons1 = Constraint(model.I, model.J, model.T, rule=density_bin_cons1)
-
-def density_bin_cons1_1(model, i,j,t):
-    return model.Ts[i,j,t] <= 70+M*(1-model.zeta1[i,j,t])
-model.density_bin_cons1_1 = Constraint(model.I, model.J, model.T, rule=density_bin_cons1_1)
-
-def density_bin_cons2(model, i,j,t):
-    return 71-M*(1-model.zeta2[i,j,t]) <= model.Ts[i,j,t]
-model.density_bin_cons2 = Constraint(model.I, model.J, model.T, rule=density_bin_cons2)
-def density_bin_cons2_1(model, i,j,t):
-    return model.Ts[i,j,t] <= 120+M*(1-model.zeta2[i,j,t])
-model.density_bin_cons2_1 = Constraint(model.I, model.J, model.T, rule=density_bin_cons2_1)
-
-def density_binaries(model, i,j,t):
-    return model.zeta1[i,j,t] + model.zeta2[i,j,t] == 1
-model.density_binaries = Constraint(model.I, model.J, model.T, rule=density_binaries)
-
-def density(model, i,j,t):
-    return model.rho[i,j,t]== 987.48*model.zeta1[i,j,t] + 963.6233333*model.zeta2[i,j,t]
-model.density = Constraint(model.I, model.J, model.T, rule=density)
 
 
 # def ramping_3(model, i,p,t):
