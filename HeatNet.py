@@ -422,7 +422,7 @@ for t in model.T:
             if i == j:
                 pass
             else:
-                print("rho: {}".format(model.rho[i,j,t]))
+                print("rho: {}".format(model.rho[i,j,t].value))
                 if model.Ppump[i,j,t].value > 0:
                     print("power {} -> {}: {}".format(j,i,model.Ppump[i,j,t].value))
 
