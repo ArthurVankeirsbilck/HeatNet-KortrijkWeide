@@ -41,7 +41,7 @@ def CHP_feasible_area(yA):
 
     return xA, xB, yB, xC, yC, xD, yD
 
-hours=100
+hours=1
 node1_demands = df["KWEA_dec_jan"].iloc[0:hours].to_list()
 node2_demands = [0]*hours
 node3_demands = [300]*hours
@@ -198,29 +198,25 @@ model.Di = Param(model.I, model.J, initialize=
 model.cons = ConstraintList()
 
 # variables
-model.x = Var(model.I, model.J, model.T, bounds=(0, 1000))  # power transmission from i to j
-model.p = Var(model.Plants, model.I, model.T, bounds=(0, 3000))  # production at node i
+model.x = Var(model.I, model.J, model.T, bounds=(0, None))  # power transmission from i to j
+model.p = Var(model.Plants, model.I, model.T, bounds=(0, None))  # production at node i
 model.mean_c = Var()  # mean transmission cost
-model.CQl = Var(model.I, model.J, model.T, bounds=(0, 3000))
-model.Ql = Var(model.I, model.J, model.T, bounds=(0, 10000))
+model.CQl = Var(model.I, model.J, model.T, bounds=(0, None))
+model.Ql = Var(model.I, model.J, model.T, bounds=(0, None))
 model.z = Var(model.I, model.J, model.T, domain=Binary)
 model.Ts = Var(model.I, model.J, model.T, bounds=(60, 120))
 model.Tr = Var(model.I, model.J, model.T, bounds=(30, 120))
 model.y = Var(model.I, model.T, domain=Binary)
 model.massflow = Var(model.I, model.J, model.T, bounds=(0, 20))
-model.P_el = Var(model.Plants, model.I, model.T, bounds=(0, 3000))
+model.P_el = Var(model.Plants, model.I, model.T, bounds=(0, None))
 model.kappa = Var(model.I, model.Plants, model.T, domain=Binary)
-model.Cramp= Var(model.Plants, model.I, model.T, bounds=(0, 3000))
-model.v = Var(model.I, model.J, model.T, bounds=(0, 100))
-model.Re = Var(model.I, model.J, model.T, bounds=(0, 10000000))
-model.Dp = Var(model.I, model.J, model.T, bounds=(0, 1000000))
-model.NWloss = Var(model.I, model.J, model.T, bounds=(0, 10000000))
-model.Ppump= Var(model.I, model.J, model.T, bounds=(0, 100))
-model.f= Var(model.I, model.J, model.T, bounds=(0, 100))
-model.rho = Var(model.I, model.J, model.T, bounds=(0, 2000))
-model.zeta1 = Var(model.I, model.J, model.T, domain=Binary)
-model.zeta2 = Var(model.I, model.J, model.T, domain=Binary)
-model.mu = Var(model.I, model.J, model.T, bounds=(0, 10))
+model.Cramp= Var(model.Plants, model.I, model.T, bounds=(0, None))
+model.v = Var(model.I, model.J, model.T, bounds=(0, None))
+model.Re = Var(model.I, model.J, model.T, bounds=(0, None))
+model.Dp = Var(model.I, model.J, model.T, bounds=(0, None))
+model.NWloss = Var(model.I, model.J, model.T, bounds=(0, None))
+model.Ppump= Var(model.I, model.J, model.T, bounds=(0, None))
+model.f= Var(model.I, model.J, model.T, bounds=(0, None))
 M = 10000
 epsilon = 0.00001
 Cramping = 0.1
@@ -310,12 +306,12 @@ model.ramping_2 = Constraint(model.I, model.Plants, model.T, rule=ramping_2)
 
 
 def flow_speed(model, i,j,t):
-    return model.v[i,j,t] == model.massflow[i,j,t]/(model.rho[i,j,t]*(3.14*((model.Di[i,j]/2)*(model.Di[i,j]/2))))
+    return model.v[i,j,t] == model.massflow[i,j,t]/(971.79*(3.14*((model.Di[i,j]/2)*(model.Di[i,j]/2))))
 
 model.flow_speed = Constraint(model.I, model.J, model.T, rule=flow_speed)
 
 def reynolds(model,i,j,t):
-    return model.Re[i,j,t] == (model.rho[i,j,t]*model.v[i,j,t]*model.Di[i,j])/model.mu[i,j,t]
+    return model.Re[i,j,t] == (971.79*model.v[i,j,t]*model.Di[i,j])/0.000355
 
 model.reynolds = Constraint(model.I, model.J, model.T, rule=reynolds)
 
@@ -328,7 +324,7 @@ model.reynolds = Constraint(model.I, model.J, model.T, rule=reynolds)
 # model.friction = Constraint(model.I, model.J, model.T, rule=friction)
 
 def pressure_drop(model,i,j,t):
-    return model.Dp[i,j,t] == (model.L[i,j]/model.Di[i,j])*0.007*model.rho[i,j,t]*((model.v[i,j,t]**2)/2)
+    return model.Dp[i,j,t] == (model.L[i,j]/model.Di[i,j])*0.007*971.79*((model.v[i,j,t]**2)/2)
 
 model.pressure_drop = Constraint(model.I, model.J, model.T, rule=pressure_drop)
 
@@ -338,43 +334,9 @@ def networkloss(model,i,j,t):
 model.networkloss = Constraint(model.I, model.J, model.T, rule=networkloss)
 
 def Pumppower(model, i,j,t):
-    return model.Ppump[i,j,t] == (((model.massflow[i,j,t]/model.rho[i,j,t])*model.NWloss[i,j,t])/0.7)/1000
+    return model.Ppump[i,j,t] == (((model.massflow[i,j,t]/971.79)*model.NWloss[i,j,t])/0.7)/1000
 
 model.Pumppower = Constraint(model.I, model.J, model.T, rule=Pumppower)
-
-# def density_bin_cons1(model, i,j,t):
-#     return 30-M*(1-model.zeta1[i,j,t]) <= model.Ts[i,j,t]
-# model.density_bin_cons1 = Constraint(model.I, model.J, model.T, rule=density_bin_cons1)
-
-# def density_bin_cons1_1(model, i,j,t):
-#     return model.Ts[i,j,t] <= 70+M*(1-model.zeta1[i,j,t])
-# model.density_bin_cons1_1 = Constraint(model.I, model.J, model.T, rule=density_bin_cons1_1)
-
-# def density_bin_cons2(model, i,j,t):
-#     return 71-M*(1-model.zeta2[i,j,t]) <= model.Ts[i,j,t]
-# model.density_bin_cons2 = Constraint(model.I, model.J, model.T, rule=density_bin_cons2)
-# def density_bin_cons2_1(model, i,j,t):
-#     return model.Ts[i,j,t] <= 120+M*(1-model.zeta2[i,j,t])
-# model.density_bin_cons2_1 = Constraint(model.I, model.J, model.T, rule=density_bin_cons2_1)
-
-# def density_binaries(model, i,j,t):
-#     return model.zeta1[i,j,t] + model.zeta2[i,j,t] == 1
-# model.density_binaries = Constraint(model.I, model.J, model.T, rule=density_binaries)
-
-# def density(model, i,j,t):
-#     return model.rho[i,j,t]== 987.48*model.zeta1[i,j,t] + 963.6233333*model.zeta2[i,j,t]
-# model.density = Constraint(model.I, model.J, model.T, rule=density)
-
-def density(model, i,j,t):
-    # return model.rho[i,j,t]== -0.5787*model.Ts[i,j,t] + 1016.4
-    return model.rho[i,j,t]== 960
-model.density = Constraint(model.I, model.J, model.T, rule=density)
-
-def dynamicviscosity(model,i,j,t):
-    # return model.mu[i,j,t] == -6*(10**(-6))*model.Ts[i,j,t]+0.0009
-    return model.mu[i,j,t] == 0.000354
-model.dynamicviscosity = Constraint(model.I, model.J, model.T, rule=dynamicviscosity)
-
 
 
 # def ramping_3(model, i,p,t):
@@ -434,7 +396,6 @@ for t in model.T:
             if i == j:
                 pass
             else:
-                print("rho: {}".format(model.rho[i,j,t].value))
                 if model.Ppump[i,j,t].value > 0:
                     print("power {} -> {}: {}".format(j,i,model.Ppump[i,j,t].value))
 
