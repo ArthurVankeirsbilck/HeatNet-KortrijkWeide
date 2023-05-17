@@ -41,7 +41,7 @@ def CHP_feasible_area(yA):
 
     return xA, xB, yB, xC, yC, xD, yD
 
-hours=5
+hours=10
 node1_demands = df["KWEA_dec_jan"].iloc[0:hours].to_list()
 node2_demands = [0]*hours
 node3_demands = [300]*hours
@@ -198,29 +198,29 @@ model.Di = Param(model.I, model.J, initialize=
 model.cons = ConstraintList()
 
 # variables
-model.x = Var(model.I, model.J, model.T, bounds=(0, None))  # power transmission from i to j
-model.p = Var(model.Plants, model.I, model.T, bounds=(0, None))  # production at node i
+model.x = Var(model.I, model.J, model.T, bounds=(0, 1000))  # power transmission from i to j
+model.p = Var(model.Plants, model.I, model.T, bounds=(0, 3000))  # production at node i
 model.mean_c = Var()  # mean transmission cost
-model.CQl = Var(model.I, model.J, model.T, bounds=(0, None))
-model.Ql = Var(model.I, model.J, model.T, bounds=(0, None))
+model.CQl = Var(model.I, model.J, model.T, bounds=(0, 3000))
+model.Ql = Var(model.I, model.J, model.T, bounds=(0, 10000))
 model.z = Var(model.I, model.J, model.T, domain=Binary)
 model.Ts = Var(model.I, model.J, model.T, bounds=(60, 120))
 model.Tr = Var(model.I, model.J, model.T, bounds=(30, 120))
 model.y = Var(model.I, model.T, domain=Binary)
 model.massflow = Var(model.I, model.J, model.T, bounds=(0, 20))
-model.P_el = Var(model.Plants, model.I, model.T, bounds=(0, None))
+model.P_el = Var(model.Plants, model.I, model.T, bounds=(0, 3000))
 model.kappa = Var(model.I, model.Plants, model.T, domain=Binary)
-model.Cramp= Var(model.Plants, model.I, model.T, bounds=(0, None))
-model.v = Var(model.I, model.J, model.T, bounds=(0, None))
-model.Re = Var(model.I, model.J, model.T, bounds=(0, None))
-model.Dp = Var(model.I, model.J, model.T, bounds=(0, None))
-model.NWloss = Var(model.I, model.J, model.T, bounds=(0, None))
-model.Ppump= Var(model.I, model.J, model.T, bounds=(0, None))
-model.f= Var(model.I, model.J, model.T, bounds=(0, None))
-model.rho = Var(model.I, model.J, model.T, bounds=(0, None))
+model.Cramp= Var(model.Plants, model.I, model.T, bounds=(0, 3000))
+model.v = Var(model.I, model.J, model.T, bounds=(0, 100))
+model.Re = Var(model.I, model.J, model.T, bounds=(0, 10000000))
+model.Dp = Var(model.I, model.J, model.T, bounds=(0, 1000000))
+model.NWloss = Var(model.I, model.J, model.T, bounds=(0, 10000000))
+model.Ppump= Var(model.I, model.J, model.T, bounds=(0, 100))
+model.f= Var(model.I, model.J, model.T, bounds=(0, 100))
+model.rho = Var(model.I, model.J, model.T, bounds=(0, 2000))
 model.zeta1 = Var(model.I, model.J, model.T, domain=Binary)
 model.zeta2 = Var(model.I, model.J, model.T, domain=Binary)
-model.mu = Var(model.I, model.J, model.T, bounds=(0, None))
+model.mu = Var(model.I, model.J, model.T, bounds=(0, 10))
 M = 10000
 epsilon = 0.00001
 Cramping = 0.1
