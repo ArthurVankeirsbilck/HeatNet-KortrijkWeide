@@ -41,7 +41,7 @@ def CHP_feasible_area(yA):
 
     return xA, xB, yB, xC, yC, xD, yD
 
-hours=1
+hours=100
 node1_demands = df["KWEA_dec_jan"].iloc[0:hours].to_list()
 node2_demands = [0]*hours
 node3_demands = [300]*hours
@@ -315,13 +315,15 @@ def reynolds(model,i,j,t):
 
 model.reynolds = Constraint(model.I, model.J, model.T, rule=reynolds)
 
-# def friction(model,i,j,t):
-#     return model.f[i,j,t] == 0.0055*(1+((2*10^4)*(0.01/model.Di[i,j])+((10**6)/model.Re[i,j,t])**(1/3)))
-# model.friction = Constraint(model.I, model.J, model.T, rule=friction)
+# def density(model, i,j,t):
+#     # return model.rho[i,j,t]== -0.5787*model.Ts[i,j,t] + 1016.4
+#     return model.rho[i,j,t]== 960
+# model.density = Constraint(model.I, model.J, model.T, rule=density)
 
-# def friction(model,i,j,t):
-#     return model.f[i,j,t] == 0.11*((68/model.Re[i,j,t])+(0.012/model.Di[i,j]))**0.25
-# model.friction = Constraint(model.I, model.J, model.T, rule=friction)
+# def dynamicviscosity(model,i,j,t):
+#     # return model.mu[i,j,t] == -6*(10**(-6))*model.Ts[i,j,t]+0.0009
+#     return model.mu[i,j,t] == 0.000354
+# model.dynamicviscosity = Constraint(model.I, model.J, model.T, rule=dynamicviscosity)
 
 def pressure_drop(model,i,j,t):
     return model.Dp[i,j,t] == (model.L[i,j]/model.Di[i,j])*0.007*971.79*((model.v[i,j,t]**2)/2)
