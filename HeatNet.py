@@ -366,12 +366,13 @@ model.Pumppower = Constraint(model.I, model.J, model.T, rule=Pumppower)
 # model.density = Constraint(model.I, model.J, model.T, rule=density)
 
 def density(model, i,j,t):
-    return model.rho[i,j,t]== -0.5787*model.Ts[i,j,t] + 1016.4
+    # return model.rho[i,j,t]== -0.5787*model.Ts[i,j,t] + 1016.4
+    return model.rho[i,j,t]== 960
 model.density = Constraint(model.I, model.J, model.T, rule=density)
 
 def dynamicviscosity(model,i,j,t):
-    # return model.mu[i,j,t] == (-7**(-10))*model.Ts[i,j,t]**3 + 2*(10**(-7))*model.Ts[i,j,t]**2 - 3*(10**(-5))*model.Ts[i,j,t] + 0.0014
-    return model.mu[i,j,t] == -6*(10**(-6))*model.Ts[i,j,t]+0.0009
+    # return model.mu[i,j,t] == -6*(10**(-6))*model.Ts[i,j,t]+0.0009
+    return model.mu[i,j,t] == 0.000354
 model.dynamicviscosity = Constraint(model.I, model.J, model.T, rule=dynamicviscosity)
 
 
