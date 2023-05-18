@@ -389,11 +389,11 @@ results = solver.solve(model,tee=True)
 
 # print(f"Objective value: {model.obj():.2f}")
 
-# for t in model.T:
-#     for i in model.I:
-#         for j in model.J:
-#             if model.x[i, j,t]() > 0:
-#                 print(f"From node {j} to node {i} at {t}: {model.x[i,j,t]():.2f} MWh")
+for t in model.T:
+    for i in model.I:
+        for j in model.J:
+            if model.x[i, j,t]() > 0:
+                print(f"From node {j} to node {i} at {t}: {model.x[i,j,t]():.2f} MWh")
 
 # print("PP:")
 # for t in model.T:
@@ -409,7 +409,11 @@ print("Heatloss cost:")
 for t in model.T:
     for i in model.I:
         for j in model.J:
-                print(f"Loss from node {j} to node {i}: {model.Ql[i,j,t].value*model.z[i,j,t].value:.2f}")
+            if i == j:
+                pass
+            else:
+                if (model.Ql[i,j,t].value*model.z[i,j,t].value) > 0:
+                    print(f"Loss from node {j} to node {i}: {model.Ql[i,j,t].value*model.z[i,j,t].value:.2f}")
 
 # print("z:")
 # for t in model.T:
