@@ -44,7 +44,7 @@ def CHP_feasible_area(yA):
 hours=1
 node1_demands = df["KWEA_dec_jan"].iloc[0:hours].to_list()
 node2_demands = [0]*hours
-node3_demands = [300]*hours
+node3_demands = [0]*hours
 node4_demands = df["Penta_dec_jan"].iloc[0:hours].to_list()
 node5_demands = df["Vegitec_dec_jan"].iloc[0:hours].to_list()
 node6_demands = [300]*hours
@@ -249,7 +249,7 @@ def capacity_constraint_rule(model, i, j,t):
 model.capacity_constraint = Constraint(model.I, model.J, model.T, rule=capacity_constraint_rule)
 
 def capacity_constraint_rule_2(model, i, j, t):
-    return sum(model.x[i, j,t] for i in model.I for j in model.J) <= 900
+    return sum(model.x[i, j,t] for i in model.I for j in model.J) <= 2000
 
 model.capacity_constraint_rule_2 = Constraint(model.nodes_connected_to_pipe1, model.nodes_connected_to_pipe1, model.T, rule=capacity_constraint_rule_2)
 
