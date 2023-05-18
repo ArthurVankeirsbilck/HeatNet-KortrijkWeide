@@ -234,12 +234,12 @@ model.obj = Objective(
     expr=sum(model.c[i,j]*model.x[i,j,t] + model.Ppump[i,j,t]*model.P_elec[t] for j in model.J for i in model.I for t in model.T) + sum(model.c_gen[i,p,t]*model.p[p,i,t] - model.P_elec[t]*model.P_el[p,i,t] for p in model.Plants for i in model.I for t in model.T), sense=minimize)
 
 def balance_constraint_rule(model, i,j,t):
-    return sum(model.x[i, j, t] - model.x[j, i, t] for j in model.J) + sum(model.p[p,i,t] for p in model.Plants) == model.d[i,t]+model.Ql[i,j,t]*model.z[i,j,t]
+    return sum(model.x[i, j, t] - model.x[j, i, t] for j in model.J) + sum(model.p[p,i,t] for p in model.Plants) == model.d[i,t] + model.Ql[i,j,t]
 
 model.balance_constraint = Constraint(model.I, model.J, model.T , rule=balance_constraint_rule)
 
 def heat_flow_constraint(model, i, j,t):
-    return Cp*model.massflow[i,j,t]*(model.Ts[i,j,t]-model.Tr[i,j,t]) == model.d[i,t]+model.Ql[i,j,t]*model.z[i,j,t]
+    return Cp*model.massflow[i,j,t]*(model.Ts[i,j,t]-model.Tr[i,j,t]) == model.d[i,t] + model.Ql[i,j,t]
 
 model.heat_flow_constraint = Constraint(model.I, model.J, model.T, rule=heat_flow_constraint)
 
@@ -299,13 +299,6 @@ def heatloss_constraint(model, i, j,t):
     return model.Ql[i,j,t] == ((((2.0*3.14*model.k[i,j]*model.L[i,j]*(model.Ts[i,j,t]-model.Tr[i,j,t]))/math.log(model.Do[i,j]/model.Di[i,j]))/1000))
 model.heatloss_constraint = Constraint(model.I, model.J, model.T, rule=heatloss_constraint)
 
-def heatloss_bin1(model, i,j,t):
-    return model.x[i,j,t] >= 1- M*(1-model.z[i,j,t])
-model.heatloss_bin1 = Constraint(model.I, model.J, model.T, rule=heatloss_bin1)
-
-def heatloss_bin2(model, i,j,t):
-    return model.x[i,j,t] <= M*model.z[i,j,t]
-model.heatloss_bin2 = Constraint(model.I, model.J, model.T, rule=heatloss_bin2)
 
 def ramping_1(model, i,p,t):
     if t == 0:
