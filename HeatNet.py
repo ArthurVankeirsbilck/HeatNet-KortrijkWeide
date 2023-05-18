@@ -291,7 +291,7 @@ def HOB_2(model, t, i, p):
 model.HOB_2_constraint = Constraint(model.T, model.HOB_Plants, rule=HOB_2)
 
 def heatloss_constraint(model, i, j,t):
-    return model.Ql[i,j,t] == ((((2.0*3.14*model.k[i,j]*model.L[i,j]*(model.Ts[i,j,t]-model.Tr[i,j,t]))/math.log(model.Do[i,j]/model.Di[i,j]))/1000))*0.2
+    return model.Ql[i,j,t] == ((((2.0*3.14*model.k[i,j]*model.L[i,j]*(model.Ts[i,j,t]-model.Tr[i,j,t]))/math.log(model.Do[i,j]/model.Di[i,j]))/1000))
 model.heatloss_constraint = Constraint(model.I, model.J, model.T, rule=heatloss_constraint)
 
 def heatloss_bin1(model, i,j,t):
@@ -387,13 +387,13 @@ results = solver.solve(model,tee=True)
 # solver = SolverFactory("mindtpy")
 # results = solver.solve(model,mip_solver="gurobi",nlp_solver="ipopt",tee=True)
 
-print(f"Objective value: {model.obj():.2f}")
+# print(f"Objective value: {model.obj():.2f}")
 
-for t in model.T:
-    for i in model.I:
-        for j in model.J:
-            if model.x[i, j,t]() > 0:
-                print(f"From node {j} to node {i} at {t}: {model.x[i,j,t]():.2f} MWh")
+# for t in model.T:
+#     for i in model.I:
+#         for j in model.J:
+#             if model.x[i, j,t]() > 0:
+#                 print(f"From node {j} to node {i} at {t}: {model.x[i,j,t]():.2f} MWh")
 
 # print("PP:")
 # for t in model.T:
@@ -405,11 +405,11 @@ for t in model.T:
 #                 if model.Ppump[i,j,t].value > 0:
 #                     print("power {} -> {}: {}".format(j,i,model.Ppump[i,j,t].value))
 
-# print("Heatloss cost:")
-# for t in model.T:
-#     for i in model.I:
-#         for j in model.J:
-#                 print(f"Loss from node {j} to node {i}: {model.Ql[i,j,t].value*model.z[i,j,t].value:.2f}")
+print("Heatloss cost:")
+for t in model.T:
+    for i in model.I:
+        for j in model.J:
+                print(f"Loss from node {j} to node {i}: {model.Ql[i,j,t].value*model.z[i,j,t].value:.2f}")
 
 # print("z:")
 # for t in model.T:
