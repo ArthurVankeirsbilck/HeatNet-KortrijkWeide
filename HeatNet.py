@@ -116,7 +116,7 @@ model.p_max_plant = Param(model.I, model.Plants, initialize={
     (7, 'Plant1'): 0, (7, 'Plant2'): 0, (7, 'Plant3'): 0
 })
 
-model.nodes_connected_to_pipe1 = Set(within=model.I * model.Pipes, initialize={
+model.nodes_connected_to_pipe1 = Set(within=model.Pipes * model.I, initialize={
 (1,1), (1,2), (1,3), (1,4)
 })
 
