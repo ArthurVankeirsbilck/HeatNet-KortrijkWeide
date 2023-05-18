@@ -234,12 +234,12 @@ model.obj = Objective(
     expr=sum(model.c[i,j]*model.x[i,j,t] + model.Ppump[i,j,t]*model.P_elec[t] for j in model.J for i in model.I for t in model.T) + sum(model.c_gen[i,p,t]*model.p[p,i,t] - model.P_elec[t]*model.P_el[p,i,t] for p in model.Plants for i in model.I for t in model.T), sense=minimize)
 
 def balance_constraint_rule(model, i,j,t):
-    return sum(model.x[i, j, t] - model.x[j, i, t] for j in model.J) + sum(model.p[p,i,t] for p in model.Plants) == model.d[i,t] + model.Ql[j,i,t]
+    return sum(model.x[i, j, t] - model.x[j, i, t] for j in model.J) + sum(model.p[p,i,t] for p in model.Plants) == model.d[i,t] + 20
 
 model.balance_constraint = Constraint(model.I, model.J, model.T , rule=balance_constraint_rule)
 
 def heat_flow_constraint(model, i, j,t):
-    return Cp*model.massflow[i,j,t]*(model.Ts[i,j,t]-model.Tr[i,j,t]) == model.d[i,t] + model.Ql[j,i,t]
+    return Cp*model.massflow[i,j,t]*(model.Ts[i,j,t]-model.Tr[i,j,t]) == model.d[i,t] + 20
 
 model.heat_flow_constraint = Constraint(model.I, model.J, model.T, rule=heat_flow_constraint)
 
@@ -296,7 +296,7 @@ def HOB_2(model, t, i, p):
 model.HOB_2_constraint = Constraint(model.T, model.HOB_Plants, rule=HOB_2)
 
 def heatloss_constraint(model, i, j,t):
-    return model.Ql[j,i,t] == (2.0*3.14*model.k[i,j]*model.L[i,j]*(120-30))
+    return model.Ql[i,j,t] == ((((2.0*3.14*model.k[i,j]*model.L[i,j]*(model.Ts[i,j,t]-model.Tr[i,j,t]))/math.log(model.Do[i,j]/model.Di[i,j]))/1000))
 model.heatloss_constraint = Constraint(model.I, model.J, model.T, rule=heatloss_constraint)
 
 
