@@ -155,7 +155,7 @@ Cp=4.18
 
 model.u =Param(model.I, model.J, initialize=
 {(1, 1): 0, (1, 2): M, (1, 3): M, (1, 4): M, (1, 5): M, (1, 6): M, (1, 7): M,
-(2, 1): M, (2, 2): 0, (2, 3): M, (2, 4): M, (2, 5): M, (2, 6): M, (2, 7): M, 
+(2, 1): M, (2, 2): 0, (2, 3): M, (2, 4): M, (2, 5): M, (2, 6): M, (2, 7): 0, 
 (3, 1): M, (3, 2): M, (3, 3): 0, (3, 4): M, (3, 5): M, (3, 6): M, (3, 7): M, 
 (4, 1): M, (4, 2): M, (4, 3): M, (4, 4): 0, (4, 5): M, (4, 6): M, (4, 7): M, 
 (5, 1): M, (5, 2): M, (5, 3): M, (5, 4): M, (5, 5): 0, (5, 6): M, (5, 7): M, 
@@ -247,7 +247,7 @@ def capacity_constraint_rule(model, i, j,t):
     return model.x[i, j,t] <= model.u[i, j]
 
 def capacity_constraint_rule(model, i, j, t):
-    return sum(model.x[i, j,t] for i in model.I for j in model.J) <= 900
+    return sum(model.x[i, j,t] for i in model.I for j in model.J) <= 2000
 
 model.capacity_constraint = Constraint(model.nodes_connected_to_pipe1, model.nodes_connected_to_pipe1, model.T, rule=capacity_constraint_rule)
 
