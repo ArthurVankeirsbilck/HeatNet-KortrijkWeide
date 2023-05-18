@@ -249,12 +249,12 @@ def capacity_constraint_rule(model, i, j,t):
 model.capacity_constraint = Constraint(model.I, model.J, model.T, rule=capacity_constraint_rule)
 
 def capacity_constraint_rule_1(model, i, j, t):
-    return sum(model.x[i, j,t] for i in model.I for j in model.J) <= 900
+    return sum(model.x[i, j,t] for i in model.I for j in model.J) <= 5000
 
 model.capacity_constraint_rule_1 = Constraint(model.nodes_connected_to_pipe2, model.nodes_connected_to_pipe2, model.T, rule=capacity_constraint_rule_1)
 
 def capacity_constraint_rule_2(model, i, j, t):
-    return sum(model.x[i, j,t] for i in model.I for j in model.J) <= 900
+    return sum(model.x[i, j,t] for i in model.I for j in model.J) <= 5000
 
 model.capacity_constraint_rule_2 = Constraint(model.nodes_connected_to_pipe1, model.nodes_connected_to_pipe1, model.T, rule=capacity_constraint_rule_2)
 
