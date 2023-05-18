@@ -92,6 +92,7 @@ model.T = Set(initialize=times)
 model.I = Set(initialize=nodes)  # set of nodes
 model.J = Set(initialize=nodes)  # set of nodes
 model.Plants = Set(initialize=Plants)
+model.Pipes = Set(initialize=([1,2]))
 model.P_elec = Param(model.T, initialize=spot["Euro"].iloc[0:hours+1].to_list())
 # parameters
 model.c = Param(model.I, model.J, initialize=
@@ -113,6 +114,10 @@ model.p_max_plant = Param(model.I, model.Plants, initialize={
     (5, 'Plant1'): 0, (5, 'Plant2'): 0, (5, 'Plant3'): 0,
     (6, 'Plant1'): 160, (6, 'Plant2'): 0, (6, 'Plant3'): 0,
     (7, 'Plant1'): 0, (7, 'Plant2'): 0, (7, 'Plant3'): 0
+})
+
+model.nodes_connected_to_pipe1 = Set(within=Model.I * Model.Pipes, initialize={
+(1,1), (1,2), (1,3), (1,4)
 })
 
 model.ramp_rate = Param(model.I, model.Plants, initialize={
@@ -237,7 +242,10 @@ model.heat_flow_constraint = Constraint(model.I, model.J, model.T, rule=heat_flo
 def capacity_constraint_rule(model, i, j,t):
     return model.x[i, j,t] <= model.u[i, j]
 
-model.capacity_constraint = Constraint(model.I, model.J, model.T, rule=capacity_constraint_rule)
+def capacity_constraint_rule(model, i, b, j, t):
+    return sum(model.x[i, j,t] for i in model.I for j in model.J) <= 900
+
+model.capacity_constraint = Constraint(model.nodes_connected_to_pipe1, model.J, model.T, rule=capacity_constraint_rule)
 
 def CHP_1(model, t, i, p):
     return model.P_el[p,i,t] - model.p_max_plant[i,p] - ((model.p_max_plant[i,p]-CHP_feasible_area(model.p_max_plant[i,p])[2])/(CHP_feasible_area(model.p_max_plant[i,p])[0]-CHP_feasible_area(model.p_max_plant[i,p])[1])) * (model.p[p,i,t] - CHP_feasible_area(model.p_max_plant[i,p])[0]) <= 0
