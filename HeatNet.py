@@ -383,21 +383,21 @@ results = solver.solve(model,tee=True)
 
 print(f"Objective value: {model.obj():.2f}")
 
-# for t in model.T:
-#     for i in model.I:
-#         for j in model.J:
-#             if model.x[i, j,t]() > 0:
-#                 print(f"From node {j} to node {i} at {t}: {model.x[i,j,t]():.2f} MWh")
-
-print("PP:")
 for t in model.T:
     for i in model.I:
         for j in model.J:
-            if i == j:
-                pass
-            else:
-                if model.Ppump[i,j,t].value > 0:
-                    print("power {} -> {}: {}".format(j,i,model.Ppump[i,j,t].value))
+            if model.x[i, j,t]() > 0:
+                print(f"From node {j} to node {i} at {t}: {model.x[i,j,t]():.2f} MWh")
+
+# print("PP:")
+# for t in model.T:
+#     for i in model.I:
+#         for j in model.J:
+#             if i == j:
+#                 pass
+#             else:
+#                 if model.Ppump[i,j,t].value > 0:
+#                     print("power {} -> {}: {}".format(j,i,model.Ppump[i,j,t].value))
 
 # print("Heatloss cost:")
 # for t in model.T:
