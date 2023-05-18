@@ -121,7 +121,7 @@ model.nodes_connected_to_pipe1 = Set(within=model.I, initialize={
 })
 
 model.nodes_connected_to_pipe2 = Set(within=model.I, initialize={
-1,2,3,4
+4,5,6,7
 })
 
 model.ramp_rate = Param(model.I, model.Plants, initialize={
@@ -247,6 +247,11 @@ def capacity_constraint_rule(model, i, j,t):
     return model.x[i, j,t] <= model.u[i, j]
 
 model.capacity_constraint = Constraint(model.I, model.J, model.T, rule=capacity_constraint_rule)
+
+def capacity_constraint_rule_1(model, i, j, t):
+    return sum(model.x[i, j,t] for i in model.I for j in model.J) <= 900
+
+model.capacity_constraint_rule_1 = Constraint(model.nodes_connected_to_pipe2, model.nodes_connected_to_pipe2, model.T, rule=capacity_constraint_rule_1)
 
 def capacity_constraint_rule_2(model, i, j, t):
     return sum(model.x[i, j,t] for i in model.I for j in model.J) <= 900
