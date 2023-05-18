@@ -160,7 +160,7 @@ model.u =Param(model.I, model.J, initialize=
 (4, 1): M, (4, 2): M, (4, 3): M, (4, 4): 0, (4, 5): M, (4, 6): M, (4, 7): M, 
 (5, 1): M, (5, 2): M, (5, 3): M, (5, 4): M, (5, 5): 0, (5, 6): M, (5, 7): M, 
 (6, 1): M, (6, 2): M, (6, 3): M, (6, 4): M, (6, 5): M, (6, 6): 0, (6, 7): M, 
-(7, 1): M, (7, 2): M, (7, 3): M, (7, 4): M, (7, 5): M, (7, 6): M, (7, 7): 0}
+(7, 1): M, (7, 2): 0, (7, 3): M, (7, 4): M, (7, 5): M, (7, 6): M, (7, 7): 0}
 ) #transmission capacity
 
 model.d = Param(model.I, model.T, initialize=demands())  # net supply (supply - demand) in node i
