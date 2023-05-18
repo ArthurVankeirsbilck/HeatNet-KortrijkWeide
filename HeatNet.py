@@ -44,7 +44,7 @@ def CHP_feasible_area(yA):
 hours=92
 node1_demands = df["KWEA_dec_jan"].iloc[0:hours].to_list()
 node2_demands = [0]*hours
-node3_demands = [0]*hours
+node3_demands = [300]*hours
 node4_demands = df["Penta_dec_jan"].iloc[0:hours].to_list()
 node5_demands = df["Vegitec_dec_jan"].iloc[0:hours].to_list()
 node6_demands = [300]*hours
