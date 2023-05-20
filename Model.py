@@ -134,7 +134,7 @@ def mixing_constraint_rule(model, i, t, pipe):
 model.mixing_constraint = Constraint(model.N, model.T, model.PowerLines, rule=mixing_constraint_rule)
 
 def heat_loss_constraint_rule(model, pipe, t):
-    return model.Q_loss[pipe, t] == 0.05 * (model.T_supply[pipe, t] - model.T_ambient[t])
+    return model.Q_loss[pipe, t] == 0.05 * (model.T_supply[pipe, t] - 15)
 model.heat_loss_constraint = Constraint(model.PowerLines, model.T, rule=heat_loss_constraint_rule)
 
 
