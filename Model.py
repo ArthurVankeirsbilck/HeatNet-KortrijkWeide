@@ -121,9 +121,7 @@ model.consistency_constraint = Constraint(model.N, model.T, rule=consistency_con
 #     return sum(model.P[i, t] * model.X[i, t] for i in model.N) == model.M_flow[pipe, t] * 4.1 * (model.T_mixed[pipe, t] - model.T_return[pipe, t])
 
 def energy_balance_constraint_rule(model, pipe, t):
-    HeatInflow = sum(model.P[i, t] * model.X[i, t] for i in model.N)
-    HeatOutflow = model.M_flow[pipe, t] * 4.1 * (model.T_mixed[pipe, t] - model.T_return[pipe, t])
-    return HeatInflow + model.Q_loss[pipe, t] == HeatOutflow
+    return sum(model.P[i, t] * model.X[i, t] for i in model.N) + model.Q_loss[pipe, t] == model.M_flow[pipe, t] * 4.1 * (model.T_mixed[pipe, t] - model.T_return[pipe, t])
 model.energy_balance_constraint = Constraint(model.PowerLines, model.T, rule=energy_balance_constraint_rule)
 
 
