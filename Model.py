@@ -125,5 +125,5 @@ results = solver.solve(model,tee=True)
 
 for t in model.T:
     for pipe in model.PowerLines:
-        print(pipe, t, model.T_supply[pipe, t].value, model.T_return[pipe, t].value)
+        print(pipe, t, model.M_flow[pipe, t],model.T_supply[pipe, t].value, model.T_return[pipe, t].value)
         
