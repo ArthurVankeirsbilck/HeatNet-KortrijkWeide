@@ -124,5 +124,5 @@ solver = SolverFactory("octeract");
 results = solver.solve(model,tee=True)
 
 for t in model.T:
-    for i in model.N:
+    for pipe in model.PowerLines:
         print(i, t, model.M_flow[pipe, t].value)
