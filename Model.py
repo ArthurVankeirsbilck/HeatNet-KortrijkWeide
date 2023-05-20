@@ -70,7 +70,7 @@ model.E = Var(model.N, model.T, within=NonNegativeReals)
 model.M_flow = Var(model.PowerLines, model.T, bounds=(0, 40),within=NonNegativeReals)
 model.T_supply = Var(model.PowerLines, model.T, bounds=(60, 120),within=NonNegativeReals)
 model.T_return = Var(model.PowerLines, model.T, bounds=(30, 120),within=NonNegativeReals)
-model.T_mixed = Var(model.T, bounds=(30, 120), within=NonNegativeReals)
+model.T_mixed = Var(model.PowerLines, model.T, bounds=(30, 120), within=NonNegativeReals)
 model.X = Var(model.N, model.T, within=Binary)
 model.Z = Var(model.N, model.N, within=Binary)
 
