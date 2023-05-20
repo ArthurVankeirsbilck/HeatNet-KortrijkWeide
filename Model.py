@@ -72,6 +72,7 @@ model.T_supply = Var(model.PowerLines, model.T, bounds=(60, 120),within=NonNegat
 model.T_return = Var(model.PowerLines, model.T, bounds=(30, 120),within=NonNegativeReals)
 model.T_mixed = Var(model.PowerLines, model.T, bounds=(30, 120), within=NonNegativeReals)
 model.T_incoming = Var(model.N, model.T, bounds=(30, 120), within=NonNegativeReals)
+model.Q_loss = Var(model.PowerLines, model.T, within=NonNegativeReals)
 model.X = Var(model.N, model.T, within=Binary)
 model.Z = Var(model.N, model.N, within=Binary)
 
@@ -119,6 +120,13 @@ model.consistency_constraint = Constraint(model.N, model.T, rule=consistency_con
 def energy_balance_constraint_rule(model, pipe, t):
     return sum(model.P[i, t] * model.X[i, t] for i in model.N) == model.M_flow[pipe, t] * 4.1 * (model.T_mixed[pipe, t] - model.T_return[pipe, t])
 
+def energy_balance_constraint_rule(model, pipe, t):
+    HeatInflow = sum(model.P[i, t] * model.X[i, t] for i in model.N)
+    HeatOutflow = model.M_flow[pipe, t] * 4.1 * (model.T_mixed[pipe, t] - model.T_return[pipe, t])
+    return HeatInflow + model.Q_loss[pipe, t] == HeatOutflow
+model.energy_balance_constraint = Constraint(model.PowerLines, model.T, rule=energy_balance_constraint_rule)
+
+
 model.energy_balance_constraint = Constraint(model.PowerLines, model.T, rule=energy_balance_constraint_rule)
 
 def mixing_constraint_rule(model, i, t, pipe):
@@ -126,6 +134,11 @@ def mixing_constraint_rule(model, i, t, pipe):
                                   model.M_flow[model.Line[i], t] * 4.1 * model.T_incoming[i, t])/(sum(model.M_flow[pipe, t] *4.1* model.X[i, t] for pipe in model.PowerLines) + model.M_flow[model.Line[i], t] * 4.1)
 
 model.mixing_constraint = Constraint(model.N, model.T, model.PowerLines, rule=mixing_constraint_rule)
+
+def heat_loss_constraint_rule(model, pipe, t):
+    return model.Q_loss[pipe, t] == 0.05 * (model.T_supply[pipe, t] - model.T_ambient[t])
+model.heat_loss_constraint = Constraint(model.PowerLines, model.T, rule=heat_loss_constraint_rule)
+
 
 solver = SolverFactory("octeract");
 results = solver.solve(model,tee=True)
