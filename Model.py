@@ -125,7 +125,7 @@ def energy_balance_constraint_rule(model, pipe, t):
 model.energy_balance_constraint = Constraint(model.PowerLines, model.T, rule=energy_balance_constraint_rule)
 
 
-model.energy_balance_constraint = Constraint(model.PowerLines, model.T, rule=energy_balance_constraint_rule)
+# model.energy_balance_constraint = Constraint(model.PowerLines, model.T, rule=energy_balance_constraint_rule)
 
 def mixing_constraint_rule(model, i, t, pipe):
     return model.T_mixed[pipe, t] == (sum(model.M_flow[pipe, t] * 4.1 * model.T_supply[pipe, t]* model.X[i, t] for pipe in model.PowerLines) +
