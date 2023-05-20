@@ -125,4 +125,4 @@ results = solver.solve(model,tee=True)
 
 for t in model.T:
     for pipe in model.PowerLines:
-        print(i, t, model.M_flow[pipe, t].value)
+        print(pipe, t, model.M_flow[pipe, t].value)
