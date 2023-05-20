@@ -9,23 +9,23 @@ model.T = Set(initialize=[1, 2, 3])
 model.PowerLines = Set(initialize=[1, 2])
 
 # Parameters
-model.P_gen = Param(model.N, model.T, initialize={
-    (1, 1): 50, (1, 2): 60, (1, 3): 70,
-    (2, 1): 80, (2, 2): 90, (2, 3): 100,
-    (3, 1): 70, (3, 2): 80, (3, 3): 90,
-    (4, 1): 70, (4, 2): 80, (4, 3): 90
+model.P_gen = Param(model.N, initialize={
+    1:50,
+    2:50,
+    3:50,
+    4:50
 })
-model.P_import = Param(model.N, model.T, initialize={
-    (1, 1): 30, (1, 2): 40, (1, 3): 50,
-    (2, 1): 20, (2, 2): 30, (2, 3): 40,
-    (3, 1): 10, (3, 2): 20, (3, 3): 30,
-    (4, 1): 10, (4, 2): 20, (4, 3): 30
+model.P_import = Param(model.N, initialize={
+    1:50,
+    2:50,
+    3:50,
+    4:50
 })
-model.P_export = Param(model.N, model.T, initialize={
-    (1, 1): 20, (1, 2): 30, (1, 3): 40,
-    (2, 1): 10, (2, 2): 20, (2, 3): 30,
-    (3, 1): 30, (3, 2): 40, (3, 3): 50,
-    (4, 1): 30, (4, 2): 40, (4, 3): 50
+model.P_export = Param(model.N, initialize={
+    1:50,
+    2:50,
+    3:50,
+    4:50
 })
 model.C_gen = Param(model.N, model.T, initialize={
     (1, 1): 5, (1, 2): 6, (1, 3): 7,
@@ -89,15 +89,15 @@ model.demand_constraint = Constraint(model.N, model.T, rule=demand_constraint_ru
 
 # Constraints
 def generation_constraint_rule(model, i, t):
-    return model.P[i, t] <= model.P_gen[i, t]
+    return model.P[i, t] <= model.P_gen[i]
 model.generation_constraint = Constraint(model.N, model.T, rule=generation_constraint_rule)
 
 def import_constraint_rule(model, i, t):
-    return model.I[i, t] <= model.P_import[i, t] * model.X[i, t]
+    return model.I[i, t] <= model.P_import[i] * model.X[i, t]
 model.import_constraint = Constraint(model.N, model.T, rule=import_constraint_rule)
 
 def export_constraint_rule(model, i, t):
-    return model.E[i, t] <= model.P_export[i, t]* model.X[i, t]
+    return model.E[i, t] <= model.P_export[i]* model.X[i, t]
 model.export_constraint = Constraint(model.N, model.T, rule=export_constraint_rule)
 
 def transmission_constraint_rule(model, t):
