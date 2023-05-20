@@ -121,11 +121,11 @@ def energy_balance_constraint_rule(model, pipe, t):
 
 model.energy_balance_constraint = Constraint(model.PowerLines, model.T, rule=energy_balance_constraint_rule)
 
-def mixing_constraint_rule(model, i, t):
+def mixing_constraint_rule(model, i, t, pipe):
     return model.T_mixed[pipe, t] == (sum(model.M_flow[pipe, t] * 4.1 * model.T_supply[pipe, t]* model.X[i, t] for pipe in model.PowerLines) +
                                   model.M_flow[model.Line[i], t] * 4.1 * model.T_incoming[i, t])/(sum(model.M_flow[pipe, t] *4.1* model.X[i, t] for pipe in model.PowerLines) + model.M_flow[model.Line[i], t] * 4.1)
 
-model.mixing_constraint = Constraint(model.N, model.T, rule=mixing_constraint_rule)
+model.mixing_constraint = Constraint(model.N, model.T, model.PowerLines, rule=mixing_constraint_rule)
 
 solver = SolverFactory("octeract");
 results = solver.solve(model,tee=True)
