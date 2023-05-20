@@ -125,4 +125,4 @@ results = solver.solve(model,tee=True)
 
 for t in model.T:
     for i in model.N:
-        print(i, t, model.I[i, t].value+ model.P[i, t].value)
+        print(i, t, model.M_flow[pipe, t].value)
