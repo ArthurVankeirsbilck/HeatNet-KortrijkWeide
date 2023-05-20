@@ -56,7 +56,7 @@ model.Line = Param(model.N, within=model.PowerLines, initialize={
 M = 1000
 
 # Parameters
-model.Demand = Param(model.N, model.T, initialize={
+model.Demand = Param(model.N, model.T, initialize={     
     (1, 1): 20, (1, 2): 30, (1, 3): 40,
     (2, 1): 25, (2, 2): 35, (2, 3): 45,
     (3, 1): 30, (3, 2): 40, (3, 3): 50,
@@ -67,7 +67,7 @@ model.Demand = Param(model.N, model.T, initialize={
 model.P = Var(model.N, model.T, within=NonNegativeReals)
 model.I = Var(model.N, model.T, within=NonNegativeReals)
 model.E = Var(model.N, model.T, within=NonNegativeReals)
-model.M_flow = Var(model.PowerLines, model.T, within=NonNegativeReals)
+model.M_flow = Var(model.PowerLines, model.T, bounds=(0, 40),within=NonNegativeReals)
 model.T_supply = Var(model.PowerLines, model.T, bounds=(60, 120),within=NonNegativeReals)
 model.T_return = Var(model.PowerLines, model.T, bounds=(30, 120),within=NonNegativeReals)
 model.X = Var(model.N, model.T, within=Binary)
