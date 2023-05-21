@@ -109,7 +109,7 @@ model.objective = Objective(rule=objective_rule, sense=minimize)
 # Constraints
 def demand_constraint_rule(model, i, t):
     return model.P[p, i, t] + model.I[i, t] >= model.Demand[i, t]
-model.demand_constraint = Constraint(model.N, model.T, rule=demand_constraint_rule)
+model.demand_constraint = Constraint(model.N, model.T, model.Plants, rule=demand_constraint_rule)
 
 def generation_constraint_rule(model, i, t, p):
     return model.P[p, i, t] <= model.P_gen[i,p]
