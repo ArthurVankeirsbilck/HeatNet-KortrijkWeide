@@ -1,5 +1,13 @@
 from pyomo.environ import *
+hours=500
+node1_demands = [10]*hours
+node2_demands = [20]*hours
+node3_demands = [5]*hours
+node4_demands = [30]*hours
+T = len(node1_demands)+1
+times = list(range(T))
 
+Plants = ['Plant1', 'Plant2', 'Plant3']
 def CHP_feasible_area(yA):
     xA = 0
     xB = round(yA*(180/247))
@@ -16,17 +24,11 @@ model = ConcreteModel()
 Plants = ['Plant1', 'Plant2', 'Plant3']
 # Sets
 model.N = Set(initialize=nodes)
-model.T = Set(initialize=[1, 2, 3])
+model.T = Set(initialize=times)
 model.PowerLines = Set(initialize=[1, 2])
 model.Plants = Set(initialize=Plants)
 
-hours=500
-node1_demands = [10]*hours
-node2_demands = [20]*hours
-node3_demands = [5]*hours
-node4_demands = [30]*hours
 
-Plants = ['Plant1', 'Plant2', 'Plant3']
 
 
 def demands():
