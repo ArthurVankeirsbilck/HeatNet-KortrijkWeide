@@ -51,6 +51,14 @@ HOB_plants ={
     (4, 'Plant2'),(4, 'Plant3'),
 }
 
+model.ramp_rate = Param(model.N, model.Plants, initialize={
+    (1, 'Plant1'): 0.8, (1, 'Plant2'):0.8, (1, 'Plant3'):0.8,
+    (2, 'Plant1'): 0.8,  (2, 'Plant2'):0.8, (2, 'Plant3'):0.8,
+    (3, 'Plant1'): 0.8, (3, 'Plant2'):0.8,(3, 'Plant3'):0.8,
+    (4, 'Plant1'): 0.8, (4, 'Plant2'): 0.8, (4, 'Plant3'): 0.8
+})
+
+
 model.CHP_Plants = Set(within=model.N * model.Plants, initialize=CHP_plants)
 model.HOB_Plants = Set(within=model.N * model.Plants, initialize=HOB_plants)
 
@@ -195,6 +203,20 @@ model.HOB_1_constraint = Constraint(model.T,model.HOB_Plants, rule=HOB_1)
 def HOB_2(model, t, i, p):
     return model.P[p,i,t] <= model.P_gen[i,p]*model.kappa[i,p,t]
 model.HOB_2_constraint = Constraint(model.T, model.HOB_Plants, rule=HOB_2)
+
+def ramping_1(model, i,p,t):
+    if t == 0:
+        return Constraint.Skip
+    else:
+        return model.ramp_rate[i,p]*model.P_gen[i,p] >= model.P[p,i,t] - model.P[p,i,t-1]
+
+model.ramping_1 = Constraint(model.I, model.Plants, model.T, rule=ramping_1)
+
+def ramping_2(model, i,p,t):
+    if t == 0: 
+        return Constraint.Skip 
+    else:
+        return model.ramp_rate[i,p]*model.P_gen[i,p] >= model.P[p,i,t-1] - model.P[p,i,t]
 
 solver = SolverFactory("octeract");
 results = solver.solve(model,tee=True)
