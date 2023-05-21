@@ -10,15 +10,35 @@ def CHP_feasible_area(yA):
     yD = round(yA*(81/247));
 
     return xA, xB, yB, xC, yC, xD, yD
-
+nodes = [1, 2, 3, 4]
 # Create a ConcreteModel object
 model = ConcreteModel()
 Plants = ['Plant1', 'Plant2', 'Plant3']
 # Sets
-model.N = Set(initialize=[1, 2, 3, 4])
+model.N = Set(initialize=nodes)
 model.T = Set(initialize=[1, 2, 3])
 model.PowerLines = Set(initialize=[1, 2])
 model.Plants = Set(initialize=Plants)
+
+hours=500
+node1_demands = [10]*hours
+node2_demands = [20]*hours
+node3_demands = [5]*hours
+node4_demands = [30]*hours
+
+Plants = ['Plant1', 'Plant2', 'Plant3']
+
+
+def demands():
+    demands_dict = {}
+    #nodes
+    for i in range(1, len(nodes)+1):
+        #time periods
+        for t in range(0, len(node1_demands)+1):
+            # add demand to dictionary with node and time period as keys
+            demands_dict[(i, t)] = eval(f"node{i}_demands[t-1]")
+    return demands_dict
+    
 # Parameters
 model.P_gen = Param(model.N, model.Plants, initialize={
     (1, 'Plant1'):50,(1, 'Plant2'):50,(1, 'Plant3'):50,
