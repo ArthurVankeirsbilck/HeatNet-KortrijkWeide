@@ -150,7 +150,7 @@ def CHP_1(model, t, i, p):
 model.CHP_1_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_1)
 
 def CHP_2(model, t, i, p):
-    return model.P_el[p,i,t] - CHP_feasible_area(model.P_gen[i,p])[2] - ((CHP_feasible_area(model.P_gen[i,p])[2]-CHP_feasible_area(model.P_gen[i,p])[4])/(CHP_feasible_area(model.P_gen[i,p])[1]-CHP_feasible_area(model.P_gen[i,p])[3])) * (model.P[p,i,t] - CHP_feasible_area(model.p_max_plant[i,p])[1]) >= M*(model.kappa[i,p,t] - 1)
+    return model.P_el[p,i,t] - CHP_feasible_area(model.P_gen[i,p])[2] - ((CHP_feasible_area(model.P_gen[i,p])[2]-CHP_feasible_area(model.P_gen[i,p])[4])/(CHP_feasible_area(model.P_gen[i,p])[1]-CHP_feasible_area(model.P_gen[i,p])[3])) * (model.P[p,i,t] - CHP_feasible_area(model.P_gen[i,p])[1]) >= M*(model.kappa[i,p,t] - 1)
 model.CHP_2_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_2)
 
 def CHP_3(model, t, i, p):
