@@ -188,6 +188,14 @@ def CHP_7(model, t, i, p):
     return model.P[p,i,t] <= CHP_feasible_area(model.P_gen[i,p])[1]*model.kappa[i,p,t]
 model.CHP_7_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_7)
 
+def HOB_1(model, t, i, p):
+    return model.P_el[p,i,t]  ==  0
+model.HOB_1_constraint = Constraint(model.T,model.HOB_Plants, rule=HOB_1)
+
+def HOB_2(model, t, i, p):
+    return model.p[p,i,t] <= model.P_gen[i,p]*model.kappa[i,p,t]
+model.HOB_2_constraint = Constraint(model.T, model.HOB_Plants, rule=HOB_2)
+
 solver = SolverFactory("octeract");
 results = solver.solve(model,tee=True)
 
