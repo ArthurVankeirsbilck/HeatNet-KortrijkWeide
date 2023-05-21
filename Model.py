@@ -89,7 +89,7 @@ model.demand_constraint = Constraint(model.N, model.T, rule=demand_constraint_ru
 
 # Constraints
 def generation_constraint_rule(model, i, t):
-    return model.P[i, t] <= model.P_gen[i, t]
+    return model.P[i, t] <= model.P_gen[i]
 model.generation_constraint = Constraint(model.N, model.T, rule=generation_constraint_rule)
 
 def import_constraint_rule(model, i, t):
