@@ -166,11 +166,11 @@ def CHP_5(model, t, i, p):
 model.CHP_5_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_5)
 
 def CHP_6(model, t, i, p):
-    return 0 <= model.p[p,i,t]
+    return 0 <= model.P[p,i,t]
 model.CHP_6_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_6)
 
 def CHP_7(model, t, i, p):
-    return model.p[p,i,t] <= CHP_feasible_area(model.P_gen[i,p])[1]*model.kappa[i,p,t]
+    return model.P[p,i,t] <= CHP_feasible_area(model.P_gen[i,p])[1]*model.kappa[i,p,t]
 model.CHP_7_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_7)
 
 solver = SolverFactory("octeract");
