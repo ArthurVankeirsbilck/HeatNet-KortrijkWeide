@@ -42,7 +42,7 @@ def demands():
     #nodes
     for i in range(1, len(Nodes)+1):
         #time periods
-        for t in range(0, len(node1_demands)+1):
+        for t in range(1, len(node1_demands)+1):
             # add demand to dictionary with node and time period as keys
             demands_dict[(i, t)] = eval(f"node{i}_demands[t-1]")
     return demands_dict 
