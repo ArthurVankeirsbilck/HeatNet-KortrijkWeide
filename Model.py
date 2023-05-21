@@ -193,7 +193,7 @@ def HOB_1(model, t, i, p):
 model.HOB_1_constraint = Constraint(model.T,model.HOB_Plants, rule=HOB_1)
 
 def HOB_2(model, t, i, p):
-    return model.p[p,i,t] <= model.P_gen[i,p]*model.kappa[i,p,t]
+    return model.P[p,i,t] <= model.P_gen[i,p]*model.kappa[i,p,t]
 model.HOB_2_constraint = Constraint(model.T, model.HOB_Plants, rule=HOB_2)
 
 solver = SolverFactory("octeract");
