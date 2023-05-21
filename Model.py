@@ -80,16 +80,16 @@ model.C_gen = Param(model.N, initialize={
     4:5
 })
 model.C_import = Param(model.N, model.T, initialize={
-    (1, 1): 8, (1, 2): 9, (1, 3): 10,
-    (2, 1): 9, (2, 2): 10, (2, 3): 11,
-    (3, 1): 7, (3, 2): 8, (3, 3): 9,
-    (4, 1): 7, (4, 2): 8, (4, 3): 9
+    1:5,
+    2:5,
+    3:5,
+    4:5
 })
 model.C_export = Param(model.N, model.T, initialize={
-    (1, 1): 3, (1, 2): 4, (1, 3): 5,
-    (2, 1): 2, (2, 2): 3, (2, 3): 4,
-    (3, 1): 4, (3, 2): 5, (3, 3): 6,
-    (4, 1): 4, (4, 2): 5, (4, 3): 6
+    1:5,
+    2:5,
+    3:5,
+    4:5
 })
 model.P_transmission = Param(initialize=100)
 
