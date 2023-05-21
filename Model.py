@@ -97,7 +97,7 @@ def import_constraint_rule(model, i, t):
 model.import_constraint = Constraint(model.N, model.T, rule=import_constraint_rule)
 
 def export_constraint_rule(model, i, t):
-    return model.E[i, t] <= model.P_export[i, t]* model.X[i, t]
+    return model.E[i, t] <= model.P_export[i]* model.X[i, t]
 model.export_constraint = Constraint(model.N, model.T, rule=export_constraint_rule)
 
 def transmission_constraint_rule(model, t):
