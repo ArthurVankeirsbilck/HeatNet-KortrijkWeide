@@ -86,7 +86,8 @@ model.T_return = Var(model.PowerLines, model.T, bounds=(30, 120),within=NonNegat
 model.X = Var(model.N, model.T, within=Binary)
 model.Z = Var(model.N, model.N, within=Binary)
 model.kappa= Var(model.N, model.Plants,model.T, within=Binary)
-
+model.P_el = Var(model.Plants, model.N, model.T, bounds=(0, None))
+M=10000
 # Objective Function
 def objective_rule(model):
     return sum(model.C_gen[i, t] * model.P[i, t] + model.C_import[i, t] * model.I[i, t] - model.C_export[i, t] * model.E[i, t]
@@ -134,24 +135,23 @@ def energy_balance_constraint_rule(model, pipe, t):
 model.energy_balance_constraint = Constraint(model.PowerLines, model.T, rule=energy_balance_constraint_rule)
 
 def CHP_1(model, t, i, p):
-    return model.P_el[p,i,t] - model.p_max_plant[i,p] - ((model.p_max_plant[i,p]-CHP_feasible_area(model.p_max_plant[i,p])[2])/(CHP_feasible_area(model.p_max_plant[i,p])[0]-CHP_feasible_area(model.p_max_plant[i,p])[1])) * (model.p[p,i,t] - CHP_feasible_area(model.p_max_plant[i,p])[0]) <= 0
+    return model.P_el[p,i,t] - model.P_gen[i,p] - ((model.P_gen[i,p]-CHP_feasible_area(model.P_gen[i,p])[2])/(CHP_feasible_area(model.P_gen[i,p])[0]-CHP_feasible_area(model.P_gen[i,p])[1])) * (model.p[p,i,t] - CHP_feasible_area(model.P_gen[i,p])[0]) <= 0
 model.CHP_1_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_1)
 
-
 def CHP_2(model, t, i, p):
-    return model.P_el[p,i,t] - CHP_feasible_area(model.p_max_plant[i,p])[2] - ((CHP_feasible_area(model.p_max_plant[i,p])[2]-CHP_feasible_area(model.p_max_plant[i,p])[4])/(CHP_feasible_area(model.p_max_plant[i,p])[1]-CHP_feasible_area(model.p_max_plant[i,p])[3])) * (model.p[p,i,t] - CHP_feasible_area(model.p_max_plant[i,p])[1]) >= M*(model.kappa[i,p,t] - 1)
+    return model.P_el[p,i,t] - CHP_feasible_area(model.P_gen[i,p])[2] - ((CHP_feasible_area(model.P_gen[i,p])[2]-CHP_feasible_area(model.P_gen[i,p])[4])/(CHP_feasible_area(model.P_gen[i,p])[1]-CHP_feasible_area(model.P_gen[i,p])[3])) * (model.p[p,i,t] - CHP_feasible_area(model.p_max_plant[i,p])[1]) >= M*(model.kappa[i,p,t] - 1)
 model.CHP_2_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_2)
 
 def CHP_3(model, t, i, p):
-    return model.P_el[p,i,t] - CHP_feasible_area(model.p_max_plant[i,p])[4] - ((CHP_feasible_area(model.p_max_plant[i,p])[4]-CHP_feasible_area(model.p_max_plant[i,p])[6])/(CHP_feasible_area(model.p_max_plant[i,p])[3]-CHP_feasible_area(model.p_max_plant[i,p])[5])) * (model.p[p,i,t] - CHP_feasible_area(model.p_max_plant[i,p])[3]) >= M*(model.kappa[i,p,t] - 1)
+    return model.P_el[p,i,t] - CHP_feasible_area(model.P_gen[i,p])[4] - ((CHP_feasible_area(model.P_gen[i,p])[4]-CHP_feasible_area(model.P_gen[i,p])[6])/(CHP_feasible_area(model.P_gen[i,p])[3]-CHP_feasible_area(model.P_gen[i,p])[5])) * (model.p[p,i,t] - CHP_feasible_area(model.P_gen[i,p])[3]) >= M*(model.kappa[i,p,t] - 1)
 model.CHP_3_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_3)
 
 def CHP_4(model, t, i, p):
-    return CHP_feasible_area(model.p_max_plant[i,p])[6]*model.kappa[i,p,t] <= model.P_el[p,i,t]
+    return CHP_feasible_area(model.P_gen[i,p])[6]*model.kappa[i,p,t] <= model.P_el[p,i,t]
 model.CHP_4_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_4)
 
 def CHP_5(model, t, i, p):
-    return model.P_el[p,i,t] <= model.p_max_plant[i,p]*model.kappa[i,p,t]
+    return model.P_el[p,i,t] <= model.P_gen[i,p]*model.kappa[i,p,t]
 model.CHP_5_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_5)
 
 def CHP_6(model, t, i, p):
@@ -159,7 +159,7 @@ def CHP_6(model, t, i, p):
 model.CHP_6_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_6)
 
 def CHP_7(model, t, i, p):
-    return model.p[p,i,t] <= CHP_feasible_area(model.p_max_plant[i,p])[1]*model.kappa[i,p,t]
+    return model.p[p,i,t] <= CHP_feasible_area(model.P_gen[i,p])[1]*model.kappa[i,p,t]
 model.CHP_7_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_7)
 
 solver = SolverFactory("octeract");
