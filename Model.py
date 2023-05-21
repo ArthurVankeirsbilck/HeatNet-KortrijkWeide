@@ -93,11 +93,11 @@ def generation_constraint_rule(model, i, t):
 model.generation_constraint = Constraint(model.N, model.T, rule=generation_constraint_rule)
 
 def import_constraint_rule(model, i, t):
-    return model.I[i, t] <= model.P_import[i] * model.X[i, t]
+    return model.I[i, t] <= model.P_import[i, t] * model.X[i, t]
 model.import_constraint = Constraint(model.N, model.T, rule=import_constraint_rule)
 
 def export_constraint_rule(model, i, t):
-    return model.E[i, t] <= model.P_export[i]* model.X[i, t]
+    return model.E[i, t] <= model.P_export[i, t]* model.X[i, t]
 model.export_constraint = Constraint(model.N, model.T, rule=export_constraint_rule)
 
 def transmission_constraint_rule(model, t):
@@ -117,21 +117,8 @@ def consistency_constraint_rule(model, i, t):
     return model.X[i, t] == sum(model.Z[i, j] for j in model.N if i != j)
 model.consistency_constraint = Constraint(model.N, model.T, rule=consistency_constraint_rule)
 
-# def energy_balance_constraint_rule(model, pipe, t):
-#     return sum(model.P[i, t] * model.X[i, t] for i in model.N) == model.M_flow[pipe, t] * 4.1 * (model.T_mixed[pipe, t] - model.T_return[pipe, t])
-
 def energy_balance_constraint_rule(model, pipe, t):
-    return sum(model.P[i, t] * model.X[i, t] for i in model.N) + model.Q_loss[pipe, t] == model.M_flow[pipe, t] * 4.1 * (model.T_mixed[pipe, t] - model.T_return[pipe, t])
-model.energy_balance_constraint = Constraint(model.PowerLines, model.T, rule=energy_balance_constraint_rule)
-
-
-# model.energy_balance_constraint = Constraint(model.PowerLines, model.T, rule=energy_balance_constraint_rule)
-
-def mixing_constraint_rule(model, i, t, pipe):
-    return model.T_mixed[pipe, t] == (sum(model.M_flow[pipe, t] * 4.1 * model.T_supply[pipe, t]* model.X[i, t] for pipe in model.PowerLines) +
-                                  model.M_flow[model.Line[i], t] * 4.1 * model.T_incoming[i, t])/(sum(model.M_flow[pipe, t] *4.1* model.X[i, t] for pipe in model.PowerLines) + model.M_flow[model.Line[i], t] * 4.1)
-
-model.mixing_constraint = Constraint(model.N, model.T, model.PowerLines, rule=mixing_constraint_rule)
+    return sum(model.P[i, t] * model.X[i, t] for i in model.N) == model.M_flow[pipe, t] * 4.1 * (model.T_mixed[pipe, t] - model.T_return[pipe, t])
 
 def heat_loss_constraint_rule(model, pipe, t):
     return model.Q_loss[pipe, t] == 0.05 * (model.T_supply[pipe, t] - 15)
