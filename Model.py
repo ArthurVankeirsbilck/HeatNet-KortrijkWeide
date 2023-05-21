@@ -210,13 +210,15 @@ def ramping_1(model, i,p,t):
     else:
         return model.ramp_rate[i,p]*model.P_gen[i,p] >= model.P[p,i,t] - model.P[p,i,t-1]
 
-model.ramping_1 = Constraint(model.I, model.Plants, model.T, rule=ramping_1)
+model.ramping_1 = Constraint(model.N, model.Plants, model.T, rule=ramping_1)
 
 def ramping_2(model, i,p,t):
     if t == 0: 
         return Constraint.Skip 
     else:
         return model.ramp_rate[i,p]*model.P_gen[i,p] >= model.P[p,i,t-1] - model.P[p,i,t]
+
+model.ramping_2 = Constraint(model.N, model.Plants, model.T, rule=ramping_2)
 
 solver = SolverFactory("octeract");
 results = solver.solve(model,tee=True)
