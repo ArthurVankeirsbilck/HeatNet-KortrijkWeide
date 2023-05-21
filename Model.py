@@ -102,17 +102,17 @@ M=10000
 
 # Objective Function
 def objective_rule(model):
-    return sum(model.C_gen[i, t] * model.P[i, t] + model.C_import[i, t] * model.I[i, t] - model.C_export[i, t] * model.E[i, t]
-               for i in model.N for t in model.T)
+    return sum(model.C_gen[i, t] * model.P[p, i, t] + model.C_import[i, t] * model.I[i, t] - model.C_export[i, t] * model.E[i, t]
+               for i in model.N for t in model.T for p in model.Plants)
 model.objective = Objective(rule=objective_rule, sense=minimize)
 
 # Constraints
 def demand_constraint_rule(model, i, t):
-    return model.P[i, t] + model.I[i, t] >= model.Demand[i, t]
+    return model.P[p, i, t] + model.I[i, t] >= model.Demand[i, t]
 model.demand_constraint = Constraint(model.N, model.T, rule=demand_constraint_rule)
 
 def generation_constraint_rule(model, i, t, p):
-    return model.P[i, t] <= model.P_gen[i,p]
+    return model.P[p, i, t] <= model.P_gen[i,p]
 model.generation_constraint = Constraint(model.N, model.T, model.Plants, rule=generation_constraint_rule)
 
 def import_constraint_rule(model, i, t):
