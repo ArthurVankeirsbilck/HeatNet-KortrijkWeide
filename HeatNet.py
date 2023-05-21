@@ -137,6 +137,7 @@ model.ramp_rate = Param(model.I, model.Plants, initialize={
 CHP_plants ={
     (1, 'Plant1'),(4, 'Plant1')  
 }
+
 HOB_plants ={
     (1, 'Plant2'), (1, 'Plant3'),
     (2, 'Plant1'), (2, 'Plant2'), (2, 'Plant3'),
