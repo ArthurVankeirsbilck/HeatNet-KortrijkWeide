@@ -102,12 +102,7 @@ model.Line = Param(model.N, within=model.PowerLines, initialize={
 M = 1000
 
 # Parameters
-model.Demand = Param(model.N, model.T, initialize={     
-    (1, 1): 20, (1, 2): 30, (1, 3): 40,
-    (2, 1): 25, (2, 2): 35, (2, 3): 45,
-    (3, 1): 30, (3, 2): 40, (3, 3): 50,
-    (4, 1): 30, (4, 2): 40, (4, 3): 50
-})
+model.Demand = Param(model.N, model.T, initialize=demands())
 
 # Decision Variables
 model.P = Var(model.Plants,model.N, model.T, within=NonNegativeReals)
