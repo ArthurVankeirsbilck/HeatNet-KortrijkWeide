@@ -2,19 +2,32 @@ from pyomo.environ import *
 
 # Create a ConcreteModel object
 model = ConcreteModel()
-
+Plants = ['Plant1', 'Plant2', 'Plant3']
 # Sets
 model.N = Set(initialize=[1, 2, 3, 4])
 model.T = Set(initialize=[1, 2, 3])
 model.PowerLines = Set(initialize=[1, 2])
-
+model.Plants = Set(initialize=Plants)
 # Parameters
-model.P_gen = Param(model.N, initialize={
-    1:50,
-    2:50,
-    3:50,
-    4:50
+model.P_gen = Param(model.N, model.Plants, initialize={
+    (1, 'Plant1'):50,(1, 'Plant2'):50,(1, 'Plant3'):50,
+    (2, 'Plant1'):50,(2, 'Plant2'):50,(2, 'Plant3'):50,
+    (3, 'Plant1'):50,(3, 'Plant2'):50,(3, 'Plant3'):50,
+    (4, 'Plant1'):50,(4, 'Plant2'):50,(4, 'Plant3'):50,
 })
+CHP_plants ={
+    (1, 'Plant1'),(4, 'Plant1')  
+}
+HOB_plants ={
+    (1, 'Plant2'),(1, 'Plant3'),
+    (2, 'Plant1'),(2, 'Plant2'),(2, 'Plant3'),
+    (3, 'Plant1'),(3, 'Plant2'),(3, 'Plant3'),
+    (4, 'Plant2'),(4, 'Plant3'),
+}
+
+model.CHP_Plants = Set(within=model.N * model.Plants, initialize=CHP_plants)
+model.HOB_Plants = Set(within=model.N * model.Plants, initialize=HOB_plants)
+
 model.P_import = Param(model.N, initialize={
     1:50,
     2:50,
@@ -72,6 +85,7 @@ model.T_supply = Var(model.PowerLines, model.T, bounds=(60, 120),within=NonNegat
 model.T_return = Var(model.PowerLines, model.T, bounds=(30, 120),within=NonNegativeReals)
 model.X = Var(model.N, model.T, within=Binary)
 model.Z = Var(model.N, model.N, within=Binary)
+model.kappa= Var(model.N, model.Plants,model.T, within=Binary)
 
 # Objective Function
 def objective_rule(model):
@@ -118,6 +132,35 @@ def energy_balance_constraint_rule(model, pipe, t):
     return sum(model.P[i, t] * model.X[i, t] for i in model.N) == model.M_flow[pipe, t] * (0.0007*model.T_supply[pipe, t]+4.1484) * (model.T_supply[pipe, t] - model.T_return[pipe, t])
 
 model.energy_balance_constraint = Constraint(model.PowerLines, model.T, rule=energy_balance_constraint_rule)
+
+def CHP_1(model, t, i, p):
+    return model.P_el[p,i,t] - model.p_max_plant[i,p] - ((model.p_max_plant[i,p]-CHP_feasible_area(model.p_max_plant[i,p])[2])/(CHP_feasible_area(model.p_max_plant[i,p])[0]-CHP_feasible_area(model.p_max_plant[i,p])[1])) * (model.p[p,i,t] - CHP_feasible_area(model.p_max_plant[i,p])[0]) <= 0
+model.CHP_1_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_1)
+
+
+def CHP_2(model, t, i, p):
+    return model.P_el[p,i,t] - CHP_feasible_area(model.p_max_plant[i,p])[2] - ((CHP_feasible_area(model.p_max_plant[i,p])[2]-CHP_feasible_area(model.p_max_plant[i,p])[4])/(CHP_feasible_area(model.p_max_plant[i,p])[1]-CHP_feasible_area(model.p_max_plant[i,p])[3])) * (model.p[p,i,t] - CHP_feasible_area(model.p_max_plant[i,p])[1]) >= M*(model.kappa[i,p,t] - 1)
+model.CHP_2_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_2)
+
+def CHP_3(model, t, i, p):
+    return model.P_el[p,i,t] - CHP_feasible_area(model.p_max_plant[i,p])[4] - ((CHP_feasible_area(model.p_max_plant[i,p])[4]-CHP_feasible_area(model.p_max_plant[i,p])[6])/(CHP_feasible_area(model.p_max_plant[i,p])[3]-CHP_feasible_area(model.p_max_plant[i,p])[5])) * (model.p[p,i,t] - CHP_feasible_area(model.p_max_plant[i,p])[3]) >= M*(model.kappa[i,p,t] - 1)
+model.CHP_3_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_3)
+
+def CHP_4(model, t, i, p):
+    return CHP_feasible_area(model.p_max_plant[i,p])[6]*model.kappa[i,p,t] <= model.P_el[p,i,t]
+model.CHP_4_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_4)
+
+def CHP_5(model, t, i, p):
+    return model.P_el[p,i,t] <= model.p_max_plant[i,p]*model.kappa[i,p,t]
+model.CHP_5_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_5)
+
+def CHP_6(model, t, i, p):
+    return 0 <= model.p[p,i,t]
+model.CHP_6_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_6)
+
+def CHP_7(model, t, i, p):
+    return model.p[p,i,t] <= CHP_feasible_area(model.p_max_plant[i,p])[1]*model.kappa[i,p,t]
+model.CHP_7_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_7)
 
 solver = SolverFactory("octeract");
 results = solver.solve(model,tee=True)
