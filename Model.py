@@ -1,13 +1,5 @@
 from pyomo.environ import *
-hours=500
-node1_demands = [10]*hours
-node2_demands = [20]*hours
-node3_demands = [5]*hours
-node4_demands = [30]*hours
-T = len(node1_demands)+1
-times = list(range(T))
 
-Plants = ['Plant1', 'Plant2', 'Plant3']
 def CHP_feasible_area(yA):
     xA = 0
     xB = round(yA*(180/247))
@@ -18,29 +10,15 @@ def CHP_feasible_area(yA):
     yD = round(yA*(81/247));
 
     return xA, xB, yB, xC, yC, xD, yD
-nodes = [1, 2, 3, 4]
+
 # Create a ConcreteModel object
 model = ConcreteModel()
 Plants = ['Plant1', 'Plant2', 'Plant3']
 # Sets
-model.N = Set(initialize=nodes)
-model.T = Set(initialize=times)
+model.N = Set(initialize=[1, 2, 3, 4])
+model.T = Set(initialize=[1, 2, 3])
 model.PowerLines = Set(initialize=[1, 2])
 model.Plants = Set(initialize=Plants)
-
-
-
-
-def demands():
-    demands_dict = {}
-    #nodes
-    for i in range(1, len(nodes)+1):
-        #time periods
-        for t in range(0, len(node1_demands)+1):
-            # add demand to dictionary with node and time period as keys
-            demands_dict[(i, t)] = eval(f"node{i}_demands[t-1]")
-    return demands_dict
-    
 # Parameters
 model.P_gen = Param(model.N, model.Plants, initialize={
     (1, 'Plant1'):50,(1, 'Plant2'):50,(1, 'Plant3'):50,
@@ -73,23 +51,23 @@ model.P_export = Param(model.N, initialize={
     3:50,
     4:50
 })
-model.C_gen = Param(model.N, initialize={
-    1:5,
-    2:5,
-    3:5,
-    4:5
+model.C_gen = Param(model.N, model.T, initialize={
+    (1, 1): 5, (1, 2): 6, (1, 3): 7,
+    (2, 1): 4, (2, 2): 5, (2, 3): 6,
+    (3, 1): 6, (3, 2): 7, (3, 3): 8,
+    (4, 1): 6, (4, 2): 7, (4, 3): 8
 })
-model.C_import = Param(model.N, initialize={
-    1:5,
-    2:5,
-    3:5,
-    4:5
+model.C_import = Param(model.N, model.T, initialize={
+    (1, 1): 8, (1, 2): 9, (1, 3): 10,
+    (2, 1): 9, (2, 2): 10, (2, 3): 11,
+    (3, 1): 7, (3, 2): 8, (3, 3): 9,
+    (4, 1): 7, (4, 2): 8, (4, 3): 9
 })
-model.C_export = Param(model.N, initialize={
-    1:5,
-    2:5,
-    3:5,
-    4:5
+model.C_export = Param(model.N, model.T, initialize={
+    (1, 1): 3, (1, 2): 4, (1, 3): 5,
+    (2, 1): 2, (2, 2): 3, (2, 3): 4,
+    (3, 1): 4, (3, 2): 5, (3, 3): 6,
+    (4, 1): 4, (4, 2): 5, (4, 3): 6
 })
 model.P_transmission = Param(initialize=100)
 
@@ -102,7 +80,12 @@ model.Line = Param(model.N, within=model.PowerLines, initialize={
 M = 1000
 
 # Parameters
-model.Demand = Param(model.N, model.T, initialize=demands())
+model.Demand = Param(model.N, model.T, initialize={     
+    (1, 1): 20, (1, 2): 30, (1, 3): 40,
+    (2, 1): 25, (2, 2): 35, (2, 3): 45,
+    (3, 1): 30, (3, 2): 40, (3, 3): 50,
+    (4, 1): 30, (4, 2): 40, (4, 3): 50
+})
 
 # Decision Variables
 model.P = Var(model.Plants,model.N, model.T, within=NonNegativeReals)
@@ -119,7 +102,7 @@ M=10000
 
 # Objective Function
 def objective_rule(model):
-    return sum(model.C_gen[i] * model.P[p, i, t] + model.C_import[i] * model.I[i, t] - model.C_export[i] * model.E[i, t] - 0.4*model.P_el[p,i,t]
+    return sum(model.C_gen[i, t] * model.P[p, i, t] + model.C_import[i, t] * model.I[i, t] - model.C_export[i, t] * model.E[i, t]
                for i in model.N for t in model.T for p in model.Plants)
 model.objective = Objective(rule=objective_rule, sense=minimize)
 
@@ -127,6 +110,10 @@ model.objective = Objective(rule=objective_rule, sense=minimize)
 def demand_constraint_rule(model, i, t, p):
     return model.P[p, i, t] + model.I[i, t] >= model.Demand[i, t]
 model.demand_constraint = Constraint(model.N, model.T, model.Plants, rule=demand_constraint_rule)
+
+# def generation_constraint_rule(model, i, t, p):
+#     return model.P[p, i, t] <= model.P_gen[i,p]
+# model.generation_constraint = Constraint(model.N, model.T, model.Plants, rule=generation_constraint_rule)
 
 def import_constraint_rule(model, i, t):
     return model.I[i, t] <= model.P_import[i] * model.X[i, t]
@@ -185,14 +172,6 @@ model.CHP_6_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_6)
 def CHP_7(model, t, i, p):
     return model.P[p,i,t] <= CHP_feasible_area(model.P_gen[i,p])[1]*model.kappa[i,p,t]
 model.CHP_7_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_7)
-
-def HOB_1(model, t, i, p):
-    return model.P_el[p,i,t]  ==  0
-model.HOB_1_constraint = Constraint(model.T,model.HOB_Plants, rule=HOB_1)
-
-def HOB_2(model, t, i, p):
-    return model.P[p,i,t] <= model.P_gen[i,p]*model.kappa[i,p,t]
-model.HOB_2_constraint = Constraint(model.T, model.HOB_Plants, rule=HOB_2)
 
 solver = SolverFactory("octeract");
 results = solver.solve(model,tee=True)
