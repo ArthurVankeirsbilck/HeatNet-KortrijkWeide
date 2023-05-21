@@ -1,5 +1,16 @@
 from pyomo.environ import *
 
+def CHP_feasible_area(yA):
+    xA = 0
+    xB = round(yA*(180/247))
+    yB = round(yA*(215/247))
+    xC = round(yA*(104.8/247))
+    yC = round(yA*(81/247))
+    xD = 0
+    yD = round(yA*(81/247));
+
+    return xA, xB, yB, xC, yC, xD, yD
+    
 # Create a ConcreteModel object
 model = ConcreteModel()
 Plants = ['Plant1', 'Plant2', 'Plant3']
