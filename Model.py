@@ -79,13 +79,13 @@ model.C_gen = Param(model.N, initialize={
     3:5,
     4:5
 })
-model.C_import = Param(model.N, model.T, initialize={
+model.C_import = Param(model.N, initialize={
     1:5,
     2:5,
     3:5,
     4:5
 })
-model.C_export = Param(model.N, model.T, initialize={
+model.C_export = Param(model.N, initialize={
     1:5,
     2:5,
     3:5,
