@@ -22,10 +22,10 @@ model.P_import = Param(model.N, initialize={
     4:50
 })
 model.P_export = Param(model.N, initialize={
-    (1, 1): 20, (1, 2): 30, (1, 3): 40,
-    (2, 1): 10, (2, 2): 20, (2, 3): 30,
-    (3, 1): 30, (3, 2): 40, (3, 3): 50,
-    (4, 1): 30, (4, 2): 40, (4, 3): 50
+    1:50,
+    2:50,
+    3:50,
+    4:50
 })
 model.C_gen = Param(model.N, model.T, initialize={
     (1, 1): 5, (1, 2): 6, (1, 3): 7,
