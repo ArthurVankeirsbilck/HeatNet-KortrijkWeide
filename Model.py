@@ -1,5 +1,4 @@
 from pyomo.environ import *
-import random
 
 def CHP_feasible_area(yA):
     xA = 0
@@ -24,14 +23,14 @@ def demand(node, demandlist):
         d[pair] = value
     
     return d
-
+    
 # Create a ConcreteModel object
 model = ConcreteModel()
+Plants = ['Plant1', 'Plant2', 'Plant3']
 
-T=500
 # Sets
 model.N = Set(initialize=[1, 2, 3, 4])
-model.T = Set(initialize=list(range(T)))
+model.T = Set(initialize=[1, 2, 3])
 model.PowerLines = Set(initialize=[1, 2])
 model.Plants = Set(initialize=Plants)
 
