@@ -1,16 +1,4 @@
 from pyomo.environ import *
-import csv
-import pandas as pd
-
-spot = pd.read_csv("Data/Costs/spot.csv")
-spot = spot[::-1]
-spot = spot.reset_index(drop=True)
-spot["Euro"]=spot["Euro"].str.replace(',','.')
-spot["Euro"] = pd.to_numeric(spot["Euro"])
-spot["Euro"] = spot["Euro"]/1000
-
-df = pd.read_csv("Consumptions.csv")
-df.apply(pd.to_numeric)
 
 def CHP_feasible_area(yA):
     xA = 0
@@ -21,32 +9,15 @@ def CHP_feasible_area(yA):
     xD = 0
     yD = round(yA*(81/247));
 
-    return xA, xB, yB, xC, yC, xD, yD 
-Nodes = [1, 2, 3, 4]
+    return xA, xB, yB, xC, yC, xD, yD
+
 # Create a ConcreteModel object
 model = ConcreteModel()
 Plants = ['Plant1', 'Plant2', 'Plant3']
 # Sets
-model.N = Set(initialize=Nodes)
+model.N = Set(initialize=[1, 2, 3, 4])
 model.T = Set(initialize=[1, 2, 3])
 model.PowerLines = Set(initialize=[1, 2])
-
-hours=500
-node1_demands = [10]*hours
-node2_demands = [10]*hours
-node3_demands = [10]*hours
-node4_demands = [10]*hours
-
-def demands():
-    demands_dict = {}
-    #nodes
-    for i in range(1, len(Nodes)+1):
-        #time periods
-        for t in range(1, len(node1_demands)+1):
-            # add demand to dictionary with node and time period as keys
-            demands_dict[(i, t)] = eval(f"node{i}_demands[t-1]")
-    return demands_dict 
-
 model.Plants = Set(initialize=Plants)
 # Parameters
 model.P_gen = Param(model.N, model.Plants, initialize={
@@ -109,7 +80,12 @@ model.Line = Param(model.N, within=model.PowerLines, initialize={
 M = 1000
 
 # Parameters
-model.Demand = Param(model.N, model.T, initialize=demands())
+model.Demand = Param(model.N, model.T, initialize={     
+    (1, 1): 20, (1, 2): 30, (1, 3): 40,
+    (2, 1): 25, (2, 2): 35, (2, 3): 45,
+    (3, 1): 30, (3, 2): 40, (3, 3): 50,
+    (4, 1): 30, (4, 2): 40, (4, 3): 50
+})
 
 # Decision Variables
 model.P = Var(model.Plants,model.N, model.T, within=NonNegativeReals)
