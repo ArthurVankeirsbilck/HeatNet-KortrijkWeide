@@ -99,9 +99,9 @@ def demand_constraint_rule(model, i, t):
 model.demand_constraint = Constraint(model.N, model.T, rule=demand_constraint_rule)
 
 # Constraints
-def generation_constraint_rule(model, i, t):
-    return model.P[i, t] <= model.P_gen[i]
-model.generation_constraint = Constraint(model.N, model.T, rule=generation_constraint_rule)
+def generation_constraint_rule(model, i, t, p):
+    return model.P[i, t] <= model.P_gen[i,p]
+model.generation_constraint = Constraint(model.N, model.T, model.Plants, rule=generation_constraint_rule)
 
 def import_constraint_rule(model, i, t):
     return model.I[i, t] <= model.P_import[i] * model.X[i, t]
