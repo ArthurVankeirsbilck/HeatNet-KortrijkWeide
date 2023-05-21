@@ -93,7 +93,7 @@ def generation_constraint_rule(model, i, t):
 model.generation_constraint = Constraint(model.N, model.T, rule=generation_constraint_rule)
 
 def import_constraint_rule(model, i, t):
-    return model.I[i, t] <= model.P_import[i, t] * model.X[i, t]
+    return model.I[i, t] <= model.P_import[i] * model.X[i, t]
 model.import_constraint = Constraint(model.N, model.T, rule=import_constraint_rule)
 
 def export_constraint_rule(model, i, t):
