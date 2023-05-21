@@ -73,11 +73,11 @@ model.P_export = Param(model.N, initialize={
     3:50,
     4:50
 })
-model.C_gen = Param(model.N, model.T, initialize={
-    (1, 1): 5, (1, 2): 6, (1, 3): 7,
-    (2, 1): 4, (2, 2): 5, (2, 3): 6,
-    (3, 1): 6, (3, 2): 7, (3, 3): 8,
-    (4, 1): 6, (4, 2): 7, (4, 3): 8
+model.C_gen = Param(model.N, initialize={
+    1:5,
+    2:5,
+    3:5,
+    4:5
 })
 model.C_import = Param(model.N, model.T, initialize={
     (1, 1): 8, (1, 2): 9, (1, 3): 10,
