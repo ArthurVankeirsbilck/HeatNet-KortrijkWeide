@@ -1,4 +1,5 @@
 from pyomo.environ import *
+import random
 
 def CHP_feasible_area(yA):
     xA = 0
@@ -11,14 +12,29 @@ def CHP_feasible_area(yA):
 
     return xA, xB, yB, xC, yC, xD, yD
 
+def demand(node, demandlist):
+    d = {}
+    for j in range(1, len(demandlist)+1): #times
+        # Create a tuple for each possible combination
+        pair = (node, j)
+        
+        # Determine the value for the combination using conditional statements
+        value = demandlist[j-1]
+            
+        d[pair] = value
+    
+    return d
+
 # Create a ConcreteModel object
 model = ConcreteModel()
-Plants = ['Plant1', 'Plant2', 'Plant3']
+
+T=500
 # Sets
 model.N = Set(initialize=[1, 2, 3, 4])
-model.T = Set(initialize=[1, 2, 3])
+model.T = Set(initialize=list(range(T)))
 model.PowerLines = Set(initialize=[1, 2])
 model.Plants = Set(initialize=Plants)
+
 # Parameters
 model.P_gen = Param(model.N, model.Plants, initialize={
     (1, 'Plant1'):50,(1, 'Plant2'):50,(1, 'Plant3'):50,
