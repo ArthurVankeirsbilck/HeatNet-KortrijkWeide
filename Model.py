@@ -205,7 +205,7 @@ def HOB_2(model, t, i, p):
 model.HOB_2_constraint = Constraint(model.T, model.HOB_Plants, rule=HOB_2)
 
 def ramping_1(model, i,p,t):
-    if t == 0:
+    if t == 1:
         return Constraint.Skip
     else:
         return model.ramp_rate[i,p]*model.P_gen[i,p] >= model.P[p,i,t] - model.P[p,i,t-1]
@@ -213,7 +213,7 @@ def ramping_1(model, i,p,t):
 model.ramping_1 = Constraint(model.N, model.Plants, model.T, rule=ramping_1)
 
 def ramping_2(model, i,p,t):
-    if t == 0: 
+    if t == 1: 
         return Constraint.Skip 
     else:
         return model.ramp_rate[i,p]*model.P_gen[i,p] >= model.P[p,i,t-1] - model.P[p,i,t]
