@@ -136,8 +136,10 @@ def demand_constraint_rule(model, i, t, p):
     return sum(model.P[p, i, t] + model.I[i, t] for p in model.Plants) == model.Demand[i, t]
 model.demand_constraint = Constraint(model.N, model.T, model.Plants, rule=demand_constraint_rule)
 
-# def production_constraint(model, i,t,p):
-#     return sum(model.P[p,i,t]
+def production_constraint(model, i,t,p):
+    return sum(model.P[p,i,t] for p in m.Plants) >= model.E[i, t]
+
+model.production_constraint = Constraint(model.N, model.T, model.Plants, rule=demand_constraint_rule)
 
 def import_constraint_rule(model, i, t):
     return model.I[i, t] <= model.P_import[i] * model.X[i, t]
