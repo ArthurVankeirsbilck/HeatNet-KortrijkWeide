@@ -161,7 +161,7 @@ def consistency_constraint_rule(model, i, t):
 model.consistency_constraint = Constraint(model.N, model.T, rule=consistency_constraint_rule)
 
 def energy_balance_constraint_rule(model, pipe, t):
-    return sum(model.P[p, i, t] * model.X[i, t] for i in model.N for p in model.Plants) == model.M_flow[pipe, t] * (0.0007*model.T_supply[pipe, t]+4.1484) * (model.T_supply[pipe, t] - model.T_return[pipe, t])
+    return sum(model.E[i, t] * model.X[i, t] for i in model.N for p in model.Plants) == model.M_flow[pipe, t] * (0.0007*model.T_supply[pipe, t]+4.1484) * (model.T_supply[pipe, t] - model.T_return[pipe, t])
 
 model.energy_balance_constraint = Constraint(model.PowerLines, model.T, rule=energy_balance_constraint_rule)
 
