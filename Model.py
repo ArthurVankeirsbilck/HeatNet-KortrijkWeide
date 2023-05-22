@@ -121,6 +121,7 @@ model.X = Var(model.N, model.T, within=Binary)
 model.Z = Var(model.N, model.N, within=Binary)
 model.kappa= Var(model.N, model.Plants,model.T, within=Binary)
 model.P_el = Var(model.Plants, model.N, model.T, bounds=(0, None))
+model.Ql = Var(model.N, model.N, model.T, bounds=(0, None))
 M=10000
 
 # Objective Function
