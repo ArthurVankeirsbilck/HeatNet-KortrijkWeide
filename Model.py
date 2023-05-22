@@ -233,4 +233,4 @@ for t in model.T:
 
 for t in model.T:
     for i in model.I:
-        print(tuple(model.Ql[i,i+1,t].value))
+        print(model.Ql[i,i+1,t].value)
