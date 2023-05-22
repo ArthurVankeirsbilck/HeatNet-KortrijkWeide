@@ -218,7 +218,7 @@ def ramping_2(model, i,p,t):
 model.ramping_2 = Constraint(model.N, model.Plants, model.T, rule=ramping_2)
 
 def heatloss_constraint(model, i, t,pipe):
-    if i == 3:
+    if i == 4:
         return Constraint.Skip
     else:
         return model.Ql[i,i+1,t] == ((((2.0*3.14*0.05*50*(model.T_supply[pipe, t]-model.T_return[pipe, t]))/math.log(0.125/0.1022))/1000))
