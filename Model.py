@@ -231,6 +231,5 @@ for t in model.T:
     for pipe in model.PowerLines:
         print(pipe, t, model.M_flow[pipe, t].value,model.T_supply[pipe, t].value, model.T_return[pipe, t].value)
 
-for t in model.T:
-    for i in model.I:
-        print(model.Ql[i,i,t].value)
+
+print(model.Ql[1,2,1].value)
