@@ -220,7 +220,7 @@ def heatloss_constraint(model, i, t,pipe):
         return Constraint.Skip
     else:
         return model.Ql[i,i+1,t] == ((((2.0*3.14*0.05*50*(model.T_supply[pipe, t]-model.T_return[pipe, t]))/math.log(0.125/0.1022))/1000))
-model.heatloss_constraint = Constraint(model.N, model.T, model.Powerlines, rule=heatloss_constraint)
+model.heatloss_constraint = Constraint(model.N, model.T, model.PowerLines, rule=heatloss_constraint)
 
 solver = SolverFactory("octeract");
 results = solver.solve(model,tee=True)
