@@ -134,10 +134,6 @@ def demand_constraint_rule(model, i, t, p):
     return model.P[p, i, t] + model.I[i, t] >= model.Demand[i, t]
 model.demand_constraint = Constraint(model.N, model.T, model.Plants, rule=demand_constraint_rule)
 
-# def generation_constraint_rule(model, i, t, p):
-#     return model.P[p, i, t] <= model.P_gen[i,p]
-# model.generation_constraint = Constraint(model.N, model.T, model.Plants, rule=generation_constraint_rule)
-
 def import_constraint_rule(model, i, t):
     return model.I[i, t] <= model.P_import[i] * model.X[i, t]
 model.import_constraint = Constraint(model.N, model.T, rule=import_constraint_rule)
@@ -150,7 +146,6 @@ def transmission_constraint_rule(model, t):
     return sum(model.P[p, i, t]  - model.E[i, t] + model.I[i, t] for i in model.N for p in model.Plants) <= model.P_transmission
 model.transmission_constraint = Constraint(model.T, rule=transmission_constraint_rule)
 
-# Constraint
 def power_line_connection_constraint_rule(model, i, j):
     if i != j:
         return model.Z[i, j] <= (model.Line[i] == model.Line[j])
@@ -163,8 +158,8 @@ def consistency_constraint_rule(model, i, t):
     return model.X[i, t] == sum(model.Z[i, j] for j in model.N if i != j)
 model.consistency_constraint = Constraint(model.N, model.T, rule=consistency_constraint_rule)
 
-def energy_balance_constraint_rule(model, pipe, t):
-    return sum(model.P[p, i, t] * model.X[i, t] for i in model.N for p in model.Plants) == model.M_flow[pipe, t] * (0.0007*model.T_supply[pipe, t]+4.1484) * (model.T_supply[pipe, t] - model.T_return[pipe, t])
+# def energy_balance_constraint_rule(model, pipe, t):
+#     return sum(model.P[p, i, t] * model.X[i, t] for i in model.N for p in model.Plants) == model.M_flow[pipe, t] * (0.0007*model.T_supply[pipe, t]+4.1484) * (model.T_supply[pipe, t] - model.T_return[pipe, t])
 
 model.energy_balance_constraint = Constraint(model.PowerLines, model.T, rule=energy_balance_constraint_rule)
 
@@ -219,6 +214,18 @@ def ramping_2(model, i,p,t):
         return model.ramp_rate[i,p]*model.P_gen[i,p] >= model.P[p,i,t-1] - model.P[p,i,t]
 
 model.ramping_2 = Constraint(model.N, model.Plants, model.T, rule=ramping_2)
+
+def pressure_drop_calc(pipe,t):
+    Dp = (0.07*50*971*(model.M_flow[pipe, t]/(971*0.012))**2)/(2*0.125)
+
+model.pressure_drop_calc = Constraint(model.PowerLines, model.T, rule=pressure_drop_calc)
+
+def heatloss_constraint(model, i, t,pipe):
+    if i == 3:
+        return Constraint.Skip
+    else:
+        return model.Ql[i,i+1,t] == ((((2.0*3.14*0.05*50*(model.T_supply[pipe, t]-model.T_return[pipe, t]))/math.log(0.125/0.1022))/1000))
+model.heatloss_constraint = Constraint(model.N, model.T, model.Powerlines, rule=heatloss_constraint)
 
 solver = SolverFactory("octeract");
 results = solver.solve(model,tee=True)
