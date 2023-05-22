@@ -233,4 +233,4 @@ for t in model.T:
 
 for t in model.T:
     for i in model.I:
-        "heatloss inbetween:{},{}: {}".format(i,i+1,model.Ql[i,i+1,t])
+        "heatloss inbetween:{},{}: {}".format(i,i+1,model.Ql[i,i+1,t].value)
