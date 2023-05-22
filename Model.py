@@ -236,4 +236,4 @@ for t in model.T:
         if i==4:
             pass
         else:
-            print("heatloss inbetween:{},{}: {}".format(i,i+1,model.Ql[i,i+1,t].value))
+            print("heatloss inbetween:{},{}: {}".format(i,i,model.Ql[i,i+1,t].value))
