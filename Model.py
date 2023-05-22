@@ -234,7 +234,7 @@ for t in model.T:
 for t in model.T:
     for i in model.N:
         for p in model.Plants:
-            print(model.P[p, i, t], model.E[i, t], model.I[i, t])
+            print(model.P[p, i, t].value, model.E[i, t].value, model.I[i, t].value)
 
 print(model.Ql[1,2,1].value)
 print(model.Ql[2,3,1].value)
