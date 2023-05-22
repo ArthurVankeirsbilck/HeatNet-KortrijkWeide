@@ -237,7 +237,7 @@ for t in model.T:
 for i in model.N:
     print(model.E[i, 1].value, model.I[i, 1].value)
     for p in model.Plants:
-        print("plant {}, node {}: {}, {}, {}".format(p,i,model.P[p, i, 1].value))
+        print("plant {}, node {}: {}".format(p,i,model.P[p, i, 1].value))
 
 print(model.Ql[1,2,1].value)
 print(model.Ql[2,3,1].value)
