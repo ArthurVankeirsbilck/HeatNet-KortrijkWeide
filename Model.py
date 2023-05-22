@@ -228,10 +228,6 @@ solver = SolverFactory("octeract");
 results = solver.solve(model,tee=True)
 
 for t in model.T:
-    for i in model.N:
-        if i==4:
-            pass
-        else:
-            for pipe in model.PowerLines:
-                print(pipe, t, model.M_flow[pipe, t].value,model.T_supply[pipe, t].value, model.T_return[pipe, t].value, model.Ql[i,i+1,t].value)
+    for pipe in model.PowerLines:
+        print(pipe, t, model.M_flow[pipe, t].value,model.T_supply[pipe, t].value, model.T_return[pipe, t].value)
             
