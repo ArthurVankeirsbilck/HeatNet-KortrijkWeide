@@ -38,7 +38,7 @@ model.Plants = Set(initialize=Plants)
 # Parameters
 model.P_gen = Param(model.N, model.Plants, initialize={
     (1, 'Plant1'):50,(1, 'Plant2'):50,(1, 'Plant3'):50,
-    (2, 'Plant1'):50,(2, 'Plant2'):50,(2, 'Plant3'):50,
+    (2, 'Plant1'):0,(2, 'Plant2'):0,(2, 'Plant3'):0,
     (3, 'Plant1'):50,(3, 'Plant2'):50,(3, 'Plant3'):50,
     (4, 'Plant1'):50,(4, 'Plant2'):50,(4, 'Plant3'):50,
 })
@@ -133,8 +133,11 @@ model.objective = Objective(rule=objective_rule, sense=minimize)
 
 # Constraints
 def demand_constraint_rule(model, i, t, p):
-    return sum(model.P[p, i, t] + model.I[i, t] - model.E[i, t] for p in model.Plants) >= model.Demand[i, t]
+    return sum(model.P[p, i, t] + model.I[i, t] for p in model.Plants) >= model.Demand[i, t]
 model.demand_constraint = Constraint(model.N, model.T, model.Plants, rule=demand_constraint_rule)
+
+def production_constraint(model, i,t,p):
+    return sum(model.P[p,i,t]
 
 def import_constraint_rule(model, i, t):
     return model.I[i, t] <= model.P_import[i] * model.X[i, t]
