@@ -233,5 +233,5 @@ for t in model.T:
 
 
 print(model.Ql[1,2,1].value)
-print(model.Ql[1,3,1].value)
-print(model.Ql[1,4,1].value)
+print(model.Ql[2,3,1].value)
+print(model.Ql[3,4,1].value)
