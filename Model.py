@@ -11,7 +11,7 @@ def CHP_feasible_area(yA):
     yD = round(yA*(81/247));
 
     return xA, xB, yB, xC, yC, xD, yD
-
+ 
 def demand(node, demandlist):
     d = {}
     for j in range(1, len(demandlist)+1): #times
