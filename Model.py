@@ -11,7 +11,7 @@ def CHP_feasible_area(yA):
     yD = round(yA*(81/247));
 
     return xA, xB, yB, xC, yC, xD, yD
- 
+
 def demand(node, demandlist):
     d = {}
     for j in range(1, len(demandlist)+1): #times
@@ -133,7 +133,7 @@ model.objective = Objective(rule=objective_rule, sense=minimize)
 
 # Constraints
 def demand_constraint_rule(model, i, t, p):
-    return model.P[p, i, t] + model.I[i, t]- sum(model.Ql[j, j+1, t] for j in range(i, 5-1))  >= model.Demand[i, t] 
+    return model.P[p, i, t] + model.I[i, t] >= model.Demand[i, t]
 model.demand_constraint = Constraint(model.N, model.T, model.Plants, rule=demand_constraint_rule)
 
 def import_constraint_rule(model, i, t):
