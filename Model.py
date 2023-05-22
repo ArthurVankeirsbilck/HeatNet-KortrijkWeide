@@ -233,7 +233,4 @@ for t in model.T:
 
 for t in model.T:
     for i in model.I:
-        if i==4:
-            pass
-        else:
-            print(tuple(model.Ql[i,i+1,t].value))
+        print(tuple(model.Ql[i,i+1,t].value))
