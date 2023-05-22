@@ -99,7 +99,8 @@ model.Line = Param(model.N, within=model.PowerLines, initialize={
     1: 1,  # Prosumer 1 is assigned to power line 1
     2: 1,  # Prosumer 2 is also assigned to power line 1
     3: 2,   # Prosumer 3 is assigned to power line 2
-    4:2
+    4:2,
+    1:2
 })
 M = 1000
 
@@ -233,3 +234,5 @@ for t in model.T:
 
 
 print(model.Ql[1,2,1].value)
+print(model.Ql[1,3,1].value)
+print(model.Ql[1,4,1].value)
