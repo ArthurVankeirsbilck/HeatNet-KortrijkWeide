@@ -1,4 +1,5 @@
 from pyomo.environ import *
+import math
 
 def CHP_feasible_area(yA):
     xA = 0
