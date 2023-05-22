@@ -231,10 +231,9 @@ for t in model.T:
     for pipe in model.PowerLines:
         print(pipe, t, model.M_flow[pipe, t].value,model.T_supply[pipe, t].value, model.T_return[pipe, t].value)
 
-for t in model.T:
-    for i in model.N:
-        for p in model.Plants:
-            print(model.P[p, i, t].value, model.E[i, t].value, model.I[i, t].value)
+for i in model.N:
+    for p in model.Plants:
+        print(model.P[p, i, 1].value, model.E[i, 1].value, model.I[i, 1].value)
 
 print(model.Ql[1,2,1].value)
 print(model.Ql[2,3,1].value)
