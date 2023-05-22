@@ -215,11 +215,6 @@ def ramping_2(model, i,p,t):
 
 model.ramping_2 = Constraint(model.N, model.Plants, model.T, rule=ramping_2)
 
-def pressure_drop_calc(pipe,t):
-    Dp = (0.07*50*971*(model.M_flow[pipe, t]/(971*0.012))**2)/(2*0.125)
-
-model.pressure_drop_calc = Constraint(model.PowerLines, model.T, rule=pressure_drop_calc)
-
 def heatloss_constraint(model, i, t,pipe):
     if i == 3:
         return Constraint.Skip
