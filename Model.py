@@ -150,7 +150,7 @@ def export_constraint_rule(model, i, t):
 model.export_constraint = Constraint(model.N, model.T, rule=export_constraint_rule)
 
 def transmission_constraint_rule(model, t):
-    return sum(- model.E[i, t] + model.I[i, t] for i in model.N) <= model.P_transmission
+    return sum(model.E[i, t] for i in model.N) <= model.P_transmission
 model.transmission_constraint = Constraint(model.T, rule=transmission_constraint_rule)
 
 def power_line_connection_constraint_rule(model, i, j):
