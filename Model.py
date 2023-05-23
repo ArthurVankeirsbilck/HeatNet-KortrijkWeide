@@ -99,7 +99,6 @@ model.Line = Param(model.N, within=model.PowerLines, initialize={
     1: 1,  # Prosumer 1 is assigned to power line 1
     2: 1,  # Prosumer 2 is also assigned to power line 1
     3: 2,   # Prosumer 3 is assigned to power line 2
-    4:1,
     4:2})
 M = 1000
 
