@@ -118,7 +118,7 @@ model.E = Var(model.N, model.T, within=NonNegativeReals)
 model.M_flow = Var(model.PowerLines, model.T, bounds=(0, 40),within=NonNegativeReals)
 model.T_supply = Var(model.PowerLines, model.T, bounds=(60, 120),within=NonNegativeReals)
 model.T_return = Var(model.PowerLines, model.T, bounds=(30, 120),within=NonNegativeReals)
-model.X = Var(model.N, model.T, within=Binary)
+model.X = Var(model.N, within=Binary)
 model.Z = Var(model.N, model.N, within=Binary)
 model.kappa= Var(model.N, model.Plants,model.T, within=Binary)
 model.P_el = Var(model.Plants, model.N, model.T, bounds=(0, None))
@@ -133,11 +133,11 @@ model.objective = Objective(rule=objective_rule, sense=minimize)
 
 # Constraints
 def demand_constraint_rule(model, i, t, p):
-    return model.I[i, t] + sum(model.P[p, i, t] for p in model.Plants) == model.Demand[i, t]
+    return model.I[i, t] - model.E[i,t] + sum(model.P[p, i, t] for p in model.Plants) == model.Demand[i, t]
 model.demand_constraint = Constraint(model.N, model.T, model.Plants, rule=demand_constraint_rule)
 
 def import_constraint_rule(model, i, t):
-    return model.I[i, t] <= model.P_import[i] * model.X[i, t]
+    return model.I[i, t] <= model.P_import[i] * model.X[i]
 model.import_constraint = Constraint(model.N, model.T, rule=import_constraint_rule)
 
 def import_export(model, i,t):
@@ -146,7 +146,7 @@ model.import_export = Constraint(model.N, model.T, rule=import_export)
 
 
 def export_constraint_rule(model, i, t):
-    return model.E[i, t] <= model.P_export[i]* model.X[i, t]
+    return model.E[i, t] <= model.P_export[i]* model.X[i]
 model.export_constraint = Constraint(model.N, model.T, rule=export_constraint_rule)
 
 def transmission_constraint_rule(model, t):
@@ -162,11 +162,11 @@ model.power_line_connection_constraint = Constraint(model.N, model.N, rule=power
 
 # Additional constraint to ensure X is consistent with Z
 def consistency_constraint_rule(model, i, t):
-    return model.X[i, t] == sum(model.Z[i, j] for j in model.N if i != j)
+    return model.X[i] == sum(model.Z[i, j] for j in model.N if i != j)
 model.consistency_constraint = Constraint(model.N, model.T, rule=consistency_constraint_rule)
 
 def energy_balance_constraint_rule(model, pipe, t):
-    return sum(model.E[i, t] * model.X[i, t] for i in model.N for p in model.Plants) == model.M_flow[pipe, t] * (0.0007*model.T_supply[pipe, t]+4.1484) * (model.T_supply[pipe, t] - model.T_return[pipe, t])
+    return sum(model.E[i, t] * model.X[i] for i in model.N for p in model.Plants) == model.M_flow[pipe, t] * (0.0007*model.T_supply[pipe, t]+4.1484) * (model.T_supply[pipe, t] - model.T_return[pipe, t])
 
 model.energy_balance_constraint = Constraint(model.PowerLines, model.T, rule=energy_balance_constraint_rule)
 
@@ -226,7 +226,7 @@ def heatloss_constraint(model, i, t,pipe):
     if i == 4:
         return Constraint.Skip
     else:
-        return model.Ql[i,i+1,t] == ((((2.0*3.14*0.05*50*(model.T_supply[pipe, t]-model.T_return[pipe, t]))/math.log(0.125/0.1022))/1000))* model.X[i, t]
+        return model.Ql[i,i+1,t] == ((((2.0*3.14*0.05*50*(model.T_supply[pipe, t]-model.T_return[pipe, t]))/math.log(0.125/0.1022))/1000))* model.X[i]
 model.heatloss_constraint = Constraint(model.N, model.T, model.PowerLines, rule=heatloss_constraint)
 
 solver = SolverFactory("octeract");
@@ -234,7 +234,7 @@ results = solver.solve(model,tee=True)
 
 for t in model.T:
     for pipe in model.PowerLines:
-        print(pipe, t, model.M_flow[pipe, t].value,model.T_supply[pipe, t].value, model.T_return[pipe, t].value)
+        print(pipe, t, model.M_flow[pipe, t].value,model.T_supply[pipe, t].value, model.T_return[pipe, t].value))
 
 for i in model.N:
     print(model.E[i, 1].value, model.I[i, 1].value)
