@@ -243,3 +243,6 @@ for i in model.N:
 print(model.Ql[1,2,1].value)
 print(model.Ql[2,3,1].value)
 print(model.Ql[3,4,1].value)
+print(model.Z[1, 2])
+print(model.Z[1, 3])
+print(model.Z[3, 4])
