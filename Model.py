@@ -93,7 +93,7 @@ model.C_export = Param(model.N, model.T, initialize={
     (3, 1): 4, (3, 2): 5, (3, 3): 6,
     (4, 1): 4, (4, 2): 5, (4, 3): 6
 })
-model.P_transmission = Param(initialize=50)
+model.P_transmission = Param(initialize=100)
 
 model.Line = Param(model.N, within=model.PowerLines, initialize={
     1: 1,  # Prosumer 1 is assigned to power line 1
