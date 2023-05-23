@@ -39,7 +39,7 @@ model.Plants = Set(initialize=Plants)
 model.P_gen = Param(model.N, model.Plants, initialize={
     (1, 'Plant1'):50,(1, 'Plant2'):50,(1, 'Plant3'):50,
     (2, 'Plant1'):0,(2, 'Plant2'):0,(2, 'Plant3'):0,
-    (3, 'Plant1'):50,(3, 'Plant2'):50,(3, 'Plant3'):50,
+    (3, 'Plant1'):0,(3, 'Plant2'):0,(3, 'Plant3'):0,
     (4, 'Plant1'):50,(4, 'Plant2'):50,(4, 'Plant3'):50,
 })
 CHP_plants ={
