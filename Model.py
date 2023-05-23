@@ -234,7 +234,7 @@ results = solver.solve(model,tee=True)
 
 for t in model.T:
     for pipe in model.PowerLines:
-        print(pipe, t, model.M_flow[pipe, t].value,model.T_supply[pipe, t].value, model.T_return[pipe, t].value))
+        print(pipe, t, model.M_flow[pipe, t].value,model.T_supply[pipe, t].value, model.T_return[pipe, t].value)
 
 for i in model.N:
     print(model.E[i, 1].value, model.I[i, 1].value)
