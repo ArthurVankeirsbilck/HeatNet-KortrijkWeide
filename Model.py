@@ -127,7 +127,7 @@ M=10000
 
 # Objective Function
 def objective_rule(model):
-    return sum(model.C_gen[i, t] * model.P[p, i, t] + model.C_import[i, t] * model.I[i, t] + model.C_export[i, t] * model.E[i, t]
+    return sum(model.C_gen[i, t] * model.P[p, i, t] + model.C_import[i, t] * model.I[i, t] + model.C_export[i, t] * model.E[i, t] - model.P_el*0.4
                for i in model.N for t in model.T for p in model.Plants)
 model.objective = Objective(rule=objective_rule, sense=minimize)
 
