@@ -141,7 +141,7 @@ def import_constraint_rule(model, i, t):
 model.import_constraint = Constraint(model.N, model.T, rule=import_constraint_rule)
 
 def import_export(model, i,t):
-    return model.E[i, t]-model.I[i, t] == 0
+    return sum(model.E[i, t]-model.I[i, t] for  i in model.N) == 0
 model.import_export = Constraint(model.N, model.T, rule=import_export)
 
 
