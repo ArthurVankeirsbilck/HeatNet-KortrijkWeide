@@ -142,7 +142,7 @@ model.import_constraint = Constraint(model.N, model.T, rule=import_constraint_ru
 
 def import_export(model, i,t):
     return model.E[i, t]-model.I[i, t] == 0
-model.import_export = Constraint(model.N, model.T, import_export)
+model.import_export = Constraint(model.N, model.T, rule=import_export)
 
 
 def export_constraint_rule(model, i, t):
