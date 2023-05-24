@@ -14,17 +14,25 @@ model.I = Var(model.N, within=NonNegativeReals)
 model.E = Var(model.N, within=NonNegativeReals)
 model.p  =Var(model.N, within=NonNegativeReals)
 model.massflow  =Var(within=NonNegativeReals)
+model.Phi = Var(model.N,within=NonNegativeReals)
+model.HL = Var(model.N, within=NonNegativeReals)
 massflow = 5
 
 def objective_rule(model):
     return sum(model.Pc[i]*model.p[i] for i in model.N)
 model.objective = Objective(rule=objective_rule, sense=minimize)
 
+def heatloss(model, i):
+    if i == 1:
+        model.HL[i] == 0
+    else:
+        model.Phi[i] == 2*0.414*(((model.Tout[i-1]+model.Tr)/2)-5)
+        model.HL[i] = (model.Phi[i]*50)/(4.18*model.massflow)
 def balance_node_heatin(model, i):
     if i == 1:
         return model.Qin[i] == 0
     else:
-        return model.Qin[i] == model.massflow*4.18*((model.Tout[i-1]-5)-model.Tr)
+        return model.Qin[i] == model.massflow*4.18*((model.Tout[i-1]-model.HL[i])-model.Tr)
 
 model.balance_node_heatin = Constraint(model.N, rule=balance_node_heatin)
 
@@ -50,7 +58,7 @@ def importconstraint(model,i):
     if i == 1:
         return model.I[i] <= 0
     else:
-        return model.I[i] <=  model.massflow *4.18*((model.Tout[i-1]-5)-model.Tr)
+        return model.I[i] <=  model.massflow *4.18*((model.Tout[i-1]-model.HL[i])-model.Tr)
     
 model.importconstraint= Constraint(model.N, rule=importconstraint)
 
