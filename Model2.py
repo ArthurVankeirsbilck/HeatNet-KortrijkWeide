@@ -81,6 +81,7 @@ for i in model.N:
         print("{}:I:{}".format(i,model.I[i].value))
         print("{}:p:{}".format(i,model.p[i].value))
         print("{}:HL:{}".format(i,model.HL[i].value))
+        print("{}:Phi:{}".format(i,model.Phi[i].value))
         
 
 print(model.massflow.value)
