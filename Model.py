@@ -143,7 +143,6 @@ def import_export(model, i,t):
     return sum(model.E[i, t]-model.I[i, t] for  i in model.N) == 0
 model.import_export = Constraint(model.N, model.T, rule=import_export)
 
-
 def export_constraint_rule(model, i, t):
     return model.E[i, t] <= model.P_export[i]* model.X[i]
 model.export_constraint = Constraint(model.N, model.T, rule=export_constraint_rule)
@@ -243,6 +242,9 @@ for i in model.N:
 print(model.Ql[1,2,1].value)
 print(model.Ql[2,3,1].value)
 print(model.Ql[3,4,1].value)
+print(model.Z[1, 2].value)
+print(model.Z[1, 3].value)
+print(model.Z[3, 4].value)
 print(model.Z[1, 2].value)
 print(model.Z[1, 3].value)
 print(model.Z[3, 4].value)
