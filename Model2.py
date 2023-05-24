@@ -13,7 +13,7 @@ model.Tout = Var(model.N, within=NonNegativeReals, bounds=(50, 120))
 model.I = Var(model.N, within=NonNegativeReals)
 model.E = Var(model.N, within=NonNegativeReals)
 model.p  =Var(model.N, within=NonNegativeReals)
-model.massflow  =Var(within=NonNegativeReals)
+model.massflow  =Var(within=NonNegativeReals, bounds=(0, 5))
 model.Phi = Var(model.N,within=NonNegativeReals)
 model.HL = Var(model.N, within=NonNegativeReals)
 massflow = 5
