@@ -54,7 +54,7 @@ def importconstraint(model,i):
     
 model.importconstraint= Constraint(model.N, rule=importconstraint)
 
-solver = SolverFactory("glpk");
+solver = SolverFactory("octeract");
 results = solver.solve(model,tee=True)
 
 for i in model.N:
