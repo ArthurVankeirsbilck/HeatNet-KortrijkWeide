@@ -40,7 +40,7 @@ model.objective = Objective(rule=objective_rule, sense=minimize)
 # model.heatloss = Constraint(model.N, rule=heatloss)cal
 
 
-def balance_node_heatin(model, i):
+def balance_node_heatin(model, i,t):
     if i == 1:
         return model.Qin[i,t] == 0
     else:
@@ -48,7 +48,7 @@ def balance_node_heatin(model, i):
 
 model.balance_node_heatin = Constraint(model.N,model.T, rule=balance_node_heatin)
 
-def balance_node_heatout(model, i):
+def balance_node_heatout(model, i,t):
     if i == 1:
         return model.Qin[i,t] + model.E[i,t] == model.massflow *4.18*(model.Tout[i,t] - model.Tr)
     else: 
@@ -56,17 +56,17 @@ def balance_node_heatout(model, i):
 
 model.balance_node_heatout = Constraint(model.N,model.T, rule=balance_node_heatout)
 
-def demandconstraint(model, i):
+def demandconstraint(model, i,t):
     return model.I[i,t] - model.E[i,t] + model.p[i,t] == model.d[i,t]
 
 model.demandconstraint = Constraint(model.N,model.T, rule=demandconstraint)
 
-def productionconstraint(model,i):
+def productionconstraint(model,i,t):
     return model.p[i,t] <= model.pmax[i,t]
 
 model.productionconstraint = Constraint(model.N,model.T, rule=productionconstraint)
 
-def importconstraint(model,i):
+def importconstraint(model,i,t):
     if i == 1:
         return model.I[i,t] <= 0
     else:
