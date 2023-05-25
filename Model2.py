@@ -22,7 +22,7 @@ model.Tout = Var(model.N,model.T, within=NonNegativeReals, bounds=(50, 120))
 model.I = Var(model.N,model.T, within=NonNegativeReals)
 model.E = Var(model.N,model.T, within=NonNegativeReals)
 model.p  =Var(model.N,model.T, within=NonNegativeReals)
-model.massflow  =Var(model.T,within=NonNegativeReals, bounds=(0, 100))
+model.massflow  =Var(model.T,within=NonNegativeReals, bounds=(0, 5))
 model.Phi = Var(model.N,model.T,within=NonNegativeReals)
 model.HL = Var(model.N,model.T, within=NonNegativeReals)
 massflow = 5
@@ -44,15 +44,15 @@ def balance_node_heatin(model, i,t):
     if i == 1:
         return model.Qin[i,t] == 0
     else:
-        return model.Qin[i,t] == model.massflow[t]*4.18*(20)
+        return model.Qin[i,t] == model.massflow[t]*4.18*((model.Tout[i-1,t]-5)-model.Tr)
 
 model.balance_node_heatin = Constraint(model.N,model.T, rule=balance_node_heatin)
 
 def balance_node_heatout(model, i,t):
     if i == 1:
-        return model.Qin[i,t] + model.E[i,t] == model.massflow[t] *4.18*(20)
+        return model.Qin[i,t] + model.E[i,t] == model.massflow[t] *4.18*(model.Tout[i,t] - model.Tr)
     else: 
-        return model.Qin[i,t] - model.I[i,t] + model.E[i,t] == model.massflow[t] *4.18*(20)
+        return model.Qin[i,t] - model.I[i,t] + model.E[i,t] == model.massflow[t] *4.18*(model.Tout[i,t] - model.Tr)
 
 model.balance_node_heatout = Constraint(model.N,model.T, rule=balance_node_heatout)
 
@@ -70,7 +70,7 @@ def importconstraint(model,i,t):
     if i == 1:
         return model.I[i,t] <= 0
     else:
-        return model.I[i,t] <=  model.massflow[t] *4.18*(20)
+        return model.I[i,t] <=  model.massflow[t] *4.18*((model.Tout[i-1,t]-5)-model.Tr)
     
 model.importconstraint= Constraint(model.N,model.T, rule=importconstraint)
 
@@ -79,7 +79,7 @@ results = solver.solve(model,tee=True)
 
 for t in model.T:
     print("At time {}".format(t))
-    print(model.massflow[t].value)  
+    print(model.massflow[t].value)      
     for i in model.N:
         if i==1:
             print("{}:Tin:{}".format(i,50))
