@@ -18,7 +18,7 @@ model.d = Param(model.N, model.T,initialize={
     (3,1):200, (3,2):200, (3,3):200})
 
 model.Qin = Var(model.N,model.T, within=NonNegativeReals)
-model.Tin = Var(model.N,model.T, within=NonNegativeReals, bounds=(50, 120))
+model.Tin = Var(model.T, within=NonNegativeReals, bounds=(0, 120))
 model.Tout = Var(model.N,model.T, within=NonNegativeReals, bounds=(50, 120))
 model.I = Var(model.N,model.T, within=NonNegativeReals)
 model.E = Var(model.N,model.T, within=NonNegativeReals)
