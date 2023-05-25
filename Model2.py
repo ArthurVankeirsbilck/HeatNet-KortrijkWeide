@@ -79,6 +79,7 @@ results = solver.solve(model,tee=True)
 
 for t in model.T:
     print("At time {}".format(t))
+    print(model.massflow[t].value)  
     for i in model.N:
         if i==1:
             print("{}:Tin:{}".format(i,50))
@@ -95,4 +96,3 @@ for t in model.T:
             print("{}:I:{}".format(i,model.I[i,t].value))
             print("{}:p:{}".format(i,model.p[i,t].value)) 
 
-    print(model.massflow.value)
