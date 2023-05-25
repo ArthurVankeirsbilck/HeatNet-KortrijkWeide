@@ -27,7 +27,7 @@ def heatloss(model, i):
         return model.HL[i] == 0
     else:
         model.Phi[i] == 2*0.414*(((model.Tout[i-1]+model.Tr)/2)-5)
-        return model.HL[i] == (model.Phi[i]*50)/(4.18*model.massflow)
+        return model.HL[i]  == (model.Phi[i]*50)/(4.18*model.massflow)
 model.heatloss = Constraint(model.N, rule=heatloss)
 
 
@@ -76,6 +76,8 @@ for i in model.N:
         print("{}:E:{}".format(i,model.E[i].value))
         print("{}:I:{}".format(i,model.I[i].value))
         print("{}:p:{}".format(i,model.p[i].value))
+        print("{}:HL:{}".format(i,model.HL[i].value))
+        print("{}:Phi:{}".format(i,model.Phi[i].value))
     else:  
         print("{}:Tin:{}".format(i,model.Tout[i-1].value))
         print("{}:Tout:{}".format(i,model.Tout[i].value))
