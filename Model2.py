@@ -44,15 +44,15 @@ def balance_node_heatin(model, i,t):
     if i == 1:
         return model.Qin[i,t] == 0
     else:
-        return model.Qin[i,t] == model.massflow*4.18*((model.Tout[i-1,t]-5)-model.Tr)
+        return model.Qin[i,t] == model.massflow[t]*4.18*((model.Tout[i-1,t]-5)-model.Tr)
 
 model.balance_node_heatin = Constraint(model.N,model.T, rule=balance_node_heatin)
 
 def balance_node_heatout(model, i,t):
     if i == 1:
-        return model.Qin[i,t] + model.E[i,t] == model.massflow *4.18*(model.Tout[i,t] - model.Tr)
+        return model.Qin[i,t] + model.E[i,t] == model.massflow[t] *4.18*(model.Tout[i,t] - model.Tr)
     else: 
-        return model.Qin[i,t] - model.I[i,t] + model.E[i,t] == model.massflow *4.18*(model.Tout[i,t] - model.Tr)
+        return model.Qin[i,t] - model.I[i,t] + model.E[i,t] == model.massflow[t] *4.18*(model.Tout[i,t] - model.Tr)
 
 model.balance_node_heatout = Constraint(model.N,model.T, rule=balance_node_heatout)
 
@@ -70,7 +70,7 @@ def importconstraint(model,i,t):
     if i == 1:
         return model.I[i,t] <= 0
     else:
-        return model.I[i,t] <=  model.massflow *4.18*((model.Tout[i-1,t]-5)-model.Tr)
+        return model.I[i,t] <=  model.massflow[t] *4.18*((model.Tout[i-1,t]-5)-model.Tr)
     
 model.importconstraint= Constraint(model.N,model.T, rule=importconstraint)
 
