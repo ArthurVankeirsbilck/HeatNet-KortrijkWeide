@@ -43,7 +43,7 @@ model.objective = Objective(rule=objective_rule, sense=minimize)
 
 def balance_node_heatin(model, i,t):
     if i == 1:
-        return model.Qin[i,t] == model.massflow[t]*4.18*(Tin[t]-model.Tr)
+        return model.Qin[i,t] == model.massflow[t]*4.18*(model.Tin[t]-model.Tr)
     else:
         return model.Qin[i,t] == model.massflow[t]*4.18*((model.Tout[i-1,t]-5)-model.Tr)
 
@@ -77,7 +77,7 @@ model.importconstraint= Constraint(model.N,model.T, rule=importconstraint)
 
 def tempmixing(model,i,t):
     if t==1:
-        Tin[t] = model.massflow_return*4.18*model.Tr + model.Tout[3,t]*model.massflow[t]*4.18/(model.massflow_return*4.18 + model.model.massflow[t]*4.18)
+        model.Tin[t] = model.massflow_return*4.18*model.Tr + model.Tout[3,t]*model.massflow[t]*4.18/(model.massflow_return*4.18 + model.model.massflow[t]*4.18)
     else:
         pass
 solver = SolverFactory("octeract");
