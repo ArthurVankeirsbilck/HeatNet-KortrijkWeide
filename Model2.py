@@ -4,7 +4,7 @@ model.N = Set(initialize=[1,2,3])
 model.T = Set(initialize=[1,2,3])
 model.pmax = Param(model.N, model.T, initialize={
     (1,1):2000, (1,2):2000,(1,3):2000,
-    (2,1):100,(2,2):100,(2,4):100,
+    (2,1):100,(2,2):100,(2,3):100,
     (3,1):20, (3,2):20, (3,3):20})
 model.Pc = Param(model.N, model.T, initialize={
     (1,1):1,(1,2):1,(1,3):1,
