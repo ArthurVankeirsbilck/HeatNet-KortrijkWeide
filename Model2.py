@@ -46,7 +46,7 @@ def balance_node_heatin(model, i):
     else:
         return model.Qin[i,t] == model.massflow*4.18*((model.Tout[i-1,t]-5)-model.Tr)
 
-model.balance_node_heatin = Constraint(model.N, rule=balance_node_heatin)
+model.balance_node_heatin = Constraint(model.N,model.T, rule=balance_node_heatin)
 
 def balance_node_heatout(model, i):
     if i == 1:
@@ -54,17 +54,17 @@ def balance_node_heatout(model, i):
     else: 
         return model.Qin[i,t] - model.I[i,t] + model.E[i,t] == model.massflow *4.18*(model.Tout[i,t] - model.Tr)
 
-model.balance_node_heatout = Constraint(model.N, rule=balance_node_heatout)
+model.balance_node_heatout = Constraint(model.N,model.T, rule=balance_node_heatout)
 
 def demandconstraint(model, i):
     return model.I[i,t] - model.E[i,t] + model.p[i,t] == model.d[i,t]
 
-model.demandconstraint = Constraint(model.N, rule=demandconstraint)
+model.demandconstraint = Constraint(model.N,model.T, rule=demandconstraint)
 
 def productionconstraint(model,i):
     return model.p[i,t] <= model.pmax[i,t]
 
-model.productionconstraint = Constraint(model.N, rule=productionconstraint)
+model.productionconstraint = Constraint(model.N,model.T, rule=productionconstraint)
 
 def importconstraint(model,i):
     if i == 1:
@@ -72,7 +72,7 @@ def importconstraint(model,i):
     else:
         return model.I[i,t] <=  model.massflow *4.18*((model.Tout[i-1,t]-5)-model.Tr)
     
-model.importconstraint= Constraint(model.N, rule=importconstraint)
+model.importconstraint= Constraint(model.N,model.T, rule=importconstraint)
 
 solver = SolverFactory("octeract");
 results = solver.solve(model,tee=True)
