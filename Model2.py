@@ -11,14 +11,13 @@ model.Pc = Param(model.N, model.T, initialize={
     (2,1):10,(2,2):10,(2,3):10,
     (3,1):500, (3,2):500, (3,3):500})
 model.Tr = Param(initialize=50)
-model.massflow_return = Param(initialize=2)
 model.d = Param(model.N, model.T,initialize={
     (1,1):50,(1,2):50,(1,3):50,
     (2,1):120,(2,2):120,(2,3):120,
     (3,1):200, (3,2):200, (3,3):200})
 
 model.Qin = Var(model.N,model.T, within=NonNegativeReals)
-model.Tin = Var(model.T, within=NonNegativeReals, bounds=(0, 120))
+model.Tin = Var(model.N,model.T, within=NonNegativeReals, bounds=(50, 120))
 model.Tout = Var(model.N,model.T, within=NonNegativeReals, bounds=(50, 120))
 model.I = Var(model.N,model.T, within=NonNegativeReals)
 model.E = Var(model.N,model.T, within=NonNegativeReals)
@@ -43,17 +42,17 @@ model.objective = Objective(rule=objective_rule, sense=minimize)
 
 def balance_node_heatin(model, i,t):
     if i == 1:
-        return model.Qin[i,t] == model.massflow[t]*4.18*(model.Tin[t]-model.Tr)
+        return model.Qin[i,t] == 0
     else:
-        return model.Qin[i,t] == model.massflow[t]*4.18*((model.Tout[i-1,t]-5)-model.Tr)
+        return model.Qin[i,t] == model.massflow[t]*4.18*(20)
 
 model.balance_node_heatin = Constraint(model.N,model.T, rule=balance_node_heatin)
 
 def balance_node_heatout(model, i,t):
     if i == 1:
-        return model.Qin[i,t] + model.E[i,t] == model.massflow[t] *4.18*(model.Tout[i,t] - model.Tr)
+        return model.Qin[i,t] + model.E[i,t] == model.massflow[t] *4.18*(20)
     else: 
-        return model.Qin[i,t] - model.I[i,t] + model.E[i,t] == model.massflow[t] *4.18*(model.Tout[i,t] - model.Tr)
+        return model.Qin[i,t] - model.I[i,t] + model.E[i,t] == model.massflow[t] *4.18*(20)
 
 model.balance_node_heatout = Constraint(model.N,model.T, rule=balance_node_heatout)
 
@@ -71,15 +70,10 @@ def importconstraint(model,i,t):
     if i == 1:
         return model.I[i,t] <= 0
     else:
-        return model.I[i,t] <=  model.massflow[t] *4.18*((model.Tout[i-1,t]-5)-model.Tr)
+        return model.I[i,t] <=  model.massflow[t] *4.18*(20)
     
 model.importconstraint= Constraint(model.N,model.T, rule=importconstraint)
 
-def tempmixing(model,i,t):
-    if t==1:
-        model.Tin[t] = model.massflow_return*4.18*model.Tr + model.Tout[3,t]*model.massflow[t]*4.18/(model.massflow_return*4.18 + model.model.massflow[t]*4.18)
-    else:
-        pass
 solver = SolverFactory("octeract");
 results = solver.solve(model,tee=True)
 
