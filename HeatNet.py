@@ -51,7 +51,7 @@ model.reynolds = Constraint(model.N, model.T, rule=reynolds)
 
 def frictionfactor(model, i, t):
     if t==1:
-        Constraint.Skip()
+        return Constraint.Skip()
     else:
         return model.f[i,t] == 0.0055*(1+(2*10**4*(0.00004/0.125)+(10**6/model.Re[i,t]))**(0.33334)) 
 
