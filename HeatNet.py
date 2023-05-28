@@ -91,7 +91,7 @@ solver = SolverFactory("octeract");
 results = solver.solve(model,tee=True)
 
 for i in model.N:
-    print("dp at {}: {}".format(i,dp[i,1].value))
+    print("dp at {}: {}".format(i,model.dp[i,1].value))
     print("Friction factor at {}: {}".format(i,model.f[i,1].value))
 
     print("production at {}: {}".format(i, model.p[i,1].value))
