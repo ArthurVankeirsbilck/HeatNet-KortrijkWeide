@@ -92,8 +92,6 @@ results = solver.solve(model,tee=True)
 
 for i in model.N:
     print("dp at {}: {}".format(i,model.dp[i,1].value))
-    print("Friction factor at {}: {}".format(i,model.f[i,1].value))
-
     print("production at {}: {}".format(i, model.p[i,1].value))
     print("massflow import at {}: {}".format(i,model.m_N_im[i,1].value))
     print("massflow export at {}: {}".format(i,model.m_N_ex[i,1].value))
