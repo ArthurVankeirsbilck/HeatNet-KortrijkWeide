@@ -23,14 +23,13 @@ model.Cp = Param(initialize=4.18)
 model.rho = Param(initialize=971.8)
 model.area = Param(initialize=0.012271846)
 model.diameter = Param(initialize=0.125)
-model.dyn_visc = Param(initialize=0.000355)
-model.k = Param(initialize=0.00004)
+model.frictionfactor = Param(initialize=0.01715437)
+model.length = Param(initialize=50)
 model.I = Var(model.N, model.T, within=NonNegativeReals)
 model.E = Var(model.N, model.T, within=NonNegativeReals)
 model.m_pipe = Var(model.N, model.T, within=NonNegativeReals)
 model.v = Var(model.N, model.T, within=NonNegativeReals)
-model.Re = Var(model.N, model.T, within=NonNegativeReals)
-model.f = Var(model.N, model.T, within=NonNegativeReals)
+model.dp = Var(model.N, model.T, within=NonNegativeReals)
 model.m_N_ex = Var(model.N, model.T, within=NonNegativeReals, bounds=(0, 30))
 model.m_N_im = Var(model.N, model.T, within=NonNegativeReals, bounds=(0, 30))
 model.Z1 = Var(model.N, model.T, domain=Binary)
@@ -44,18 +43,10 @@ def speed(model, i ,t):
 
 model.speed = Constraint(model.N, model.T, rule=speed) 
 
-def reynolds(model,i,t):
-    return model.Re[i,t] == model.rho*model.v[i,t]*model.diameter/model.dyn_visc
+def pressureloss(model, i,t):
+    return model.dp[i,t] == (model.length/model.diameter) * model.frictionfactor * model.rho * (model.v[i,t]**2/2)
 
-model.reynolds = Constraint(model.N, model.T, rule=reynolds) 
-
-def frictionfactor(model, i, t):
-    if i==1:
-        return model.f[i,t] == 0
-    else:
-        return model.f[i,t] == 0.0055*(1+(2*10**4*(0.00004/0.125)+(10**6/model.Re[i,t]))**(0.33334)) 
-
-model.frictionfactor = Constraint(model.N, model.T, rule=frictionfactor) 
+model.pressureloss = Constraint(model.N, model.T, rule=pressureloss) 
 
 def demandcons(model, i, t):
     return  model.I[i,t]*model.Z1[i,t] - model.E[i,t]*model.Z2[i,t] + model.p[i,t] == model.demand[i,t]
@@ -100,9 +91,7 @@ solver = SolverFactory("octeract");
 results = solver.solve(model,tee=True)
 
 for i in model.N:
-    print("pipeflow at {}: {}".format(i,model.m_pipe[i,1].value))
-    print("pipespeed at {}: {}".format(i,model.v[i,1].value))
-    print("Reynolds at {}: {}".format(i,model.Re[i,1].value))
+    print("dp at {}: {}".format(i,dp[i,1].value))
     print("Friction factor at {}: {}".format(i,model.f[i,1].value))
 
     print("production at {}: {}".format(i, model.p[i,1].value))
