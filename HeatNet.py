@@ -93,7 +93,7 @@ def productionconstraint(model,i,t):
 
 model.productionconstraint = Constraint(model.N,model.T, rule=productionconstraint)
 
-solver = SolverFactory("gurobi");
+solver = SolverFactory("octeract");
 results = solver.solve(model,tee=True)
 
 for i in model.N:
