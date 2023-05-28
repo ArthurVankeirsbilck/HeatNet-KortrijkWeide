@@ -23,13 +23,11 @@ model.Cp = Param(initialize=4.18)
 model.rho = Param(initialize=971.8)
 model.area = Param(initialize=0.012271846)
 model.diameter = Param(initialize=0.125)
-model.frictionfactor = Param(initialize=0.01715437)
-model.length = Param(initialize=50)
 model.I = Var(model.N, model.T, within=NonNegativeReals)
 model.E = Var(model.N, model.T, within=NonNegativeReals)
 model.m_pipe = Var(model.N, model.T, within=NonNegativeReals)
 model.v = Var(model.N, model.T, within=NonNegativeReals)
-model.dp = Var(model.N, model.T, within=NonNegativeReals)
+model.dp= Var(model.N, model.T, within=NonNegativeReals)
 model.m_N_ex = Var(model.N, model.T, within=NonNegativeReals, bounds=(0, 30))
 model.m_N_im = Var(model.N, model.T, within=NonNegativeReals, bounds=(0, 30))
 model.Z1 = Var(model.N, model.T, domain=Binary)
@@ -43,8 +41,8 @@ def speed(model, i ,t):
 
 model.speed = Constraint(model.N, model.T, rule=speed) 
 
-def pressureloss(model, i,t):
-    return model.dp[i,t] == (model.length/model.diameter) * model.frictionfactor * model.rho * (model.v[i,t]**2/2)
+def pressureloss(model, i ,t):
+    return model.dp[i,t] == (50/model.diameter) * 0.01715437 * model.rho * (model.v[i,t]**2/2)
 
 model.pressureloss = Constraint(model.N, model.T, rule=pressureloss) 
 
@@ -87,11 +85,12 @@ def productionconstraint(model,i,t):
 
 model.productionconstraint = Constraint(model.N,model.T, rule=productionconstraint)
 
-solver = SolverFactory("octeract");
+solver = SolverFactory("gurobi");
 results = solver.solve(model,tee=True)
 
 for i in model.N:
-    print("dp at {}: {}".format(i,model.dp[i,1].value))
+    print("pipeflow at {}: {}".format(i,model.m_pipe[i,1].value))
+    print("pipespeed at {}: {}".format(i,model.v[i,1].value))
     print("production at {}: {}".format(i, model.p[i,1].value))
     print("massflow import at {}: {}".format(i,model.m_N_im[i,1].value))
     print("massflow export at {}: {}".format(i,model.m_N_ex[i,1].value))
