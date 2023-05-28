@@ -49,10 +49,10 @@ def reynolds(model,i,t):
 
 model.reynolds = Constraint(model.N, model.T, rule=reynolds) 
 
-# def frictionfactor(model, i, t):
-#     return model.f[i,t] == 0.0055*(1+(2*10**4*(model.k/model.diameter)+(10**6/model.Re[i,t]))**(1/3)) 
+def frictionfactor(model, i, t):
+    return model.f[i,t] == 0.0055*(1+(2*10**4*(model.k/model.diameter)+(10**6/model.Re[i,t]))**(0.33334)) 
 
-# model.frictionfactor = Constraint(model.N, model.T, rule=frictionfactor) 
+model.frictionfactor = Constraint(model.N, model.T, rule=frictionfactor) 
 
 def demandcons(model, i, t):
     return  model.I[i,t]*model.Z1[i,t] - model.E[i,t]*model.Z2[i,t] + model.p[i,t] == model.demand[i,t]
