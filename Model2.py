@@ -10,7 +10,8 @@ model.Pc = Param(model.N, model.T, initialize={
     (1,1):1,(1,2):1,(1,3):1,
     (2,1):10,(2,2):10,(2,3):10,
     (3,1):500, (3,2):500, (3,3):500})
-model.Tr = Param(initialize=50)
+model.Tr = Param(initialize=40)
+model.Ts = Param(initialize=60)
 model.d = Param(model.N, model.T,initialize={
     (1,1):50,(1,2):50,(1,3):50,
     (2,1):120,(2,2):120,(2,3):120,
@@ -18,7 +19,7 @@ model.d = Param(model.N, model.T,initialize={
 
 model.Qin = Var(model.N,model.T, within=NonNegativeReals)
 model.Tin = Var(model.N,model.T, within=NonNegativeReals, bounds=(50, 120))
-model.Tout = Var(model.N,model.T, within=NonNegativeReals, bounds=(50, 120))
+model.massflowout = Var(model.N,model.T, within=NonNegativeReals, bounds=(0, 30))
 model.I = Var(model.N,model.T, within=NonNegativeReals)
 model.E = Var(model.N,model.T, within=NonNegativeReals)
 model.p  =Var(model.N,model.T, within=NonNegativeReals)
