@@ -105,9 +105,9 @@ def pipe_flow(model, i,t):
         return model.m_pipe[i,t] == model.m_pipe[i-1,t] + model.m_N_ex[i-1,t]*model.Z2[i-1,t]  - model.m_N_im[i-1,t]*model.Z1[i-1,t]
 model.pipe_flow = Constraint(model.N, model.T, rule= pipe_flow)
 
-# def pipe_flow_cons(model, i,t):
-#     return model.m_N_im[i,t] <= model.m_pipe[i,t]
-# model.pipe_flow_cons = Constraint(model.N, model.T, rule= pipe_flow_cons)
+def pipe_flow_cons(model, i,t):
+    return model.m_N_im[i,t] <= model.m_pipe[i,t]
+model.pipe_flow_cons = Constraint(model.N, model.T, rule= pipe_flow_cons)
 
 def CHP_1(model, t, i, p):
     return model.P_el[p,i,t] - model.P_gen[i,p] - ((model.P_gen[i,p]-CHP_feasible_area(model.P_gen[i,p])[2])/(CHP_feasible_area(model.P_gen[i,p])[0]-CHP_feasible_area(model.P_gen[i,p])[1])) * (model.p[p,i,t] - CHP_feasible_area(model.P_gen[i,p])[0]) <= 0
@@ -161,7 +161,7 @@ def ramping_2(model, i,p,t):
 
 model.ramping_2 = Constraint(model.N, model.Plants, model.T, rule=ramping_2)
 
-solver = SolverFactory("gurobi");
+solver = SolverFactory("octeract");
 results = solver.solve(model,tee=True)
 
 for i in model.N:
