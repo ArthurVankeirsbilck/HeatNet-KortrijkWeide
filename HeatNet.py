@@ -182,7 +182,7 @@ def ramping_2(model, i,p,t):
 
 model.ramping_2 = Constraint(model.N, model.Plants, model.T, rule=ramping_2)
 
-solver = SolverFactory("octeract");
+solver = SolverFactory("gurobi");
 results = solver.solve(model,tee=True)
 
 for i in model.N:
