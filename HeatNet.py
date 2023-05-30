@@ -66,6 +66,8 @@ model.m_N_ex = Var(model.N, model.T, within=NonNegativeReals, bounds=(0, 30))
 model.m_N_im = Var(model.N, model.T, within=NonNegativeReals, bounds=(0, 30))
 model.Z1 = Var(model.N, model.T, domain=Binary)
 model.Z2 = Var(model.N, model.T, domain=Binary)
+model.flow1 = Var(model.T, domain=Binary)
+model.flow2 = Var(model.T, domain=Binary)
 model.p = Var(model.Plants,model.N, model.T, within=NonNegativeReals)
 
 model.obj = Objective(expr=sum(model.p[p,i,t]*model.Cgen[i]  + model.Ppump[i,t] + model.Afnamekost*model.I[i,t] for i in model.N for t in model.T for p in model.Plants), sense=minimize)
@@ -81,10 +83,8 @@ def demandcons(model, i, t):
 model.demandcons = Constraint(model.N, model.T, rule=demandcons)
 
 def importcons(model, i, t):
-    if i == 1:
-        return model.I[i,t] ==  0+ M*(1-model.PF[t])
-    elif i ==3:
-        return model.I[i,t] ==  0 + M*model.PF[t]
+    if i ==3:
+        return model.I[i,t] ==  0
     else:
         return model.I[i,t] == model.m_N_im[i,t]*model.Z1[i,t] * (model.Ts - model.Tr) * model.Cp
 
@@ -100,14 +100,26 @@ def import_exportcons(model, i, t):
 
 model.import_exportcons = Constraint(model.N, model.T, rule= import_exportcons)
 
+def flowconstraint(model, t):
+    return model.flow1[t] + model.flow2[t] == 1
+
+model.flowconstraint = Constraint(model.T, rule=flowconstraint)
+
+# def pipe_flow(model, i,t):
+#     if i == 3:
+#         return model.m_pipe[i,t] ==  0
+#     else:
+#         return model.m_pipe[3-i,t] == model.m_pipe[4-i,t] + model.m_N_ex[4-i,t]*model.Z2[4-i,t]  - model.m_N_im[4-i,t]*model.Z1[4-i,t]
+# model.pipe_flow = Constraint(model.N, model.T, rule= pipe_flow)
+
 def pipe_flow(model, i,t):
     if i == 1:
-        return model.m_pipe[i,t] ==  0 + M*(1-model.PF[t])
-    elif i == 3:
-        return model.m_pipe[i,t]*(1-model.PF[t]) ==  0 + M*model.PF[t]
+        return model.m_pipe[i,t] ==  0
+    if i == 3:
+        return model.m_pipe[i,t] ==  0
     else:
-        return model.m_pipe[i,t] == (model.m_pipe[i-1,t] + model.m_N_ex[i-1,t]*model.Z2[i-1,t]  - model.m_N_im[i-1,t]*model.Z1[i-1,t])*model.PF[t]
-        + (model.m_pipe[4-i,t] + model.m_N_ex[4-i,t]*model.Z2[4-i,t]  - model.m_N_im[4-i,t]*model.Z1[4-i,t])*(1-model.PF[t])
+        return model.m_pipe[i,t]*model.flow1[t] + model.m_pipe[3-i,t]*model.flow2[t] == (model.m_pipe[i-1,t] + model.m_N_ex[i-1,t]*model.Z2[i-1,t]  - model.m_N_im[i-1,t]*model.Z1[i-1,t])*model.flow1[t] + (model.m_pipe[4-i,t] + model.m_N_ex[4-i,t]*model.Z2[4-i,t]  - model.m_N_im[4-i,t]*model.Z1[4-i,t])*model.flow2[t]
+model.pipe_flow = Constraint(model.N, model.T, rule= pipe_flow)
 
 def pipe_flow_cons(model, i,t):
     return model.m_N_im[i,t] <= model.m_pipe[i,t]
