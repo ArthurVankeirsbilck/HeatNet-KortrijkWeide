@@ -115,7 +115,7 @@ def pipe_flow(model, i,t):
     else:
         return model.m_pipe[i,t] == (model.m_pipe[i-1,t] + model.m_N_ex[i-1,t]*model.Z2[i-1,t]  - model.m_N_im[i-1,t]*model.Z1[i-1,t])*model.PF[t] 
         + (model.m_pipe[4-i,t] + model.m_N_ex[4-i,t]*model.Z2[4-i,t]  - model.m_N_im[4-i,t]*model.Z1[4-i,t])*(1-model.PF[t])
-        
+
 model.pipe_flow = Constraint(model.N, model.T, rule= pipe_flow)
 
 # def pipe_flow(model, i,t):
@@ -182,7 +182,7 @@ def ramping_2(model, i,p,t):
 
 model.ramping_2 = Constraint(model.N, model.Plants, model.T, rule=ramping_2)
 
-solver = SolverFactory("gurobi");
+solver = SolverFactory("octeract");
 results = solver.solve(model,tee=True)
 
 for i in model.N:
