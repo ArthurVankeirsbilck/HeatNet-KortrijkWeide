@@ -303,7 +303,7 @@ print("Model type:", model_type)
 
 print("Model reading done, solving begins...")
 
-solver = SolverFactory("Cplex");
+solver = SolverFactory("cplex");
 results = solver.solve(model,tee=True)
 
 print("Model solved, writing results...")
