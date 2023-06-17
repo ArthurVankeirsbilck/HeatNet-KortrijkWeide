@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 df = pd.read_csv("Data/Energy/Gas/Temp.csv")
-    
+df_LAGO = pd.read_csv("Data/Energy/Gas/Temp_LAGO.csv")
 def conversion(start, stop, consumption, data, HV):
     list = []
     conslist = []
@@ -15,9 +15,7 @@ def conversion(start, stop, consumption, data, HV):
             
     data["HDD"] = list
     for i, row in data.iterrows():
-        cubic = (row["HDD"]/sum(list))*consumption
-        cubic2 = (cubic*3600)/HV
-        cons = ((cubic2*0.85)/HV)*1000
+        cons = ((row["HDD"]/sum(list))*consumption)*1000
         conslist.append(cons)
     
     data["Cons"] = conslist
@@ -25,25 +23,34 @@ def conversion(start, stop, consumption, data, HV):
 
 dec_Collectief = conversion(0, 744, 382.980, df, 45)
 jan_Collectief  = conversion(744, 1488, 484.581, df, 45)
-
 cons_collectief = [dec_Collectief, jan_Collectief]
 Collectief_dec_jan = pd.concat(cons_collectief)
 
+
 dec_KWEA = conversion(0, 744, 132.169, df, 45)
 jan_KWEA = conversion(744, 1488, 112.969, df, 45)
-
 cons_KWEA = [dec_KWEA, jan_KWEA]
 KWEA_dec_jan = pd.concat(cons_KWEA)
 
 dec_Penta = conversion(0, 744, 372.587, df, 45)
 jan_Penta = conversion(744, 1488, 307.188, df, 45)
-
 cons_Penta = [dec_Penta, jan_Penta]
 Penta_dec_jan = pd.concat(cons_Penta)
 
+dec_LAGO = conversion(0, 744, 377.2891, df_LAGO, 45)
+jan_LAGO = conversion(744, 1488, 362.81, df_LAGO, 45)
+cons_LAGO = [dec_LAGO, jan_LAGO]
+LAGO_dec_jan = pd.concat(cons_LAGO)
+Total  = (dec_LAGO["Cons"].sum())
+print(Total)
+dec_PTI = conversion(0, 744, 156.685, df, 45)
+jan_PTI = conversion(744, 1488, 210.532, df, 45)
+cons_PTI = [dec_PTI, jan_PTI]
+PTI_dec_jan = pd.concat(cons_PTI)
+
+
 year_Vegitec = conversion(0, 9504, 120.243, df, 45)
 
-dict = {'Collectief_dec_jan': Collectief_dec_jan["Cons"].to_list(), 'KWEA_dec_jan': KWEA_dec_jan["Cons"].to_list(), 'Penta_dec_jan': Penta_dec_jan["Cons"].to_list(), 'Vegitec_dec_jan': year_Vegitec["Cons"].iloc[0:1488].to_list()}  
+dict = {'Collectief': Collectief_dec_jan["Cons"].to_list(), 'KWEA': KWEA_dec_jan["Cons"].to_list(), 'Penta': Penta_dec_jan["Cons"].to_list(), 'Vegitec': year_Vegitec["Cons"].iloc[0:1488].to_list(), 'LAGO': LAGO_dec_jan["Cons"].to_list(), "PTI":PTI_dec_jan["Cons"].to_list()}  
 df = pd.DataFrame(dict) 
-print(df)
-df.to_csv('Consumptions.csv') 
+df.to_csv('Consumptions.csv')   
