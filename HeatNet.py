@@ -188,7 +188,7 @@ print("Reading input data done...")
 model.obj = Objective(expr=sum(model.p[p,i,t]*model.Cgen[i,p,t]  + model.Ppump[i,t]*model.Injectieprijs[t] + model.Afnamekost*model.I[i,t] - model.P_el[p,i,t]*model.Injectieprijs[t] for i in model.N for t in model.T for p in model.Plants), sense=minimize)
 
 def pumppower(model, i ,t):
-    return model.Ppump[i,t] == model.coefficients[i]*model.m_pipe[i,t] - model.intercepts[i]  
+    return model.Ppump[i,t] == (model.coefficients[i]*model.m_pipe[i,t] - model.intercepts[i])/1000  
 
 model.pumppower = Constraint(model.N, model.T, rule=pumppower) 
 
@@ -303,7 +303,7 @@ print("Model type:", model_type)
 
 print("Model reading done, solving begins...")
 
-solver = SolverFactory("cplex");
+solver = SolverFactory("gurobi", keepfiles = True);
 results = solver.solve(model,tee=True)
 
 print("Model solved, writing results...")

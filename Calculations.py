@@ -130,8 +130,8 @@ b =0.01
 lambda_i = 0.028
 du = 0.125
 ds = 0.130
-Ts = 60
-Tr = 40
+Ts = 70
+Tr = 50
 
 #############################################################################
 
@@ -154,4 +154,4 @@ def Heatloss(lamda_g, Tg, alpha, h_accent, b, lambda_i, du, ds, Ts, Tr):
     print(Phi)
     return Phi
 
-Heatloss(lamda_g, Tg, alpha, h_accent, b, lambda_i, du, ds, Ts, Tr)
+print(Heatloss(lamda_g, Tg, alpha, h_accent, b, lambda_i, du, ds, Ts, Tr))
