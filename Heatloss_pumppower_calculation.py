@@ -128,8 +128,8 @@ alpha = 1.72*(Tg-20)*0.33 #https://www.actahort.org/books/893/893_55.htm#:~:text
 h_accent = 2 + lamda_g/alpha
 b =0.01
 lambda_i = 0.028
-du = 0.125
-ds = 0.130
+du = 0.130
+ds = 0.125
 Ts = 70
 Tr = 50
 

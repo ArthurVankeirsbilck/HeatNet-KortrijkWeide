@@ -3,11 +3,6 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from itertools import zip_longest
-#Jaar 2022
-#Data voor 1 jaar 2021-2022 verbruiken, prijzen en temperatuur, nieuwe PU calculator
-#CHP PENTA 0.67, CHP KWEA 0.6
-#OF aanpassen voor kost van beide elek en heat productie
-#Data LAGO juistzetten
 
 ######################## INPUT Data ########################
 node_list = [1,2,3,4,5,6,7]
@@ -81,7 +76,7 @@ T_forward_flow = []
 T_backward_flow = []
 
 for i in range(len(demand_list_node1)-1):
-    if demand_list_node1[i] < 88888888 and demand_list_node2[i] < 88888888:
+    if demand_list_node1[i] < 525.7 and demand_list_node2[i] < 2697:
         T_forward_flow.append(i+1)
     else:
         T_backward_flow.append(i+1)

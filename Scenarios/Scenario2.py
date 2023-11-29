@@ -291,15 +291,6 @@ solver = SolverFactory("gurobi", keepfiles = True);
 results = solver.solve(model,tee=True)
 
 print("Model solved, writing results...")
-# model.P_gen = Param(model.N,model.Plants, initialize={
-#     (1, 'Plant1'): 200, (1, 'Plant2'): 0,(1, 'Plant3'): 0,
-#     (2, 'Plant1'): 2312,(2, 'Plant2'): 45,(2, 'Plant3'): 340,
-#     (3, 'Plant1'): 0,(3, 'Plant2'): 0,(3, 'Plant3'): 0,
-#     (4, 'Plant1'): 360,(4, 'Plant2'): 0,(4, 'Plant3'): 0,
-#     (5, 'Plant1'): 0,(5, 'Plant2'): 0,(5, 'Plant3'): 0,
-#     (6, 'Plant1'): 160,(6, 'Plant2'): 1440,(6, 'Plant3'): 0,
-#     (7, 'Plant1'): 1000,(7, 'Plant2'): 1000,(7, 'Plant3'): 1000
-# })
 
 productions = []
 productions_EL = []
