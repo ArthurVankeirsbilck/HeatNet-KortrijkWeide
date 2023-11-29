@@ -51,7 +51,7 @@ Alles per productie eenheid:
 
 Het bestand Heatloss_calculation.py zorgt voor de pompvermogen berekeningen van de leidingen en doordat de berekeningen omtrent pompvermogen sterke non-linear zijn word een lineaire approximatie uitgevoerd, voor elke pijpsectie word daarna als csv geoutput.
 
-![Topologie](Images\topologydhs.png)
+![Topologie](Images/topologydhs.png)
 
 #### Pompvermogen approximatie
 
