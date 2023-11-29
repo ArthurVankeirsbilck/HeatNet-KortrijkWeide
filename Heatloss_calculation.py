@@ -7,14 +7,14 @@ import math
 ############################### PIPE LENGTH ################################
 Length_1_2 = 50
 Length_2_3 = 120
-Length_3_4 = 331
-Length_4_5 = 173
+Length_3_4 = 173
+Length_4_5 = 331
 Length_5_6 = 112
 Length_6_7 = 100
 Length_7_8 = 50
 
 Length_list = [Length_1_2, Length_2_3, Length_3_4, 
-               Length_4_5, Length_5_6, Length_6_7, Length_7_8]
+               Length_4_5, Length_5_6, Length_6_7,Length_7_8]
 #############################################################################
 
 ################################# VARIABLES #################################

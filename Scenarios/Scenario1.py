@@ -3,31 +3,22 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from itertools import zip_longest
-#Jaar 2022
-#Data voor 1 jaar 2021-2022 verbruiken, prijzen en temperatuur, nieuwe PU calculator
-#CHP PENTA 0.67, CHP KWEA 0.6
-#OF aanpassen voor kost van beide elek en heat productie
-#Data LAGO juistzetten
 
 ######################## INPUT Data ########################
-node_list = [1,2,3,4,5,6,7]
+node_list = [1,2,3,4]
 Plants = ['Plant1', 'Plant2', 'Plant3']
 ############################################################
 
 ####################### CONSUMPTIONS #######################
 
-df = pd.read_csv('Data/Temperature/Consumptions.csv')
+df = pd.read_csv('..\Consumptions.csv')
 
 Times = len(df['KWEA'].values.tolist())
 time_list = list(range(1, Times))
-node_list = [1,2,3,4,5,6,7]
 demand_list_node1 = df['KWEA'].values.tolist()
-demand_list_node2 = df['PTI'].values.tolist()
-demand_list_node3 = df['KWEP'].values.tolist()
+demand_list_node2 = [0]*Times
+demand_list_node3 = df['Penta'].values.tolist()
 demand_list_node4 = df['Vegitec'].values.tolist()
-demand_list_node5 = df['QUBUS'].values.tolist()
-demand_list_node6 = df['LAGO'].values.tolist()
-demand_list_node7 = df['HangarK'].values.tolist()
 demand = {}
 
 for i in node_list:
@@ -40,33 +31,21 @@ for i in node_list:
 ########################## PRICES ##########################
 prices = {}
 
-price_list_node1_Plant1 = [0.05]*8760
-price_list_node1_Plant2 = [0.05]*8760
-price_list_node1_Plant3 = [0.05]*8760
+price_list_node1_Plant1 = [0.0861]*744 + [0.0752]*744
+price_list_node1_Plant2 = [0.0861]*744 + [0.0752]*744
+price_list_node1_Plant3 = [0.0861]*744 + [0.0752]*744
 
-price_list_node2_Plant1 = [0.05]*8760
-price_list_node2_Plant2 = [0.05]*8760
-price_list_node2_Plant3 = [0.05]*8760
+price_list_node2_Plant1 = [0.0861]*744 + [0.0752]*744
+price_list_node2_Plant2 = [0.0861]*744 + [0.0752]*744
+price_list_node2_Plant3 = [0.0861]*744 + [0.0752]*744
 
-price_list_node3_Plant1 = [0.05]*8760
-price_list_node3_Plant2 = [0.05]*8760
-price_list_node3_Plant3 = [0.05]*8760
+price_list_node3_Plant1 = [0.0861]*744 + [0.0752]*744
+price_list_node3_Plant2 = [0.0861]*744 + [0.0752]*744
+price_list_node3_Plant3 = [0.0861]*744 + [0.0752]*744
 
-price_list_node4_Plant1 = [0.05]*8760
-price_list_node4_Plant2 = [0.05]*8760
-price_list_node4_Plant3 = [0.05]*8760
-
-price_list_node5_Plant1 = [0.05]*8760
-price_list_node5_Plant2 = [0.05]*8760
-price_list_node5_Plant3 = [0.05]*8760
-
-price_list_node6_Plant1 = [0.05]*8760
-price_list_node6_Plant2 = [0.05]*8760
-price_list_node6_Plant3 = [0.05]*8760
-
-price_list_node7_Plant1 = [0.05]*8760
-price_list_node7_Plant2 = [0.05]*8760
-price_list_node7_Plant3 = [0.05]*8760
+price_list_node4_Plant1 = [0]*1488
+price_list_node4_Plant2 = [0]*1488
+price_list_node4_Plant3 = [0]*1488
 
 for i in node_list:
     for j in Plants:
@@ -76,12 +55,19 @@ for i in node_list:
 
 ############################################################
 
+###################### INJECTION PRICES ####################
+In_prices = {}
+injectieprijslijst = [0.1185]*744 + [0.12083]*744
+for time, price in zip(time_list, injectieprijslijst):
+    In_prices[(time)] = price
+############################################################
+
 #################### BACK/FORWARD FLOWS ####################
 T_forward_flow = []
 T_backward_flow = []
 
 for i in range(len(demand_list_node1)-1):
-    if demand_list_node1[i] < 88888888 and demand_list_node2[i] < 88888888:
+    if demand_list_node1[i] < 525.7 and demand_list_node2[i] < 2697:
         T_forward_flow.append(i+1)
     else:
         T_backward_flow.append(i+1)
@@ -92,7 +78,7 @@ print(len(T_backward_flow))
 
 ################## PUMPPOWER COEFFICIENTS ##################
 coefficients_LC = {}
-df_pipesegments = pd.read_csv("LinearRegression.csv")
+df_pipesegments = pd.read_csv("../LinearRegression.csv")
 coefficient_list = df_pipesegments['coefficients'].values.tolist()
 for node, d in zip(node_list, coefficient_list):
     coefficients_LC[node] = d
@@ -104,7 +90,7 @@ for node, d in zip(node_list, intercept_list):
 ############################################################
 
 CHP_plants ={
-    (1, 'Plant1'),(3, 'Plant1'), (6, 'Plant1')
+    (1, 'Plant1'),(3, 'Plant1')
 }
 
 HOB_plants ={
@@ -112,11 +98,19 @@ HOB_plants ={
     (2, 'Plant1'),(2, 'Plant2'),(2, 'Plant3'),
     (3, 'Plant2'),(3, 'Plant3'),
     (4, 'Plant1'),(4, 'Plant2'),(4, 'Plant3'),
-    (5, 'Plant1'),(5, 'Plant2'),(5, 'Plant3'),
-    (6, 'Plant2'),(6, 'Plant3'),
-    (7, 'Plant1'),(7, 'Plant2'),(7, 'Plant3')
 }
 
+def CHP_feasible_area(yA):
+    xA = 0
+    xB = round(yA*(180/247))
+    yB = round(yA*(215/247))
+    xC = round(yA*(104.8/247))
+    yC = round(yA*(81/247))
+    xD = 0
+    yD = round(yA*(81/247));
+
+    return xA, xB, yB, xC, yC, xD, yD
+    
 model = ConcreteModel()
 model.N = Set(initialize=node_list)
 model.T = Set(initialize=time_list)
@@ -129,37 +123,31 @@ model.HOB_Plants = Set(within=model.N * model.Plants, initialize=HOB_plants)
 model.demand = Param(model.N, model.T, initialize=demand)
 
 model.P_gen = Param(model.N,model.Plants, initialize={
-    (1, 'Plant1'): 478, (1, 'Plant2'): 1000,(1, 'Plant3'): 0,
-    (2, 'Plant1'): 2312,(2, 'Plant2'):   45,(2, 'Plant3'): 340,
-    (3, 'Plant1'): 384,(3, 'Plant2'): 0,(3, 'Plant3'): 0,
+    (1, 'Plant1'): 478, (1, 'Plant2'):2000,(1, 'Plant3'): 0,
+    (2, 'Plant1'): 0,(2, 'Plant2'): 0,(2, 'Plant3'): 0,
+    (3, 'Plant1'): 360,(3, 'Plant2'): 0,(3, 'Plant3'): 0,
     (4, 'Plant1'): 0,(4, 'Plant2'): 0,(4, 'Plant3'): 0,
-    (5, 'Plant1'): 0,(5, 'Plant2'): 0,(5, 'Plant3'): 0,
-    (6, 'Plant1'): 160,(6, 'Plant2'): 1440,(6, 'Plant3'): 0,
-    (7, 'Plant1'): 0,(7, 'Plant2'): 500,(7, 'Plant3'): 0
 })
 ramprate_HOB = 0.05
 model.ramp_rate = Param(model.N, model.Plants, initialize={
     (1, 'Plant1'): 0.05,(1, 'Plant2'): ramprate_HOB,(1, 'Plant3'): ramprate_HOB,
-    (2, 'Plant1'): ramprate_HOB,(2, 'Plant2'): ramprate_HOB,(2, 'Plant3'): ramprate_HOB,
-    (3, 'Plant1'): ramprate_HOB,(3, 'Plant2'):ramprate_HOB,(3, 'Plant3'): ramprate_HOB,
-    (4, 'Plant1'): 0.05,(4, 'Plant2'): ramprate_HOB,(4, 'Plant3'): ramprate_HOB,
-    (5, 'Plant1'): ramprate_HOB,(5, 'Plant2'): ramprate_HOB,(5, 'Plant3'): ramprate_HOB,
-    (6, 'Plant1'): 0.05,(6, 'Plant2'): ramprate_HOB,(6, 'Plant3'): ramprate_HOB,
-    (7, 'Plant1'): ramprate_HOB,(7, 'Plant2'): ramprate_HOB,(7, 'Plant3'): ramprate_HOB
+    (2, 'Plant1'): ramprate_HOB,(2, 'Plant2'):ramprate_HOB,(2, 'Plant3'): ramprate_HOB,
+    (3, 'Plant1'): 0.05,(3, 'Plant2'): ramprate_HOB,(3, 'Plant3'): ramprate_HOB,
+    (4, 'Plant1'): ramprate_HOB,(4, 'Plant2'): ramprate_HOB,(4, 'Plant3'): ramprate_HOB,
 })
 
-model.Injectieprijs = Param(initialize=0.16)
+model.Injectieprijs = Param(model.T, initialize=In_prices)
 model.Cgen = Param(model.N, model.Plants, model.T, initialize=prices)
 M = 1000
 model.P_el = Var(model.Plants, model.N, model.T, bounds=(0, None))
 model.kappa= Var(model.N, model.Plants,model.T, within=Binary)
-model.lengths = Param(model.N, initialize={1:50, 2:120,3:331,4:173,5:112,6:100,7:50})
+model.lengths = Param(model.N, initialize={1:50, 2:331,3:173,4:112})
 model.coefficients = Param(model.N,initialize=coefficients_LC)
 model.intercepts = Param(model.N,initialize=Intercepts_LC)
 model.Ts = Param(initialize=60)
 model.Tr = Param(initialize=40)
 model.Cp = Param(initialize=4.18)
-model.Afnamekost = Param(initialize=0.25) 
+model.Afnamekost = Param(initialize=0.03) 
 model.I = Var(model.N, model.T, within=NonNegativeReals)
 model.E = Var(model.N, model.T, within=NonNegativeReals)
 model.m_pipe = Var(model.N, model.T, within=NonNegativeReals)
@@ -170,42 +158,9 @@ model.Z1 = Var(model.N, model.T, domain=Binary)
 model.Z2 = Var(model.N, model.T, domain=Binary)
 model.p = Var(model.Plants,model.N, model.T, within=NonNegativeReals)
 
-### controleren
-model.yA = Param(model.CHP_Plants, initialize={
-    (1, 'Plant1'): 140, (3, 'Plant1'):288, (6, 'Plant1'):140
-})
-
-model.xA = Param(model.CHP_Plants, initialize={
-    (1, 'Plant1'): 0, (3, 'Plant1'):0, (6, 'Plant1'):0
-})
-
-model.xB = Param(model.CHP_Plants, initialize={
-    (1, 'Plant1'): 207, (3, 'Plant1'): 232, (6, 'Plant1'):140
-})
-
-model.yB = Param(model.CHP_Plants, initialize={
-    (1, 'Plant1'): 112, (3, 'Plant1'): 230.4, (6, 'Plant1'):112
-})
-
-model.xC = Param(model.CHP_Plants, initialize={
-    (1, 'Plant1'): 42, (3, 'Plant1'): 115.5, (6, 'Plant1'):112
-})
-
-model.yC = Param(model.CHP_Plants, initialize={
-    (1, 'Plant1'): 89.6, (3, 'Plant1'): 184.32, (6, 'Plant1'):56
-})
-
-model.xD = Param(model.CHP_Plants, initialize={
-    (1, 'Plant1'): 0, (3, 'Plant1'):0, (6, 'Plant1'):0
-})
-
-model.yD = Param(model.CHP_Plants, initialize={
-    (1, 'Plant1'): 70, (3, 'Plant1'): 144, (6, 'Plant1'):70
-})
-
 print("Reading input data done...")
 
-model.obj = Objective(expr=sum(((model.P_el[p,i,t])*(model.Cgen[i,p,t]/0.33)) + model.Ppump[i,t]*model.Afnamekost - model.P_el[p,i,t]*model.Injectieprijs for i in model.N for t in model.T for p in model.Plants), sense=minimize)
+model.obj = Objective(expr=sum((model.p[p,i,t]*model.Cgen[i,p,t])  + model.Ppump[i,t]*model.Injectieprijs[t] + model.Afnamekost*model.I[i,t] for i in model.N for t in model.T for p in model.Plants), sense=minimize)
 
 def pumppower(model, i ,t):
     return model.Ppump[i,t] == (model.coefficients[i]*model.m_pipe[i,t] - model.intercepts[i])/1000  
@@ -217,12 +172,11 @@ def demandcons(model, i, t):
         return model.I[i,t]*model.Z1[i,t] - model.E[i,t]*model.Z2[i,t] + sum(model.p[p,i,t] for p in model.Plants) == model.demand[i,t]
     else:
         return  model.I[i,t]*model.Z1[i,t] - model.E[i,t]*model.Z2[i,t] + sum(model.p[p,i,t] for p in model.Plants) == model.demand[i,t]+0.184*model.lengths[i]
-
 model.demandcons = Constraint(model.N, model.T, rule=demandcons)
 
 def importcons(model, i, t):
     if i == len(node_list):
-        return model.I[i,t] ==  0
+        return model.I[i,t] ==  0   
     else:
         return model.I[i,t] == model.m_N_im[i,t]*model.Z1[i,t] * (model.Ts - model.Tr) * model.Cp
 
@@ -264,23 +218,23 @@ def pipe_flow_cons(model, i,t):
 model.pipe_flow_cons = Constraint(model.N, model.T, rule= pipe_flow_cons)
 
 def CHP_1(model, t, i, p):
-    return model.P_el[p,i,t] - model.yA[i,p] - ((model.yA[i,p]-model.yC[i,p])/(model.xB[i,p]-model.xC[i,p])) * (model.p[p,i,t]) <= 0
+    return model.P_el[p,i,t] - model.P_gen[i,p] - ((model.P_gen[i,p]-CHP_feasible_area(model.P_gen[i,p])[2])/(CHP_feasible_area(model.P_gen[i,p])[0]-CHP_feasible_area(model.P_gen[i,p])[1])) * (model.p[p,i,t] - CHP_feasible_area(model.P_gen[i,p])[0]) <= 0
 model.CHP_1_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_1)
 
 def CHP_2(model, t, i, p):
-    return model.P_el[p,i,t] - model.yB[i,p] - ((model.yB[i,p]-model.yC[i,p])/(model.xB[i,p]-model.xC[i,p])) * (model.p[p,i,t] - model.xB[i,p]) >= M*(model.kappa[i,p,t] - 1)
+    return model.P_el[p,i,t] - CHP_feasible_area(model.P_gen[i,p])[2] - ((CHP_feasible_area(model.P_gen[i,p])[2]-CHP_feasible_area(model.P_gen[i,p])[4])/(CHP_feasible_area(model.P_gen[i,p])[1]-CHP_feasible_area(model.P_gen[i,p])[3])) * (model.p[p,i,t] - CHP_feasible_area(model.P_gen[i,p])[1]) >= M*(model.kappa[i,p,t] - 1)
 model.CHP_2_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_2)
 
 def CHP_3(model, t, i, p):
-    return model.P_el[p,i,t] - model.yC[i,p] - ((model.yC[i,p]-model.yD[i,p])/(model.xC[i,p]-model.xD[i,p])) * (model.p[p,i,t] - model.xC[i,p]) >= M*(model.kappa[i,p,t] - 1)
+    return model.P_el[p,i,t] - CHP_feasible_area(model.P_gen[i,p])[4] - ((CHP_feasible_area(model.P_gen[i,p])[4]-CHP_feasible_area(model.P_gen[i,p])[6])/(CHP_feasible_area(model.P_gen[i,p])[3]-CHP_feasible_area(model.P_gen[i,p])[5])) * (model.p[p,i,t] - CHP_feasible_area(model.P_gen[i,p])[3]) >= M*(model.kappa[i,p,t] - 1)
 model.CHP_3_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_3)
 
 def CHP_4(model, t, i, p):
-    return model.yD[i,p]*model.kappa[i,p,t] <= model.P_el[p,i,t]
+    return CHP_feasible_area(model.P_gen[i,p])[6]*model.kappa[i,p,t] <= model.P_el[p,i,t]
 model.CHP_4_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_4)
 
 def CHP_5(model, t, i, p):
-    return model.P_el[p,i,t] <= model.yA[i,p]*model.kappa[i,p,t]
+    return model.P_el[p,i,t] <= model.P_gen[i,p]*model.kappa[i,p,t]
 model.CHP_5_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_5)
 
 def CHP_6(model, t, i, p):
@@ -288,7 +242,7 @@ def CHP_6(model, t, i, p):
 model.CHP_6_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_6)
 
 def CHP_7(model, t, i, p):
-    return model.p[p,i,t] <= model.xB[i,p]*model.kappa[i,p,t]
+    return model.p[p,i,t] <= CHP_feasible_area(model.P_gen[i,p])[1]*model.kappa[i,p,t]
 model.CHP_7_constraint = Constraint(model.T, model.CHP_Plants, rule=CHP_7)
 
 def HOB_1(model, t, i, p):
