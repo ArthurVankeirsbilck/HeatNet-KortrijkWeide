@@ -145,16 +145,16 @@ model.ramp_rate = Param(model.N, model.Plants, initialize={
 
 model.Injectieprijs = Param(initialize=0.16)
 model.Cgen = Param(model.N, model.Plants, model.T, initialize=prices)
-M = 1000
-model.P_el = Var(model.Plants, model.N, model.T, bounds=(0, None))
-model.kappa= Var(model.N, model.Plants,model.T, within=Binary)
-model.lengths = Param(model.N, initialize={1:50, 2:120,3:331,4:173,5:112,6:100,7:50})
-model.coefficients = Param(model.N,initialize=coefficients_LC)
-model.intercepts = Param(model.N,initialize=Intercepts_LC)
 model.Ts = Param(initialize=60)
 model.Tr = Param(initialize=40)
 model.Cp = Param(initialize=4.18)
+model.lengths = Param(model.N, initialize={1:50, 2:120,3:331,4:173,5:112,6:100,7:50})
+model.coefficients = Param(model.N,initialize=coefficients_LC)
+model.intercepts = Param(model.N,initialize=Intercepts_LC)
 model.Afnamekost = Param(initialize=0.25) 
+
+model.P_el = Var(model.Plants, model.N, model.T, bounds=(0, None))
+model.kappa= Var(model.N, model.Plants,model.T, within=Binary)
 model.I = Var(model.N, model.T, within=NonNegativeReals)
 model.E = Var(model.N, model.T, within=NonNegativeReals)
 model.m_pipe = Var(model.N, model.T, within=NonNegativeReals)
@@ -165,7 +165,6 @@ model.Z1 = Var(model.N, model.T, domain=Binary)
 model.Z2 = Var(model.N, model.T, domain=Binary)
 model.p = Var(model.Plants,model.N, model.T, within=NonNegativeReals)
 
-### controleren
 model.yA = Param(model.CHP_Plants, initialize={
     (1, 'Plant1'): 140, (3, 'Plant1'):288, (6, 'Plant1'):140
 })
@@ -199,7 +198,7 @@ model.yD = Param(model.CHP_Plants, initialize={
 })
 
 print("Reading input data done...")
-
+M = 1000
 model.obj = Objective(expr=sum(((model.P_el[p,i,t])*(model.Cgen[i,p,t]/0.33)) + model.Ppump[i,t]*model.Afnamekost - model.P_el[p,i,t]*model.Injectieprijs for i in model.N for t in model.T for p in model.Plants), sense=minimize)
 
 def pumppower(model, i ,t):

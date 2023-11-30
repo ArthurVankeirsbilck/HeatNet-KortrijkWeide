@@ -4,6 +4,17 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from itertools import zip_longest
 
+def CHP_feasible_area(yA):
+    xA = 0
+    xB = round(yA*(180/247))
+    yB = round(yA*(215/247))
+    xC = round(yA*(104.8/247))
+    yC = round(yA*(81/247))
+    xD = 0
+    yD = round(yA*(81/247));
+
+    return xA, xB, yB, xC, yC, xD, yD
+
 ######################## INPUT Data ########################
 node_list = [1,2,3,4]
 Plants = ['Plant1', 'Plant2', 'Plant3']
@@ -99,17 +110,6 @@ HOB_plants ={
     (3, 'Plant2'),(3, 'Plant3'),
     (4, 'Plant1'),(4, 'Plant2'),(4, 'Plant3'),
 }
-
-def CHP_feasible_area(yA):
-    xA = 0
-    xB = round(yA*(180/247))
-    yB = round(yA*(215/247))
-    xC = round(yA*(104.8/247))
-    yC = round(yA*(81/247))
-    xD = 0
-    yD = round(yA*(81/247));
-
-    return xA, xB, yB, xC, yC, xD, yD
     
 model = ConcreteModel()
 model.N = Set(initialize=node_list)
