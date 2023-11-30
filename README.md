@@ -1,9 +1,18 @@
 # Gebruik model EMS DOE
+### Quickstart
+
+1. Installeren van Gurobi en conda met alle benodigde libraries.
+2. Runnen van Heatloss_pumppower_calculations.py 
+3. Runnen HeatNet.py
+
+Een meer uitgebreide uitleg kan je hieronder vinden:
+
+### Algemeen
 
 Eerst en vooral zijn er verschillende dingen nodig om het model te kunnen runnen:
 
-* Geldige solver: het model is een MQCQP model, ik raad [Gurobi](https://www.gurobi.com/academia/academic-program-and-licenses/) aan, gratis academische licentie is te verkrijgen.
-
+* Geldige solver: het model is een MQCQP model, ik raad [Gurobi](https://www.gurobi.com/academia/academic-program-and-licenses/) aan, gratis academische licentie is te verkrijgen. 
+    + Er zijn open-source solvers beschikbaar maar dit raad ik niet aan, commercieel is altijd sneller en betrouwbaarder voor grotere modellen. Beschikbare open-source solvers: [scip](https://www.scipopt.org/), [baron](https://minlp.com/baron-solver), [couenne](https://github.com/coin-or/Couenne)
 * Om gemakkelijk te werk te gaan raad ik aan om in een [Conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/windows.html) environment het model te runnen en zo duidelijk de geinstalleerde libraries en eventueel solvers op 1 plek te hebben.
 
 * Benodigde libraries:
@@ -157,7 +166,7 @@ for i in node_list:
         demand[(i, time)] = d
 ```
 
-Daarna wordt op dezelfde manier de prijzen binnengelezen en omgezet naar matrix met de juist index met enige verschil dat de prijssetting variabelen index $(i,p,t)$ hebben waar i de node, p de powerplant en t de tijd voorstellen. Dit betekend dat het mogelijk is om voor elke node en elk verschillende productieenheid bij die node een verschillende prijssetting kan gegeven worden doorheen de tijd.
+Daarna wordt op dezelfde manier de prijzen binnengelezen en omgezet naar matrix met de juist index met enige verschil dat de prijssetting variabelen index $(i,p,t)$ hebben waar i de node, p de powerplant en t de tijd voorstellen. Dit betekend dat het mogelijk is om voor elke node en elk verschillende productieenheid bij die node een verschillende prijssetting kan gegeven worden doorheen de tijd. Momenteel worden de prijzen statisch gedefinieerd als lijst en dan omgezet naar de juiste matrix, maar dit kan evengoed uit csv data maar die preprocessing moet vooraf gebeuren.
 
 ```
 for i in node_list:
@@ -272,8 +281,34 @@ model.yD = Param(model.CHP_Plants, initialize={
 })
 ``` 
 Punten zijn gedifinieerd als:
-![COnvex area CHP](Images/topologydhs.png)
+![COnvex area CHP](Images/CHP.png)
+
 ##### Model variabelen
 
-Het model bepaald de waarde van de variabelen afhankelijk hoe ze geindexeerd zijn:
+Het model bepaald de waarde van de variabelen afhankelijk hoe ze geindexeerd zijn, uitleg kan hieronder gevonden worden:
 
+```
+model.P_el = Var(model.Plants, model.N, model.T, bounds=(0, None)) (output elektriciteit voor CHP plants)
+model.kappa= Var(model.N, model.Plants,model.T, within=Binary) (binaire variabele)
+model.I = Var(model.N, model.T, within=NonNegativeReals) (warmte import voor een bepaalde node in vermogen)
+model.E = Var(model.N, model.T, within=NonNegativeReals) (warmte export voor een bepaalde node in vermogen)
+model.m_pipe = Var(model.N, model.T, within=NonNegativeReals) (massastroom door de leiding)
+model.Ppump= Var(model.N, model.T, within=NonNegativeReals) (pompvermogen benodigd om drukverlies en lengte leiding te overwinnen)
+model.m_N_ex = Var(model.N, model.T, within=NonNegativeReals) (import bij een bepaalde node in massastroom)
+model.m_N_im = Var(model.N, model.T, within=NonNegativeReals) (export bij een bepaalde node in massastroom)
+model.Z1 = Var(model.N, model.T, domain=Binary) (binaire variabele)
+model.Z2 = Var(model.N, model.T, domain=Binary) (binaire variabele)
+model.p = Var(model.Plants,model.N, model.T, within=NonNegativeReals) (warmteoutput plant)
+```
+
+Daarna staan de constraints en objective function, basically het model zelf. Hier zou ik niks aanpassen behalve moest je de dynamics van het model willen aanpassen theorie achter het model kan je hier vinden: [Overleaf](https://www.overleaf.com/read/pghtwxvxdycy#099ca2).
+
+Daarna eindigd het model met het uitschrijven van de resultaten in verschillende csv bestanden voor elke plant op elk tijdstip.
+
+### Extra Commentaar
+
+Dit model is zeker bruikbaar voor een leek maar toch wil ik nog een paar punten aanhalen:
+
+* Door de dynamiek van het systeem is dit een model die zeer _restricted_, met de momentele input is het systeem in balans en is er een _feasible_ oplossing voor het MILP probleem. Belangrijk om te begrijpen is dat wanneer de solver _infeasibility_ aantoont dat de voornaamste oorzaak een onrealistische demand voor het geinstalleerd vermogen is. Er zijn heel veel dingen te bekijken bij _infeasibility_ maar ik ga ervan uit dat het geinstalleerd vermogen vrijwel hetzelfde blijft dus raad ik aan daar niet te veel aan te passen.
+
+* Bij variabelen moeten er altijd bounds gedifined worden, anders zal de solver _unbounded_ terug geven als oplossing en is het probleem niet geconstraind en is de oplossing $-\infin$ of $\infin$.
