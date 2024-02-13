@@ -1,5 +1,5 @@
 Usage:
-- conda create -n <envname> python pip
+- conda create -n ENVNAME python pip
 - Packages needed:
 Pyomo,
 Numpy,
