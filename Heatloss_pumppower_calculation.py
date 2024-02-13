@@ -3,7 +3,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 import math
-
+import json
+with open('inputs.json', 'r') as file:
+    data = json.load(file)
 ############################### PIPE LENGTH ################################
 Length_1_2 = 50
 Length_2_3 = 120
@@ -89,11 +91,11 @@ def linear_regression(df):
 
     y_pred = regressor.predict(X)
 
-    plt.scatter(X, y, color = 'red')
-    plt.plot(X, regressor.predict(X), color = 'blue')
-    plt.xlabel('Massflows')
-    plt.ylabel('Pump Power')
-    plt.savefig('m-Ppump.png')
+    # plt.scatter(X, y, color = 'red')
+    # plt.plot(X, regressor.predict(X), color = 'blue')
+    # plt.xlabel('Massflows')
+    # plt.ylabel('Pump Power')
+    # plt.savefig('m-Ppump.png')
     return(coefficients,intercept)
 
 
@@ -106,18 +108,15 @@ for i in Length_list:
     coefficients.append(coefficient.item(0))
     intercepts.append(intercept.item(0))
 
-print(coefficients)
-print(intercepts)
+print("Coefficients:{}".format(coefficients))
+print("Intercepts:{}".format(intercepts))
      
 dict = {'coefficients': coefficients, 'intercepts': intercepts}  
        
 df = pd.DataFrame(dict) 
-df.to_csv('LinearRegression.csv')
+df.to_csv('LinearRegression_PumpPower.csv')
 
 ######################## PUMP POWER CALCULATIONS DONE ######################
-
-
-
 
 ######################## START HEATLOSS CALCULATIONS #######################
 
@@ -130,8 +129,10 @@ b =0.01
 lambda_i = 0.028
 du = 0.130
 ds = 0.125
-Ts = 70
-Tr = 50
+Ts = data["Supplytemp"]
+Tr = data["Returntemp"]
+
+print("Supply Temp. [°C]: {}, Return Temp. [°C]: {}".format(Ts, Tr))
 
 #############################################################################
 
@@ -144,14 +145,21 @@ def Heatloss(lamda_g, Tg, alpha, h_accent, b, lambda_i, du, ds, Ts, Tr):
     Ri = (1/(2*3.1415*lambda_i))*math.log(du/ds)
     #############################################################################
 
-    ######################## COMBINDED TRANSMISSION FACTOR #####################
+    ######################## COMBINED TRANSMISSION FACTOR #####################
     K = 1/(Ri+Rm)
     #############################################################################
 
     ############################## HEATLOSS PU LENGTH ###########################
     Phi = 2*K*(((Ts+Tr)/2)-Tg)
     #############################################################################
-    print(Phi)
+    print("Heatloss [W/m]: {}".format(Phi))
     return Phi
 
-print(Heatloss(lamda_g, Tg, alpha, h_accent, b, lambda_i, du, ds, Ts, Tr))
+heat_loss = Heatloss(lamda_g, Tg, alpha, h_accent, b, lambda_i, du, ds, Ts, Tr)
+
+data['heatloss'] = heat_loss
+
+with open("inputs.json", 'w') as file:
+    json.dump(data, file, indent=4)
+
+print("File updated successfully.")
