@@ -47,7 +47,7 @@ Above eq. establishes a binary relationship between the import and export variab
     \quad \forall i \in N \backslash \{1\}, t \in \tau 
 ```
 
-Above eq. ensures the continuity of mass flow rates within the DHS's pipes. It calculates the mass flow rate ($m^{DH-pipe}_{i,t}$) for each pipe segment at each node based on the flow rates of the preceding segment, export, and import variables. The equation represents the mass flow rate balance for each pipe segment between nodes and each time period. Regarding the bidirectional flow, the direction is determined based on the mass flow demand at each side of the network, the constraint consists of $i-1$ when forward flow is chosen and $i+1$ when backward flow is chosen.
+Above eq. ensures the continuity of mass flow rates within the DHS's pipes. It calculates the mass flow rate ($m^{DH-pipe}_{i,t}$) for each pipe segment at each node based on the flow rates of the preceding segment, export, and import variables. The equation represents the mass flow rate balance for each pipe segment between nodes and each time period. Regarding the bidirectional flow, the direction is determined based on the mass flow demand at each side of the network (for now only node $i \rightarrow i+1$), the constraint consists of $i-1$ when forward flow is chosen and $i+1$ when backward flow is chosen.
 
 ```math
     m^{in}_{i,t} \leq m^{DH-pipe}_{i,t} \quad \forall i \in N, t \in \tau
@@ -85,7 +85,7 @@ P^{el}_{p,i,t} - y^A_{g} - \frac{y^A_{g} - y^C_{g}}{x^B_{g} - x^C_{g}} \cdot (p_
     \quad \forall i \in N, g \in P_{CHP}, t \in \tau
 ```
 
-Similar constraints are defined for other technologies, such as Heat-Only Boiler (HOB) plants, where the electricity production is set to zero ($P^{el}_{p,i,t} = 0$) and the heat production is limited by $p^{max}_{i,p}$.
+Similar constraints are defined for other technologies, such as Heat-Only Boiler (HOB) plants, where the electricity production is set to zero ($P^{el}{p,i,t} = 0$) and the heat production is limited by $p^{max}{i,p}$.
 
 ```math
      p_{i,p,t} - p_{i,p,t-1} \leq RUR_{p,i,t} \quad \forall i \in N, p \in P, t \in \tau \setminus \{1\}
