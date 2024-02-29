@@ -23,18 +23,20 @@ Eq. \ref{OF} presents the formulation of the objective or cost function, which c
 
 The model is subject to several constraints that ensure the system operates effectively and efficiently.
 
-$$
+```math
         I_{i,t}\zeta^a_{i,t} - E_{i,t}\zeta^b_{i,t} + \sum_{p \in P} p_{i,p,t} = d_{i,t} +  HL^{pipe-segment}_{i \rightarrow i+1} \\
         \quad \forall i \in N, t \in \tau, p \in P
-\label{demand} $$
+\label{demand}
+```
+
 The demand constraint, Eq. \ref{demand}, ensures that the energy demand for each consumer at each time period is met. It calculates the net energy consumed or produced by a technology based on the import and export variables, represented by $I_{i,t}$ and $E_{i,t}$ respectively, and compares it to the corresponding energy demand $d_{i,t}$. The terms $\zeta^a_{i,t}$ and $\zeta^b_{i,t}$ are binary variables that indicate whether energy is imported or exported from or to the DHS at each node for each time period. It is evident from this constraint that the model is primarily designed to regulate heat-related aspects and does not explicitly consider electricity generation or the participants own electricity consumption. The optimization solely focuses on managing the district heating system and its associated heat dynamics.
 
-$
+```math
     I_{i,t} = m^{in}_{i,t}\zeta^a_{i,t}\Delta TC_p  \quad \forall i \in N, t \in \tau \backslash \{1\}
     \label{import}
-$
+```
 
-$
+```math
 E_{i,t} = m^{ex}_{i,t}\zeta^b_{i,t}\Delta Tc_p  \quad \forall i \in N, t \in \tau \backslash \{1\}
 \label{export}
-$
+```
