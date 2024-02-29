@@ -34,7 +34,7 @@ The demand constraint, ensures that the energy demand for each consumer at each 
 E_{i,t} = m^{ex}_{i,t}\zeta^b_{i,t}\Delta Tc_p  \quad \forall i \in N, t \in \tau \backslash \{1\}
 ```
 
-The import constraint, determines the energy import for each technology during every time period. It is derived from the mass flow rate of energy entering node $i$ $(m^{in}_{i,t})$ and the binary variable $\zeta^a{i,t}$, which indicates the presence of import. Similarly, the export constraint, Second eq. above, calculates the energy export for each technology at each time period. It calculates the export variable $E_{i,t}$ based on the mass flow rate of energy exiting the system at node $i$ ($m^{ex}_{i,t}$), the binary variable $\zeta^b{i,t}$ denoting the presence of export, and the temperature difference. The variable $m^{ex}_{i,t}$ represents the mass flow rate of energy entering the DHS.
+The import constraint, determines the energy import for each technology during every time period. It is derived from the mass flow rate of energy entering node $i$ $(m^{in}{i,t})$ and the binary variable $\zeta^a{i,t}$, which indicates the presence of import. Similarly, the export constraint, Second eq. above, calculates the energy export for each technology at each time period. It calculates the export variable $E_{i,t}$ based on the mass flow rate of energy exiting the system at node $i$ ($m^{ex}_{i,t}$), the binary variable $\zeta^b{i,t}$ denoting the presence of export, and the temperature difference. The variable $m^{ex}_{i,t}$ represents the mass flow rate of energy entering the DHS.
 
 ```math
     \zeta^a_{i,t} + \zeta^b_{i,t} = 1 \quad \forall i \in N, t \in \tau
