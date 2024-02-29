@@ -1,13 +1,7 @@
-Usage:
+## Usage
 - conda create -n ENVNAME python pip
 - Packages needed:
-Pyomo,
-Numpy,
-Matplotlib,
-Pandas,
-scikit-learn,
-Pyarrow,
-Tkinter
+Pyomo, Numpy, Matplotlib, Pandas, scikit-learn, Pyarrow, Tkinter
 
 Run via command prompt Run.Bat, results are available in \results folder after completion.
 
