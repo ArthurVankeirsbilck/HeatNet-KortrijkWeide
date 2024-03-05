@@ -1,4 +1,5 @@
 ## Usage
+
 - conda create -n ENVNAME python pip
 - Packages needed:
 Pyomo, Numpy, Matplotlib, Pandas, scikit-learn, Pyarrow, Tkinter
@@ -8,7 +9,15 @@ Run via command prompt Run.Bat, results are available in \results folder after c
 Be considerate  with the inputs please, not 100% foolproof just yet.
 
 ## Model description
+
+### Set formulations
+$N$ = set of nodes in the system;
+$P$ = set of powerplants in the system consisting of all available powerplants as of right now this is defined as $ P_{CHP} \cup P_{HOB}$;
+$\Tau$ = set of times;
+
+
 ### General
+
 The MQCQP model is designed to determine an optimal solution that not only meets the energy demand but also minimizes the overall cost of the DHS, considering the different technological options available for heat production and distribution. Through this approach, the study aims to enhance the efficiency and economic performance of prosumer LEC DHSs.
 
 ```math
@@ -58,6 +67,7 @@ Above eq. ensures that the import of energy for node technology at each time per
 Further constraints are imposed on the variables heat and electricity production variables, $p_{p,i,t}$ and $p^{el}_{p,i,t}$, to account for the characteristics of specific technologies.
 
 ### Plant models
+
 The feasible operating region of a CHP plant is assumed to be convex in terms of heat and power. The convexity of an operating area means that if the CHP can operate at two different points, it can also operate at any point on the line segment connecting them (Wang et al. (2015)). The polyhedral region consists of four CHP operating points. Points A and B represent the maximum electricity and heat generation, respectively, and their connecting segment defines the maximum fuel consumption. Points C and D represent the minimum electricity generation and heat generation, respectively, and their connecting segment defines the minimum fuel consumption. The segments between points A and D and between points B and C define the scope of operation of only electricity generation and maximum heat generation, respectively. Heat and electricity generation belong to the area within the above segments and are defined by equations presented below, M represents a sufficiently large number.
 
 The constraints ensure that the electricity production $P^{el}_{p,i,t}$ is within the allowable range and dependent on the values of the specific operating points of the CHP plants denoted by $y$ and $x$ respectively.
@@ -99,8 +109,11 @@ Similar constraints are defined for other technologies, such as Heat-Only Boiler
 To account for the ramping of power production between consecutive time steps, constraints the two above eq. are imposed.
 
 ### Pump Power and Heat loss calculations
-Arbitrary to explain the pump power and heatloss calculations, formulas used are defined below
+
+Arbitrary to explain the pump power and heatloss calculations, formulas used are defined below.
+
 #### Pump Power
+
 Linearised due to non-linear characteristics of the calculations:
 
 ```math
