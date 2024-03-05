@@ -11,9 +11,9 @@ Be considerate  with the inputs please, not 100% foolproof just yet.
 ## Model description
 
 ### Set formulations
-$N$ = set of nodes in the system;
-$P$ = set of powerplants in the system consisting of all available powerplants as of right now this is defined as $P_{CHP} \cup P_{HOB}$;
-$\Tau$ = set of times;
+- $N$ = set of nodes in the system;
+- $P$ = set of powerplants in the system consisting of all available powerplants as of right now this is defined as $P_{CHP} \cup P_{HOB}$;
+- $\Tau$ = set of times;
 
 
 ### General
